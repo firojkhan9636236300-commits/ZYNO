@@ -26,26 +26,26 @@
     }
 
     .logo {
-      font-size: 32px;
+      font-size: 34px;
       font-weight: bold;
       color: #00bfff;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
     }
 
     .hero {
       text-align: center;
-      padding: 80px 20px;
+      padding: 55px 20px 35px;
     }
 
     .hero h1 {
       font-size: 42px;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
 
     .hero p {
       color: #b9c7da;
       font-size: 18px;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     .btn {
@@ -60,30 +60,89 @@
     }
 
     .games {
-      padding: 30px 20px 60px;
+      padding: 25px 18px 60px;
       text-align: center;
     }
 
     .games h2 {
+      font-size: 28px;
       margin-bottom: 25px;
     }
 
+    /* MAIN 0-36 GAME */
+    .main-game {
+      max-width: 850px;
+      margin: 0 auto 30px;
+      padding: 35px 25px;
+      background: linear-gradient(145deg, #0b2c57, #081b38);
+      border: 2px solid #00bfff;
+      border-radius: 22px;
+      box-shadow: 0 0 25px rgba(0,191,255,0.18);
+    }
+
+    .main-game .icon {
+      font-size: 65px;
+      margin-bottom: 12px;
+    }
+
+    .main-game h3 {
+      font-size: 34px;
+      color: #00bfff;
+      margin-bottom: 10px;
+    }
+
+    .main-game p {
+      color: #b9c7da;
+      margin-bottom: 22px;
+      font-size: 17px;
+    }
+
+    /* OTHER GAMES */
+    .game-grid {
+      max-width: 900px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
     .card {
-      max-width: 420px;
-      margin: 15px auto;
-      padding: 25px;
+      padding: 25px 18px;
       background: #0b2345;
       border: 1px solid #163f70;
-      border-radius: 15px;
+      border-radius: 17px;
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      border-color: #00bfff;
+      transform: translateY(-3px);
+    }
+
+    .card .icon {
+      font-size: 42px;
+      margin-bottom: 12px;
     }
 
     .card h3 {
       color: #00bfff;
       margin-bottom: 8px;
+      font-size: 22px;
     }
 
     .card p {
       color: #aebed3;
+      margin-bottom: 18px;
+    }
+
+    .play-btn {
+      display: inline-block;
+      padding: 10px 22px;
+      background: #00bfff;
+      color: #00152b;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
     }
 
     footer {
@@ -91,6 +150,20 @@
       padding: 25px;
       color: #71839d;
       border-top: 1px solid #16345f;
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 34px;
+      }
+
+      .main-game h3 {
+        font-size: 28px;
+      }
+
+      .game-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -108,12 +181,50 @@
   </section>
 
   <section class="games" id="games">
-    <h2>Games</h2>
 
-    <div class="card">
-      <h3>Coming Soon</h3>
-      <p>New games are coming to ZYNO.</p>
+    <h2>Our Games</h2>
+
+    <!-- BIG 0-36 GAME -->
+    <div class="main-game">
+      <div class="icon">🎰</div>
+      <h3>ZYNO Roulette 0–36</h3>
+      <p>The main ZYNO roulette experience.</p>
+      <a href="#" class="play-btn">Play Now</a>
     </div>
+
+    <!-- OTHER GAMES -->
+    <div class="game-grid">
+
+      <div class="card">
+        <div class="icon">🎯</div>
+        <h3>ZYNO Roulette 0–11</h3>
+        <p>Fast and exciting ZYNO number game.</p>
+        <a href="#" class="play-btn">Play Now</a>
+      </div>
+
+      <div class="card">
+        <div class="icon">🎲</div>
+        <h3>Ludo</h3>
+        <p>Classic multiplayer board game experience.</p>
+        <a href="#" class="play-btn">Play Now</a>
+      </div>
+
+      <div class="card">
+        <div class="icon">🃏</div>
+        <h3>Teen Patti</h3>
+        <p>Enjoy the classic Indian card game.</p>
+        <a href="#" class="play-btn">Play Now</a>
+      </div>
+
+      <div class="card">
+        <div class="icon">♠️</div>
+        <h3>ZYNO Cards</h3>
+        <p>Our own original ZYNO card game.</p>
+        <a href="#" class="play-btn">Coming Soon</a>
+      </div>
+
+    </div>
+
   </section>
 
   <footer>
