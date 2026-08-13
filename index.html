@@ -1,450 +1,636 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZYNO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZYNO</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
-    body {
-      font-family: Arial, sans-serif;
-      background: #06152d;
-      color: white;
-      min-height: 100vh;
-    }
+body{
+  font-family:Arial,sans-serif;
+  background:#06152d;
+  color:white;
+  min-height:100vh;
+}
 
-    header {
-      padding: 22px;
-      text-align: center;
-      border-bottom: 1px solid #16345f;
-    }
+header{
+  padding:22px;
+  text-align:center;
+  border-bottom:1px solid #16345f;
+}
 
-    .logo {
-      font-size: 34px;
-      font-weight: bold;
-      color: #00bfff;
-      letter-spacing: 4px;
-    }
+.logo{
+  font-size:34px;
+  font-weight:bold;
+  color:#00bfff;
+  letter-spacing:4px;
+}
 
-    .hero {
-      text-align: center;
-      padding: 55px 20px 35px;
-    }
+.hero{
+  text-align:center;
+  padding:45px 20px 30px;
+}
 
-    .hero h1 {
-      font-size: 42px;
-      margin-bottom: 12px;
-    }
+.hero h1{
+  font-size:40px;
+  margin-bottom:12px;
+}
 
-    .hero p {
-      color: #b9c7da;
-      font-size: 18px;
-      margin-bottom: 25px;
-    }
+.hero p{
+  color:#b9c7da;
+  font-size:18px;
+  margin-bottom:22px;
+}
 
-    .btn,
-    .play-btn {
-      display: inline-block;
-      padding: 12px 25px;
-      background: #00bfff;
-      color: #00152b;
-      text-decoration: none;
-      border-radius: 9px;
-      font-weight: bold;
-      border: none;
-      cursor: pointer;
-    }
+.btn,
+.play-btn{
+  display:inline-block;
+  padding:12px 25px;
+  background:#00bfff;
+  color:#00152b;
+  text-decoration:none;
+  border-radius:9px;
+  font-weight:bold;
+  border:none;
+}
 
-    .games {
-      padding: 25px 18px 60px;
-      text-align: center;
-    }
+.games{
+  padding:25px 15px 60px;
+  text-align:center;
+}
 
-    .games h2 {
-      font-size: 28px;
-      margin-bottom: 25px;
-    }
+.games h2{
+  font-size:28px;
+  margin-bottom:25px;
+}
 
-    /* MAIN ROULETTE */
-    .main-game {
-      max-width: 850px;
-      margin: 0 auto 30px;
-      padding: 35px 20px;
-      background: linear-gradient(145deg, #0b2c57, #081b38);
-      border: 2px solid #00bfff;
-      border-radius: 22px;
-      box-shadow: 0 0 25px rgba(0,191,255,0.18);
-    }
+/* MAIN GAME */
 
-    .wheel-box {
-      position: relative;
-      width: 310px;
-      height: 310px;
-      margin: 0 auto 25px;
-    }
+.main-game{
+  max-width:900px;
+  margin:auto;
+  padding:30px 15px;
+  background:linear-gradient(145deg,#211238,#090b16);
+  border:2px solid #00eaff;
+  border-radius:22px;
+  box-shadow:0 0 25px rgba(0,234,255,.18);
+}
 
-    .pointer {
-      position: absolute;
-      top: -8px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
+.wheel-box{
+  position:relative;
+  width:320px;
+  height:320px;
+  margin:0 auto 25px;
+}
 
-      width: 0;
-      height: 0;
-      border-left: 12px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 28px solid #00bfff;
+.pointer{
+  position:absolute;
+  top:-9px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:20;
 
-      filter: drop-shadow(0 0 5px #00bfff);
-    }
+  width:0;
+  height:0;
 
-    .wheel {
-      width: 310px;
-      height: 310px;
-      border-radius: 50%;
-      position: relative;
+  border-left:13px solid transparent;
+  border-right:13px solid transparent;
+  border-top:30px solid #ffd34d;
 
-      background:
-  repeating-conic-gradient(
-    from 0deg,
-    #151a22 0deg 9.73deg,
-    #c5cbd3 9.73deg 19.46deg
-  );
+  filter:drop-shadow(0 0 6px #ffd34d);
+}
 
-      border: 10px solid #00eaff;
-      
-    
-      box-shadow:
-        0 0 20px rgba(0,191,255,0.6),
-        inset 0 0 20px rgba(0,0,0,0.8);
+.wheel{
+  width:320px;
+  height:320px;
+  border-radius:50%;
+  position:relative;
 
-      transition: transform 5s cubic-bezier(.12,.75,.18,1);
-    }
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      #5b267d 0deg 9.73deg,
+      #111118 9.73deg 19.46deg
+    );
 
-    .wheel::before {
-      content: "";
-      position: absolute;
-      inset: 22px;
-      border-radius: 50%;
-      border: 3px solid #00bfff;
-    }
+  border:11px solid #ffd34d;
 
-    .wheel::after {
-      content: "ZYNO";
-      position: absolute;
-      width: 78px;
-      height: 78px;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
+  box-shadow:
+    0 0 25px rgba(255,211,77,.45),
+    inset 0 0 25px rgba(0,0,0,.9);
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  transition:transform 5s cubic-bezier(.12,.75,.18,1);
+}
 
-      border-radius: 50%;
-      background: #06152d;
-      border: 4px solid #00bfff;
-      color: #00bfff;
-      font-size: 19px;
-      font-weight: bold;
-      letter-spacing: 2px;
-      box-shadow: 0 0 15px rgba(0,191,255,0.5);
-    }
+.wheel::before{
+  content:"";
+  position:absolute;
+  inset:25px;
+  border-radius:50%;
+  border:3px solid #ffd34d;
+}
 
-    .numbers {
-      position: absolute;
-      inset: 0;
-      border-radius: 50%;
-    }
+.wheel::after{
+  content:"ZYNO";
+  position:absolute;
+  width:82px;
+  height:82px;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
 
-    .number {
-      position: absolute;
-      left: 50%;
-      top: 50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-      width: 28px;
-      height: 28px;
+  border-radius:50%;
+  background:#090b16;
+  border:4px solid #00eaff;
+  color:#00eaff;
+  font-size:19px;
+  font-weight:bold;
+  letter-spacing:2px;
 
-      margin-left: -14px;
-      margin-top: -14px;
+  box-shadow:0 0 18px rgba(0,234,255,.55);
+}
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+/* NUMBERS INSIDE WHEEL */
 
-      color: white;
-      font-size: 11px;
-      font-weight: bold;
+.numbers{
+  position:absolute;
+  inset:0;
+}
 
-      transform:
-        rotate(var(--angle))
-        translateY(-127px)
-        rotate(calc(var(--angle) * -1));
-    }
+.number{
+  position:absolute;
+  left:50%;
+  top:50%;
 
-    .main-game h3 {
-      font-size: 34px;
-      color: #00bfff;
-      margin-bottom: 10px;
-    }
+  width:30px;
+  height:30px;
 
-    .main-game p {
-      color: #b9c7da;
-      margin-bottom: 20px;
-      font-size: 17px;
-    }
+  margin-left:-15px;
+  margin-top:-15px;
 
-    #spinBtn {
-      font-size: 17px;
-      min-width: 130px;
-    }
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-    #result {
-      margin-top: 18px;
-      font-size: 18px;
-      color: #00bfff;
-      font-weight: bold;
-      min-height: 22px;
-    }
+  color:#fff;
+  font-size:11px;
+  font-weight:bold;
 
-    /* OTHER GAMES */
-    .game-grid {
-      max-width: 900px;
-      margin: auto;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 18px;
-    }
+  transform:
+    rotate(var(--angle))
+    translateY(-132px)
+    rotate(calc(var(--angle) * -1));
+}
 
-    .card {
-      padding: 25px 18px;
-      background: #0b2345;
-      border: 1px solid #163f70;
-      border-radius: 17px;
-    }
+/* RESULT */
 
-    .card .icon {
-      font-size: 42px;
-      margin-bottom: 12px;
-    }
+.main-game h3{
+  font-size:32px;
+  color:#00eaff;
+  margin-bottom:8px;
+}
 
-    .card h3 {
-      color: #00bfff;
-      margin-bottom: 8px;
-      font-size: 22px;
-    }
+.main-game p{
+  color:#b9c7da;
+  margin-bottom:18px;
+}
 
-    .card p {
-      color: #aebed3;
-      margin-bottom: 18px;
-    }
+#spinBtn{
+  padding:12px 30px;
+  background:#00eaff;
+  color:#00152b;
+  border:none;
+  border-radius:9px;
+  font-size:17px;
+  font-weight:bold;
+}
 
-    footer {
-      text-align: center;
-      padding: 25px;
-      color: #71839d;
-      border-top: 1px solid #16345f;
-    }
+#result{
+  margin-top:15px;
+  min-height:24px;
+  color:#ffd34d;
+  font-weight:bold;
+}
 
-    @media (max-width: 600px) {
+/* BETTING AREA */
 
-      .hero h1 {
-        font-size: 34px;
-      }
+.bet-title{
+  margin:30px 0 12px;
+  color:#00eaff;
+  font-size:21px;
+}
 
-      .main-game h3 {
-        font-size: 28px;
-      }
+.points{
+  margin-bottom:18px;
+  color:#ffd34d;
+  font-size:18px;
+  font-weight:bold;
+}
 
-      .wheel-box,
-      .wheel {
-        width: 285px;
-        height: 285px;
-      }
+.number-grid{
+  max-width:850px;
+  margin:auto;
 
-      .number {
-        transform:
-          rotate(var(--angle))
-          translateY(-115px)
-          rotate(calc(var(--angle) * -1));
-      }
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:7px;
+}
 
-      .game-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+.bet-number{
+  min-height:58px;
+  border:1px solid #5b267d;
+  border-radius:8px;
+  background:#10121c;
+  color:white;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+
+.bet-number strong{
+  font-size:16px;
+}
+
+.bet-number small{
+  color:#ffd34d;
+  font-size:11px;
+  margin-top:4px;
+}
+
+.bet-number.active{
+  border-color:#00eaff;
+  box-shadow:0 0 10px rgba(0,234,255,.45);
+}
+
+/* OTHER GAMES */
+
+.game-grid{
+  max-width:900px;
+  margin:30px auto 0;
+
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+
+.card{
+  padding:25px 18px;
+  background:#0b2345;
+  border:1px solid #163f70;
+  border-radius:17px;
+}
+
+.card .icon{
+  font-size:42px;
+  margin-bottom:12px;
+}
+
+.card h3{
+  color:#00bfff;
+  margin-bottom:8px;
+  font-size:22px;
+}
+
+.card p{
+  color:#aebed3;
+  margin-bottom:18px;
+}
+
+footer{
+  text-align:center;
+  padding:25px;
+  color:#71839d;
+  border-top:1px solid #16345f;
+}
+
+@media(max-width:600px){
+
+  .hero h1{
+    font-size:33px;
+  }
+
+  .wheel-box,
+  .wheel{
+    width:285px;
+    height:285px;
+  }
+
+  .number{
+    transform:
+      rotate(var(--angle))
+      translateY(-117px)
+      rotate(calc(var(--angle) * -1));
+  }
+
+  .number-grid{
+    grid-template-columns:repeat(4,1fr);
+  }
+
+  .game-grid{
+    grid-template-columns:1fr;
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <header>
-    <div class="logo">ZYNO</div>
-  </header>
+<header>
+  <div class="logo">ZYNO</div>
+</header>
 
-  <section class="hero">
-    <h1>Welcome to ZYNO</h1>
-    <p>Play. Enjoy. Experience ZYNO.</p>
-    <a href="#games" class="btn">Explore Games</a>
-  </section>
+<section class="hero">
+  <h1>Welcome to ZYNO</h1>
+  <p>Play. Enjoy. Experience ZYNO.</p>
+  <a href="#games" class="btn">Explore Games</a>
+</section>
 
-  <section class="games" id="games">
+<section class="games" id="games">
 
-    <h2>Our Games</h2>
+<h2>Our Games</h2>
 
-    <!-- BIG 0-36 ROULETTE -->
-    <div class="main-game">
+<div class="main-game">
 
-      <div class="wheel-box">
+  <!-- WHEEL -->
 
-        <div class="pointer"></div>
+  <div class="wheel-box">
 
-        <div class="wheel" id="wheel">
+    <div class="pointer"></div>
 
-          <div class="numbers">
-            <span class="number" style="--angle:0deg">0</span>
-            <span class="number" style="--angle:9.73deg">1</span>
-            <span class="number" style="--angle:19.46deg">2</span>
-            <span class="number" style="--angle:29.19deg">3</span>
-            <span class="number" style="--angle:38.92deg">4</span>
-            <span class="number" style="--angle:48.65deg">5</span>
-            <span class="number" style="--angle:58.38deg">6</span>
-            <span class="number" style="--angle:68.11deg">7</span>
-            <span class="number" style="--angle:77.84deg">8</span>
-            <span class="number" style="--angle:87.57deg">9</span>
-            <span class="number" style="--angle:97.30deg">10</span>
-            <span class="number" style="--angle:107.03deg">11</span>
-            <span class="number" style="--angle:116.76deg">12</span>
-            <span class="number" style="--angle:126.49deg">13</span>
-            <span class="number" style="--angle:136.22deg">14</span>
-            <span class="number" style="--angle:145.95deg">15</span>
-            <span class="number" style="--angle:155.68deg">16</span>
-            <span class="number" style="--angle:165.41deg">17</span>
-            <span class="number" style="--angle:175.14deg">18</span>
-            <span class="number" style="--angle:184.87deg">19</span>
-            <span class="number" style="--angle:194.60deg">20</span>
-            <span class="number" style="--angle:204.33deg">21</span>
-            <span class="number" style="--angle:214.06deg">22</span>
-            <span class="number" style="--angle:223.79deg">23</span>
-            <span class="number" style="--angle:233.52deg">24</span>
-            <span class="number" style="--angle:243.25deg">25</span>
-            <span class="number" style="--angle:252.98deg">26</span>
-            <span class="number" style="--angle:262.71deg">27</span>
-            <span class="number" style="--angle:272.44deg">28</span>
-            <span class="number" style="--angle:282.17deg">29</span>
-            <span class="number" style="--angle:291.90deg">30</span>
-            <span class="number" style="--angle:301.63deg">31</span>
-            <span class="number" style="--angle:311.36deg">32</span>
-            <span class="number" style="--angle:321.09deg">33</span>
-            <span class="number" style="--angle:330.82deg">34</span>
-            <span class="number" style="--angle:340.55deg">35</span>
-            <span class="number" style="--angle:350.28deg">36</span>
-          </div>
+    <div class="wheel" id="wheel">
 
-        </div>
-      </div>
+      <div class="numbers">
 
-      <h3>ZYNO Roulette 0–36</h3>
-      <p>The main ZYNO roulette experience.</p>
+        <span class="number" style="--angle:0deg">0</span>
+        <span class="number" style="--angle:9.73deg">1</span>
+        <span class="number" style="--angle:19.46deg">2</span>
+        <span class="number" style="--angle:29.19deg">3</span>
+        <span class="number" style="--angle:38.92deg">4</span>
+        <span class="number" style="--angle:48.65deg">5</span>
+        <span class="number" style="--angle:58.38deg">6</span>
+        <span class="number" style="--angle:68.11deg">7</span>
+        <span class="number" style="--angle:77.84deg">8</span>
+        <span class="number" style="--angle:87.57deg">9</span>
+        <span class="number" style="--angle:97.30deg">10</span>
+        <span class="number" style="--angle:107.03deg">11</span>
+        <span class="number" style="--angle:116.76deg">12</span>
+        <span class="number" style="--angle:126.49deg">13</span>
+        <span class="number" style="--angle:136.22deg">14</span>
+        <span class="number" style="--angle:145.95deg">15</span>
+        <span class="number" style="--angle:155.68deg">16</span>
+        <span class="number" style="--angle:165.41deg">17</span>
+        <span class="number" style="--angle:175.14deg">18</span>
+        <span class="number" style="--angle:184.87deg">19</span>
+        <span class="number" style="--angle:194.60deg">20</span>
+        <span class="number" style="--angle:204.33deg">21</span>
+        <span class="number" style="--angle:214.06deg">22</span>
+        <span class="number" style="--angle:223.79deg">23</span>
+        <span class="number" style="--angle:233.52deg">24</span>
+        <span class="number" style="--angle:243.25deg">25</span>
+        <span class="number" style="--angle:252.98deg">26</span>
+        <span class="number" style="--angle:262.71deg">27</span>
+        <span class="number" style="--angle:272.44deg">28</span>
+        <span class="number" style="--angle:282.17deg">29</span>
+        <span class="number" style="--angle:291.90deg">30</span>
+        <span class="number" style="--angle:301.63deg">31</span>
+        <span class="number" style="--angle:311.36deg">32</span>
+        <span class="number" style="--angle:321.09deg">33</span>
+        <span class="number" style="--angle:330.82deg">34</span>
+        <span class="number" style="--angle:340.55deg">35</span>
+        <span class="number" style="--angle:350.28deg">36</span>
 
-      <button class="play-btn" id="spinBtn" onclick="spinWheel()">
-        SPIN
-      </button>
-
-      <div id="result"></div>
-
-    </div>
-
-    <!-- OTHER GAMES -->
-    <div class="game-grid">
-
-      <div class="card">
-        <div class="icon">🎯</div>
-        <h3>ZYNO Roulette 0–11</h3>
-        <p>Fast and exciting ZYNO number game.</p>
-        <a href="#" class="play-btn">Play Now</a>
-      </div>
-
-      <div class="card">
-        <div class="icon">🎲</div>
-        <h3>Ludo</h3>
-        <p>Classic multiplayer board game experience.</p>
-        <a href="#" class="play-btn">Play Now</a>
-      </div>
-
-      <div class="card">
-        <div class="icon">🃏</div>
-        <h3>Teen Patti</h3>
-        <p>Enjoy the classic Indian card game.</p>
-        <a href="#" class="play-btn">Play Now</a>
-      </div>
-
-      <div class="card">
-        <div class="icon">♠️</div>
-        <h3>ZYNO Cards</h3>
-        <p>Our own original ZYNO card game.</p>
-        <a href="#" class="play-btn">Coming Soon</a>
       </div>
 
     </div>
+  </div>
 
-  </section>
+  <h3>ZYNO Roulette 0–36</h3>
+  <p>Hold a number below to add demo points.</p>
 
-  <footer>
-    © 2026 ZYNO. All rights reserved.
-  </footer>
+  <button id="spinBtn" onclick="spinWheel()">SPIN</button>
 
-  <script>
-    let currentRotation = 0;
-    let spinning = false;
+  <div id="result"></div>
 
-    function spinWheel() {
+  <div class="bet-title">BET ON NUMBER</div>
 
-      if (spinning) return;
+  <div class="points">
+    Demo Points: <span id="balance">1000</span>
+  </div>
 
-      spinning = true;
+  <!-- BETTING NUMBERS -->
 
-      const wheel = document.getElementById("wheel");
-      const button = document.getElementById("spinBtn");
-      const result = document.getElementById("result");
+  <div class="number-grid" id="numberGrid"></div>
 
-      button.disabled = true;
-      button.textContent = "SPINNING...";
+</div>
 
-      const winningNumber = Math.floor(Math.random() * 37);
 
-      const extraSpins = 5 + Math.floor(Math.random() * 4);
-      const anglePerNumber = 360 / 37;
+<!-- OTHER GAMES -->
 
-      const targetAngle =
-        extraSpins * 360 +
-        (360 - winningNumber * anglePerNumber);
+<div class="game-grid">
 
-      currentRotation += targetAngle;
+  <div class="card">
+    <div class="icon">🎯</div>
+    <h3>ZYNO Roulette 0–11</h3>
+    <p>Fast and exciting ZYNO number game.</p>
+    <a href="#" class="play-btn">Play Now</a>
+  </div>
 
-      wheel.style.transform =
-        "rotate(" + currentRotation + "deg)";
+  <div class="card">
+    <div class="icon">🎲</div>
+    <h3>Ludo</h3>
+    <p>Classic multiplayer board game experience.</p>
+    <a href="#" class="play-btn">Play Now</a>
+  </div>
 
-      setTimeout(function() {
+  <div class="card">
+    <div class="icon">🃏</div>
+    <h3>Teen Patti</h3>
+    <p>Enjoy the classic Indian card game.</p>
+    <a href="#" class="play-btn">Play Now</a>
+  </div>
 
-        result.textContent =
-          "Result: " + winningNumber;
+  <div class="card">
+    <div class="icon">♠️</div>
+    <h3>ZYNO Cards</h3>
+    <p>Our original ZYNO card game.</p>
+    <a href="#" class="play-btn">Coming Soon</a>
+  </div>
 
-        button.disabled = false;
-        button.textContent = "SPIN";
-        spinning = false;
+</div>
 
-      }, 5200);
+</section>
+
+<footer>
+© 2026 ZYNO. All rights reserved.
+</footer>
+
+
+<script>
+
+let currentRotation = 0;
+let spinning = false;
+
+let balance = 1000;
+
+const bets = {};
+
+const numberGrid =
+  document.getElementById("numberGrid");
+
+const balanceElement =
+  document.getElementById("balance");
+
+
+/* CREATE BET NUMBERS */
+
+for(let i = 0; i <= 36; i++){
+
+  bets[i] = 0;
+
+  const button =
+    document.createElement("div");
+
+  button.className = "bet-number";
+
+  button.innerHTML =
+    "<strong>" + i + "</strong>" +
+    "<small>Bet: 0</small>";
+
+  numberGrid.appendChild(button);
+
+  let timer = null;
+  let startTime = 0;
+
+  function startBet(e){
+
+    e.preventDefault();
+
+    if(spinning) return;
+
+    if(timer !== null) return;
+
+    startTime = Date.now();
+
+    timer = setInterval(function(){
+
+      if(balance <= 0){
+        clearInterval(timer);
+        timer = null;
+        return;
+      }
+
+      balance--;
+      bets[i]++;
+
+      balanceElement.textContent = balance;
+
+      button.querySelector("small").textContent =
+        "Bet: " + bets[i];
+
+      button.classList.add("active");
+
+    },500);
+  }
+
+  function stopBet(){
+
+    if(timer !== null){
+
+      clearInterval(timer);
+      timer = null;
     }
-  </script>
+  }
+
+  button.addEventListener(
+    "pointerdown",
+    startBet
+  );
+
+  button.addEventListener(
+    "pointerup",
+    stopBet
+  );
+
+  button.addEventListener(
+    "pointercancel",
+    stopBet
+  );
+
+  button.addEventListener(
+    "pointerleave",
+    stopBet
+  );
+}
+
+
+/* SPIN */
+
+function spinWheel(){
+
+  if(spinning) return;
+
+  spinning = true;
+
+  const wheel =
+    document.getElementById("wheel");
+
+  const button =
+    document.getElementById("spinBtn");
+
+  const result =
+    document.getElementById("result");
+
+  button.disabled = true;
+  button.textContent = "SPINNING...";
+
+  const winningNumber =
+    Math.floor(Math.random() * 37);
+
+  const extraSpins =
+    5 + Math.floor(Math.random() * 4);
+
+  const anglePerNumber =
+    360 / 37;
+
+  const targetAngle =
+    extraSpins * 360 +
+    (360 - winningNumber * anglePerNumber);
+
+  currentRotation += targetAngle;
+
+  wheel.style.transform =
+    "rotate(" + currentRotation + "deg)";
+
+  setTimeout(function(){
+
+    result.textContent =
+      "Result: " + winningNumber;
+
+    button.disabled = false;
+    button.textContent = "SPIN";
+
+    spinning = false;
+
+  },5200);
+}
+
+</script>
 
 </body>
 </html>
