@@ -360,52 +360,81 @@ footer{
   }
 
   .main-game{
-    padding-left:6px;
-    padding-right:6px;
+    width:100%;
+    padding-left:5px;
+    padding-right:5px;
+    overflow:hidden;
   }
 
-  .wheel-box,
+  .wheel-box{
+    width:225px;
+    height:225px;
+    margin:0 auto 20px;
+  }
+
   .wheel{
-    width:265px;
-    height:265px;
+    width:225px;
+    height:225px;
   }
 
   .number{
-    width:23px;
-    height:23px;
-    margin-left:-11.5px;
-    margin-top:-11.5px;
+    width:20px;
+    height:20px;
 
-    font-size:8px;
+    margin-left:-10px;
+    margin-top:-10px;
+
+    font-size:7px;
 
     transform:
       rotate(var(--angle))
-      translateY(-108px)
+      translateY(-91px)
       rotate(calc(var(--angle) * -1));
   }
 
-  .wheel::after{
-    width:64px;
-    height:64px;
-    font-size:15px;
+  .wheel::before{
+    inset:16px;
+    border-width:2px;
   }
 
-  .wheel::before{
-    inset:19px;
+  .wheel::after{
+    width:55px;
+    height:55px;
+
+    font-size:13px;
+    border-width:3px;
+  }
+
+  .pointer{
+    top:-6px;
+
+    border-left-width:9px;
+    border-right-width:9px;
+    border-top-width:20px;
   }
 
   .number-grid{
     grid-template-columns:repeat(4,1fr);
     gap:6px;
+    width:100%;
   }
 
   .bet-number{
     min-height:54px;
   }
 
+  .bet-number strong{
+    font-size:14px;
+  }
+
+  .bet-number small{
+    font-size:9px;
+  }
+
   .game-grid{
     grid-template-columns:1fr;
   }
+
 }
 </style>
 </head>
