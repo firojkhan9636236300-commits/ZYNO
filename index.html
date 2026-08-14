@@ -35,9 +35,7 @@ body{
 }
 
 
-/* =========================
-   GAME BOX
-========================= */
+/* GAME BOX */
 
 .game-box{
     position:relative;
@@ -62,14 +60,11 @@ body{
 }
 
 
-/* =========================
-   BETTING TIME
-========================= */
+/* BETTING TIME */
 
 .betting-time{
     text-align:center;
-    margin:0;
-    padding:4px 0 5px;
+    padding:4px 0 7px;
 }
 
 .betting-title{
@@ -81,11 +76,8 @@ body{
 
 .timer-big{
     color:#ffd34e;
-
     font-size:34px;
-
     line-height:1;
-
     font-weight:bold;
 
     text-shadow:
@@ -95,19 +87,18 @@ body{
 }
 
 
-/* =========================
-   WHEEL
-========================= */
+/* WHEEL AREA */
 
 .wheel-area{
     display:flex;
-
     justify-content:center;
-
     align-items:center;
 
-    padding:4px 0 8px;
+    padding:4px 0 9px;
 }
+
+
+/* WHEEL */
 
 .wheel{
     width:min(57vw,245px);
@@ -130,16 +121,17 @@ body{
         0 0 0 3px #513814,
         0 0 24px rgba(255,211,78,.35),
         inset 0 0 30px #000;
+
+    transform:rotate(0deg);
+
+    will-change:transform;
 }
 
 
-/* =========================
-   INNER RING
-========================= */
+/* INNER RING */
 
 .wheel-ring{
     position:absolute;
-
     inset:15%;
 
     border-radius:50%;
@@ -152,9 +144,7 @@ body{
 }
 
 
-/* =========================
-   ZYNO CENTER
-========================= */
+/* CENTER */
 
 .wheel-center{
     position:absolute;
@@ -174,29 +164,39 @@ body{
     border:5px solid #00e5ff;
 
     display:flex;
-
     align-items:center;
     justify-content:center;
 
     color:#00e5ff;
 
     font-size:13px;
-
     font-weight:bold;
-
     letter-spacing:1px;
+
+    text-align:center;
 
     box-shadow:
         0 0 17px rgba(0,229,255,.35),
         inset 0 0 13px #000;
 
-    z-index:3;
+    z-index:10;
+}
+
+.wheel-center.win{
+    color:#ffd34e;
+
+    border-color:#ffd34e;
+
+    font-size:18px;
+
+    line-height:1.1;
+
+    text-shadow:
+        0 0 12px rgba(255,211,78,.7);
 }
 
 
-/* =========================
-   WHEEL NUMBERS
-========================= */
+/* WHEEL NUMBERS */
 
 .wheel-number{
     position:absolute;
@@ -205,14 +205,12 @@ body{
     height:17px;
 
     display:flex;
-
     align-items:center;
     justify-content:center;
 
     color:#fff;
 
     font-size:8px;
-
     font-weight:bold;
 
     text-shadow:0 2px 3px #000;
@@ -223,9 +221,7 @@ body{
 }
 
 
-/* =========================
-   POINTER
-========================= */
+/* POINTER */
 
 .pointer{
     position:absolute;
@@ -239,9 +235,7 @@ body{
     height:0;
 
     border-left:8px solid transparent;
-
     border-right:8px solid transparent;
-
     border-top:18px solid #ffd34e;
 
     filter:
@@ -249,30 +243,25 @@ body{
             0 0 6px rgba(255,211,78,.7)
         );
 
-    z-index:8;
+    z-index:20;
 }
 
 
-/* =========================
-   INFO
-========================= */
+/* INFO */
 
 .info{
     display:grid;
 
-    grid-template-columns:
-        repeat(3,1fr);
+    grid-template-columns:repeat(3,1fr);
 
     gap:4px;
 
     margin-top:2px;
-
     margin-bottom:7px;
 }
 
 .info-box{
-    background:
-        rgba(8,12,30,.85);
+    background:rgba(8,12,30,.85);
 
     border:1px solid #31415f;
 
@@ -285,7 +274,6 @@ body{
 
 .info-title{
     color:#9daec5;
-
     font-size:7px;
 }
 
@@ -300,9 +288,7 @@ body{
 }
 
 
-/* =========================
-   NUMBER SECTION
-========================= */
+/* NUMBER SECTION */
 
 .number-section{
     margin-top:0;
@@ -325,16 +311,13 @@ body{
 .number-grid{
     display:grid;
 
-    grid-template-columns:
-        repeat(6,1fr);
+    grid-template-columns:repeat(6,1fr);
 
     gap:3px;
 }
 
 
-/* =========================
-   NUMBER BOX
-========================= */
+/* NUMBER */
 
 .number{
     min-height:38px;
@@ -344,7 +327,6 @@ body{
     display:flex;
 
     align-items:center;
-
     justify-content:center;
 
     position:relative;
@@ -353,16 +335,15 @@ body{
 
     font-weight:bold;
 
-    border:1px solid
-        rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.15);
 
     cursor:pointer;
 
     user-select:none;
 
-    transition:.15s;
+    transition:.1s;
 
-    touch-action:manipulation;
+    touch-action:none;
 
     overflow:hidden;
 }
@@ -380,33 +361,25 @@ body{
 }
 
 
-/* =========================
-   SELECTED NUMBER
-========================= */
+/* PRESSED NUMBER */
 
-.number.selected{
-    border:2px solid #00e5ff;
+.number.pressed{
+    border:2px solid #ffd34e;
 
     box-shadow:
-        0 0 0 2px
-        rgba(0,229,255,.15),
-
-        0 0 12px
-        rgba(0,229,255,.8);
+        0 0 0 2px rgba(255,211,78,.15),
+        0 0 15px rgba(255,211,78,.8);
 
     transform:scale(.94);
 }
 
 
-/* =========================
-   BET COUNT ON NUMBER
-========================= */
+/* BET COUNT */
 
 .bet-count{
     position:absolute;
 
     top:2px;
-
     right:3px;
 
     color:#ffd34e;
@@ -417,8 +390,7 @@ body{
 
     line-height:1;
 
-    background:
-        rgba(0,0,0,.55);
+    background:rgba(0,0,0,.65);
 
     border-radius:3px;
 
@@ -428,9 +400,7 @@ body{
 }
 
 
-/* =========================
-   SELECTED BET
-========================= */
+/* SELECTED BET */
 
 .selected-bet{
     margin-top:7px;
@@ -460,15 +430,12 @@ body{
 }
 
 
-/* =========================
-   GAME BUTTONS
-========================= */
+/* GAME BUTTONS */
 
 .game-buttons{
     display:grid;
 
-    grid-template-columns:
-        repeat(3,1fr);
+    grid-template-columns:repeat(3,1fr);
 
     gap:4px;
 
@@ -496,8 +463,7 @@ body{
     font-weight:bold;
 
     box-shadow:
-        0 0 10px
-        rgba(0,229,255,.12);
+        0 0 10px rgba(0,229,255,.12);
 
     cursor:pointer;
 
@@ -509,9 +475,7 @@ body{
 }
 
 
-/* =========================
-   RESULT
-========================= */
+/* RESULT */
 
 .result{
     text-align:center;
@@ -528,9 +492,7 @@ body{
 }
 
 
-/* =========================
-   SMALL PHONE
-========================= */
+/* SMALL PHONE */
 
 @media(max-width:350px){
 
@@ -542,31 +504,26 @@ body{
     .wheel-number{
         width:16px;
         height:16px;
-
         font-size:7px;
     }
 
     .number{
         min-height:36px;
-
         font-size:10px;
     }
 
     .game-button{
         font-size:8px;
-
         min-height:38px;
     }
 
     .timer-big{
         font-size:31px;
     }
-
 }
 
 </style>
 </head>
-
 
 <body>
 
@@ -575,9 +532,7 @@ body{
 <div class="game-box">
 
 
-<!-- =========================
-     BETTING TIME
-========================= -->
+<!-- BETTING TIME -->
 
 <div class="betting-time">
 
@@ -594,9 +549,7 @@ body{
 </div>
 
 
-<!-- =========================
-     WHEEL
-========================= -->
+<!-- WHEEL -->
 
 <div class="wheel-area">
 
@@ -608,8 +561,12 @@ body{
 
     <div class="wheel-ring"></div>
 
-    <div class="wheel-center">
+    <div
+        class="wheel-center"
+        id="wheelCenter">
+
         ZYNO
+
     </div>
 
 </div>
@@ -617,12 +574,9 @@ body{
 </div>
 
 
-<!-- =========================
-     INFO
-========================= -->
+<!-- INFO -->
 
 <div class="info">
-
 
 <div class="info-box">
 
@@ -633,7 +587,9 @@ body{
     <div
         class="info-value"
         id="balance">
+
         10000
+
     </div>
 
 </div>
@@ -648,7 +604,9 @@ body{
     <div
         class="info-value"
         id="timer">
+
         60
+
     </div>
 
 </div>
@@ -663,7 +621,9 @@ body{
     <div
         class="info-value"
         id="lastWin">
+
         0
+
     </div>
 
 </div>
@@ -671,16 +631,15 @@ body{
 </div>
 
 
-<!-- =========================
-     NUMBERS
-========================= -->
+<!-- NUMBERS -->
 
 <div class="number-section">
 
 <div class="number-title">
-    SELECT NUMBER 0 - 36
-</div>
 
+    SELECT NUMBER 0 - 36
+
+</div>
 
 <div
     class="number-grid"
@@ -690,9 +649,7 @@ body{
 </div>
 
 
-<!-- =========================
-     SELECTED BET
-========================= -->
+<!-- SELECTED BET -->
 
 <div
     class="selected-bet"
@@ -703,12 +660,9 @@ body{
 </div>
 
 
-<!-- =========================
-     OTHER GAMES
-========================= -->
+<!-- OTHER GAMES -->
 
 <div class="game-buttons">
-
 
 <button
     class="game-button"
@@ -736,7 +690,6 @@ body{
 
 </button>
 
-
 </div>
 
 
@@ -759,7 +712,7 @@ body{
 <script>
 
 /* =========================
-   GAME VARIABLES
+   VARIABLES
 ========================= */
 
 let balance = 10000;
@@ -772,7 +725,15 @@ let timeLeft = 60;
 
 let spinning = false;
 
-let bettingInterval = null;
+let roundRunning = true;
+
+let pressTimer = null;
+
+let pressStart = 0;
+
+let currentBetDiv = null;
+
+let wheelRotation = 0;
 
 
 /* =========================
@@ -790,7 +751,7 @@ const redNumbers = [
 
 
 /* =========================
-   NUMBER GRID
+   ELEMENTS
 ========================= */
 
 const numberGrid =
@@ -798,46 +759,47 @@ const numberGrid =
         "numberGrid"
     );
 
+const wheel =
+    document.getElementById(
+        "wheel"
+    );
+
+const wheelCenter =
+    document.getElementById(
+        "wheelCenter"
+    );
+
+
+/* =========================
+   NUMBER GRID
+========================= */
 
 for(let i = 0; i <= 36; i++){
 
     const div =
         document.createElement("div");
 
-
-    div.classList.add(
-        "number"
-    );
+    div.classList.add("number");
 
 
     if(i === 0){
 
-        div.classList.add(
-            "zero"
-        );
+        div.classList.add("zero");
 
     }
-
     else if(
         redNumbers.includes(i)
     ){
 
-        div.classList.add(
-            "red"
-        );
+        div.classList.add("red");
 
     }
-
     else{
 
-        div.classList.add(
-            "black"
-        );
+        div.classList.add("black");
 
     }
 
-
-    /* NUMBER TEXT */
 
     const numberText =
         document.createElement("span");
@@ -849,16 +811,13 @@ for(let i = 0; i <= 36; i++){
     );
 
 
-    /* BET COUNT */
-
     const betCount =
         document.createElement("span");
 
     betCount.className =
         "bet-count";
 
-    betCount.textContent =
-        "";
+    betCount.textContent = "";
 
     div.appendChild(
         betCount
@@ -866,121 +825,74 @@ for(let i = 0; i <= 36; i++){
 
 
     /* =========================
-       NUMBER TAP
+       PRESS DOWN
     ========================= */
 
-    div.onclick = function(){
+    div.addEventListener(
+        "pointerdown",
+        function(e){
 
-        if(spinning){
+            e.preventDefault();
 
-            return;
+            if(spinning) return;
 
-        }
+            if(!roundRunning) return;
 
-
-        /*
-           PURANE SELECTED NUMBER
-           KO UNSELECT KARO
-        */
-
-        document
-            .querySelectorAll(".number")
-            .forEach(function(n){
-
-                n.classList.remove(
-                    "selected"
-                );
-
-            });
-
-
-        /*
-           NUMBER SELECT
-        */
-
-        div.classList.add(
-            "selected"
-        );
-
-
-        selectedNumber = i;
-
-        totalBet = 0;
-
-
-        /*
-           IS NUMBER KA PURANA
-           BET COUNT RESET
-        */
-
-        betCount.textContent =
-            "";
-
-
-        /*
-           PURANA TIMER STOP
-        */
-
-        if(bettingInterval){
-
-            clearInterval(
-                bettingInterval
+            startHolding(
+                i,
+                div,
+                betCount
             );
 
-            bettingInterval = null;
+        }
+    );
+
+
+    /* =========================
+       PRESS UP
+    ========================= */
+
+    div.addEventListener(
+        "pointerup",
+        function(e){
+
+            e.preventDefault();
+
+            stopHolding();
 
         }
+    );
 
 
-        /*
-           FIRST POINT
-           IMMEDIATELY
-        */
+    div.addEventListener(
+        "pointercancel",
+        function(){
 
-        placeOnePointBet();
+            stopHolding();
 
-
-        /*
-           HAR 0.25 SECOND
-           1 POINT
-        */
-
-        bettingInterval =
-            setInterval(function(){
-
-                if(spinning){
-
-                    clearInterval(
-                        bettingInterval
-                    );
-
-                    bettingInterval =
-                        null;
-
-                    return;
-
-                }
+        }
+    );
 
 
-                if(timeLeft <= 0){
+    div.addEventListener(
+        "pointerleave",
+        function(){
 
-                    clearInterval(
-                        bettingInterval
-                    );
+            /*
+               Agar finger number se
+               bahar chala gaya to stop
+            */
 
-                    bettingInterval =
-                        null;
+            if(
+                pressTimer !== null
+            ){
 
-                    return;
+                stopHolding();
 
-                }
+            }
 
-
-                placeOnePointBet();
-
-            },250);
-
-    };
+        }
+    );
 
 
     numberGrid.appendChild(
@@ -991,30 +903,159 @@ for(let i = 0; i <= 36; i++){
 
 
 /* =========================
+   START HOLDING
+========================= */
+
+function startHolding(
+    number,
+    div,
+    betCount
+){
+
+    stopHolding();
+
+
+    selectedNumber = number;
+
+    currentBetDiv = div;
+
+    totalBet = 0;
+
+
+    /*
+       SAB NUMBER KI
+       PRESSED CLASS HATAO
+    */
+
+    document
+        .querySelectorAll(".number")
+        .forEach(function(n){
+
+            n.classList.remove(
+                "pressed"
+            );
+
+        });
+
+
+    div.classList.add(
+        "pressed"
+    );
+
+
+    /*
+       PEHLA POINT
+       PRESS KARTE HI
+    */
+
+    placeOnePointBet(
+        betCount
+    );
+
+
+    /*
+       HAR 0.25 SECOND
+       1 POINT
+    */
+
+    pressStart =
+        Date.now();
+
+
+    pressTimer =
+        setInterval(function(){
+
+            if(!roundRunning){
+
+                stopHolding();
+
+                return;
+
+            }
+
+
+            if(spinning){
+
+                stopHolding();
+
+                return;
+
+            }
+
+
+            if(timeLeft <= 0){
+
+                stopHolding();
+
+                return;
+
+            }
+
+
+            placeOnePointBet(
+                betCount
+            );
+
+        },250);
+
+}
+
+
+/* =========================
+   STOP HOLDING
+========================= */
+
+function stopHolding(){
+
+    if(pressTimer !== null){
+
+        clearInterval(
+            pressTimer
+        );
+
+        pressTimer = null;
+
+    }
+
+
+    if(currentBetDiv){
+
+        currentBetDiv.classList.remove(
+            "pressed"
+        );
+
+    }
+
+    currentBetDiv = null;
+
+}
+
+
+/* =========================
    ONE POINT BET
 ========================= */
 
-function placeOnePointBet(){
+function placeOnePointBet(
+    betCount
+){
 
-    const betAmount = 1;
-
-
-    if(selectedNumber === null){
+    if(
+        selectedNumber === null
+    ){
 
         return;
 
     }
 
 
-    if(balance < betAmount){
+    if(balance < 1){
 
         document
             .getElementById("result")
             .textContent =
             "💰 Balance khatam ho gaya";
 
-
-        stopAutomaticBetting();
+        stopHolding();
 
         return;
 
@@ -1022,23 +1063,23 @@ function placeOnePointBet(){
 
 
     /*
-       BALANCE MINUS
+       1 POINT MINUS
     */
 
     balance =
-        balance - betAmount;
+        balance - 1;
 
 
     /*
-       TOTAL BET PLUS
+       TOTAL BET
     */
 
     totalBet =
-        totalBet + betAmount;
+        totalBet + 1;
 
 
     /*
-       BALANCE DISPLAY
+       BALANCE UPDATE
     */
 
     document
@@ -1048,37 +1089,19 @@ function placeOnePointBet(){
 
 
     /*
-       SELECTED NUMBER FIND
+       BET COUNT
     */
 
-    const selectedDiv =
-        document
-            .querySelectorAll(".number")[selectedNumber];
+    if(betCount){
 
-
-    /*
-       BET COUNT DISPLAY
-    */
-
-    if(selectedDiv){
-
-        const betCount =
-            selectedDiv.querySelector(
-                ".bet-count"
-            );
-
-        if(betCount){
-
-            betCount.textContent =
-                "BET " + totalBet;
-
-        }
+        betCount.textContent =
+            "BET " + totalBet;
 
     }
 
 
     /*
-       SELECTED BET MESSAGE
+       SELECTED BET
     */
 
     document
@@ -1111,27 +1134,22 @@ function placeOnePointBet(){
    WHEEL NUMBERS
 ========================= */
 
-const wheel =
-    document.getElementById(
-        "wheel"
-    );
-
-
 for(let i = 0; i <= 36; i++){
 
     const number =
-        document.createElement(
-            "div"
-        );
-
+        document.createElement("div");
 
     number.className =
         "wheel-number";
 
-
     number.textContent =
         i;
 
+
+    /*
+       37 NUMBERS
+       CIRCLE ME
+    */
 
     const angle =
         (i * 360 / 37) - 90;
@@ -1141,7 +1159,9 @@ for(let i = 0; i <= 36; i++){
 
 
     const angleRad =
-        angle * Math.PI / 180;
+        angle *
+        Math.PI /
+        180;
 
 
     const x =
@@ -1158,7 +1178,6 @@ for(let i = 0; i <= 36; i++){
 
     number.style.left =
         x + "%";
-
 
     number.style.top =
         y + "%";
@@ -1179,82 +1198,143 @@ for(let i = 0; i <= 36; i++){
    STOP BETTING
 ========================= */
 
-function stopAutomaticBetting(){
+function lockBetting(){
 
-    if(bettingInterval){
+    roundRunning = false;
 
-        clearInterval(
-            bettingInterval
-        );
-
-        bettingInterval =
-            null;
-
-    }
+    stopHolding();
 
 }
 
 
 /* =========================
-   AUTO ROUND
+   SPIN WHEEL
 ========================= */
 
-function finishRound(){
+function spinWheel(){
 
-    if(spinning){
-
-        return;
-
-    }
-
-
-    stopAutomaticBetting();
-
-
-    if(selectedNumber === null){
-
-        document
-            .getElementById("result")
-            .textContent =
-            "Koi number select nahi hua";
-
-        return;
-
-    }
-
-
-    if(totalBet <= 0){
-
-        document
-            .getElementById("result")
-            .textContent =
-            "Bet nahi lagi";
-
-        return;
-
-    }
-
+    if(spinning) return;
 
     spinning = true;
+
+    roundRunning = false;
+
+    stopHolding();
+
+
+    /*
+       WINNING NUMBER
+    */
+
+    const winningNumber =
+        Math.floor(
+            Math.random() * 37
+        );
+
+
+    /*
+       37 SEGMENTS
+    */
+
+    const segment =
+        360 / 37;
+
+
+    /*
+       NUMBER 0 KI POSITION
+       TOP POINTER KE PASS HAI
+    */
+
+    const targetAngle =
+        winningNumber * segment;
+
+
+    /*
+       EXTRA FULL ROTATIONS
+    */
+
+    const extraSpins =
+        6 * 360;
+
+
+    /*
+       FINAL ROTATION
+
+       Wheel ko aise ghumaya
+       jayega ki winning number
+       pointer ke neeche aaye.
+    */
+
+    const finalRotation =
+        wheelRotation +
+        extraSpins +
+        (360 - targetAngle);
+
+
+    wheel.style.transition =
+        "transform 4.5s cubic-bezier(.12,.72,.18,1)";
+
+    wheel.style.transform =
+        "rotate(" +
+        finalRotation +
+        "deg)";
+
+
+    wheelRotation =
+        finalRotation;
 
 
     document
         .getElementById("result")
         .textContent =
-        "🎡 Result aa raha hai...";
+        "🎡 Wheel ghoom raha hai...";
 
+
+    /*
+       SPIN COMPLETE
+    */
 
     setTimeout(function(){
 
-        const winningNumber =
-            Math.floor(
-                Math.random() * 37
-            );
+        showWinningNumber(
+            winningNumber
+        );
+
+    },4600);
+
+}
 
 
-        /* =========================
-           WIN
-        ========================== */
+/* =========================
+   SHOW WINNING NUMBER
+========================= */
+
+function showWinningNumber(
+    winningNumber
+){
+
+    /*
+       WIN NUMBER CENTER
+    */
+
+    wheelCenter.classList.add(
+        "win"
+    );
+
+
+    wheelCenter.innerHTML =
+        "WIN<br>" +
+        winningNumber;
+
+
+    /*
+       CHECK PLAYER BET
+    */
+
+    if(
+        selectedNumber !== null &&
+        totalBet > 0
+    ){
 
         if(
             winningNumber ===
@@ -1280,13 +1360,17 @@ function finishRound(){
 
 
             document
-                .getElementById("lastWin")
+                .getElementById(
+                    "lastWin"
+                )
                 .textContent =
                 winAmount;
 
 
             document
-                .getElementById("result")
+                .getElementById(
+                    "result"
+                )
                 .textContent =
                 "🎉 WIN! Number " +
                 winningNumber +
@@ -1296,21 +1380,20 @@ function finishRound(){
 
         }
 
-
-        /* =========================
-           LOSS
-        ========================== */
-
         else{
 
             document
-                .getElementById("lastWin")
+                .getElementById(
+                    "lastWin"
+                )
                 .textContent =
                 "0";
 
 
             document
-                .getElementById("result")
+                .getElementById(
+                    "result"
+                )
                 .textContent =
                 "Number " +
                 winningNumber +
@@ -1320,46 +1403,70 @@ function finishRound(){
 
         }
 
-
-        /*
-           BALANCE UPDATE
-        */
+    }
+    else{
 
         document
-            .getElementById("balance")
+            .getElementById(
+                "lastWin"
+            )
             .textContent =
-            balance;
+            "0";
+
+
+        document
+            .getElementById(
+                "result"
+            )
+            .textContent =
+            "Winning Number: " +
+            winningNumber;
+
+    }
+
+
+    /*
+       BALANCE UPDATE
+    */
+
+    document
+        .getElementById("balance")
+        .textContent =
+        balance;
+
+
+    /*
+       4 SECOND WIN DISPLAY
+    */
+
+    setTimeout(function(){
+
+        wheelCenter.classList.remove(
+            "win"
+        );
+
+        wheelCenter.innerHTML =
+            "ZYNO";
 
 
         /*
-           RESET
+           RESET BET
         */
 
         totalBet = 0;
 
         selectedNumber = null;
 
-        spinning = false;
-
-
-        /*
-           SELECTED REMOVE
-        */
-
         document
             .querySelectorAll(".number")
             .forEach(function(n){
 
                 n.classList.remove(
-                    "selected"
+                    "pressed"
                 );
 
             });
 
-
-        /*
-           BET COUNTS CLEAR
-        */
 
         document
             .querySelectorAll(".bet-count")
@@ -1371,12 +1478,48 @@ function finishRound(){
 
 
         document
-            .getElementById("selectedBet")
+            .getElementById(
+                "selectedBet"
+            )
             .textContent =
             "Number select karo";
 
 
-    },1200);
+        /*
+           NEXT ROUND
+        */
+
+        timeLeft = 60;
+
+        document
+            .getElementById(
+                "timer"
+            )
+            .textContent =
+            "60";
+
+
+        document
+            .getElementById(
+                "bigTimer"
+            )
+            .textContent =
+            "60";
+
+
+        spinning = false;
+
+        roundRunning = true;
+
+
+        document
+            .getElementById(
+                "result"
+            )
+            .textContent =
+            "Number select karo";
+
+    },4000);
 
 }
 
@@ -1387,37 +1530,69 @@ function finishRound(){
 
 setInterval(function(){
 
+    /*
+       AGAR WHEEL SPIN HO RAHA HAI
+       TO TIMER STOP
+    */
+
+    if(spinning){
+
+        return;
+
+    }
+
+
+    /*
+       BETTING TIME
+    */
+
     if(timeLeft > 0){
 
         timeLeft--;
 
     }
 
-    else{
 
-        finishRound();
+    /*
+       TIMER DISPLAY
+    */
 
+    document
+        .getElementById(
+            "timer"
+        )
+        .textContent =
+        timeLeft;
+
+
+    document
+        .getElementById(
+            "bigTimer"
+        )
+        .textContent =
+        timeLeft;
+
+
+    /*
+       0 PAR WHEEL SPIN
+    */
+
+    if(timeLeft === 0){
+
+        lockBetting();
+
+        /*
+           Thoda sa pause
+           phir wheel spin
+        */
 
         setTimeout(function(){
 
-            timeLeft = 60;
+            spinWheel();
 
-        },1300);
+        },300);
 
     }
-
-
-    document
-        .getElementById("timer")
-        .textContent =
-        timeLeft;
-
-
-    document
-        .getElementById("bigTimer")
-        .textContent =
-        timeLeft;
-
 
 },1000);
 
