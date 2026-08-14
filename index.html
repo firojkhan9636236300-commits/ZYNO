@@ -83,7 +83,8 @@ body{
     justify-content:center;
     align-items:center;
 
-    padding:0 0 5px;
+    /* WHEEL THODA SA NEECHE */
+    padding:12px 0 5px;
 }
 
 
@@ -139,7 +140,7 @@ body{
 
 
 /* =========================
-   CENTER / WINNING NUMBER
+   CENTER
 ========================= */
 
 .wheel-center{
@@ -182,7 +183,9 @@ body{
 }
 
 
-/* WIN NUMBER */
+/* =========================
+   WIN NUMBER
+========================= */
 
 .wheel-center.win{
     color:#ffd34e;
@@ -261,7 +264,7 @@ body{
 ========================= */
 
 .number-section{
-    margin-top:0;
+    margin-top:4px;
 }
 
 .number-title{
@@ -377,34 +380,61 @@ body{
 
 
 /* =========================
-   BETTING TIME
-   NOW BELOW NUMBERS
+   BETTING TIME / TOP INFO
 ========================= */
 
 .betting-time{
-    text-align:center;
+    display:grid;
 
-    padding:8px 0 5px;
+    grid-template-columns:1fr 1fr 1fr;
+
+    align-items:center;
+
+    gap:5px;
+
+    padding:6px 3px 7px;
 
     margin-top:5px;
 
     border-top:1px solid rgba(0,229,255,.15);
+
+    border-bottom:1px solid rgba(0,229,255,.12);
 }
 
-.betting-title{
+.info-box{
+    text-align:center;
+
+    min-width:0;
+}
+
+.info-title{
     color:#c1bfd7;
 
-    font-size:12px;
-
-    letter-spacing:1px;
+    font-size:9px;
 
     font-weight:bold;
+
+    letter-spacing:.5px;
+
+    white-space:nowrap;
+}
+
+.info-value{
+    color:#ffd34e;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    margin-top:3px;
+
+    white-space:nowrap;
 }
 
 .timer-big{
     color:#ffd34e;
 
-    font-size:34px;
+    font-size:30px;
 
     line-height:1;
 
@@ -414,6 +444,61 @@ body{
         0 0 18px rgba(255,211,78,.35);
 
     margin-top:3px;
+}
+
+
+/* =========================
+   LAST 4 WIN NUMBERS
+========================= */
+
+.last-numbers{
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:3px;
+
+    margin-top:3px;
+
+    min-height:20px;
+}
+
+.last-number{
+    width:20px;
+    height:20px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    border-radius:50%;
+
+    background:#090b12;
+
+    border:1px solid #00e5ff;
+
+    color:#fff;
+
+    font-size:8px;
+
+    font-weight:bold;
+
+    flex-shrink:0;
+}
+
+.last-number.red{
+    background:#542049;
+}
+
+.last-number.black{
+    background:#090b12;
+}
+
+.last-number.zero{
+    background:#078b67;
 }
 
 
@@ -546,7 +631,22 @@ body{
     }
 
     .timer-big{
-        font-size:31px;
+        font-size:27px;
+    }
+
+    .info-title{
+        font-size:8px;
+    }
+
+    .info-value{
+        font-size:14px;
+    }
+
+    .last-number{
+        width:18px;
+        height:18px;
+
+        font-size:7px;
     }
 
 }
@@ -609,25 +709,77 @@ body{
 
 
 <!-- =========================
-     BETTING TIME
-     BELOW NUMBERS
+     BALANCE / TIMER / LAST 4
 ========================= -->
 
 <div class="betting-time">
 
-    <div class="betting-title">
 
-        BETTING TIME
+    <!-- BALANCE -->
+
+    <div class="info-box">
+
+        <div class="info-title">
+
+            BALANCE
+
+        </div>
+
+        <div
+            class="info-value"
+            id="balanceDisplay">
+
+            10000
+
+        </div>
 
     </div>
 
-    <div
-        class="timer-big"
-        id="bigTimer">
 
-        60
+    <!-- BETTING TIMER -->
+
+    <div class="info-box">
+
+        <div class="info-title">
+
+            BETTING TIME
+
+        </div>
+
+        <div
+            class="timer-big"
+            id="bigTimer">
+
+            60
+
+        </div>
 
     </div>
+
+
+    <!-- LAST 4 WIN -->
+
+    <div class="info-box">
+
+        <div class="info-title">
+
+            LAST 4 WIN
+
+        </div>
+
+        <div
+            class="last-numbers"
+            id="lastNumbers">
+
+            <span class="last-number">-</span>
+            <span class="last-number">-</span>
+            <span class="last-number">-</span>
+            <span class="last-number">-</span>
+
+        </div>
+
+    </div>
+
 
 </div>
 
@@ -724,6 +876,17 @@ let currentBetDiv = null;
 let wheelRotation = 0;
 
 
+/*
+   LAST 4 COMPLETED WINNING NUMBERS
+
+   IMPORTANT:
+   Newest number will be shown
+   on the RIGHT side.
+*/
+
+let lastWinningNumbers = [];
+
+
 /* =========================
    RED NUMBERS
 ========================= */
@@ -772,6 +935,147 @@ const selectedBet =
         "selectedBet"
     );
 
+const balanceDisplay =
+    document.getElementById(
+        "balanceDisplay"
+    );
+
+const lastNumbers =
+    document.getElementById(
+        "lastNumbers"
+    );
+
+
+/* =========================
+   BALANCE DISPLAY
+========================= */
+
+function updateBalance(){
+
+    balanceDisplay.textContent =
+        balance.toLocaleString();
+
+}
+
+
+/* =========================
+   LAST 4 WINNING NUMBERS
+========================= */
+
+function addWinningNumber(number){
+
+    /*
+       NEW NUMBER END MEIN ADD HOGA
+
+       Isliye latest winning number
+       RIGHT SIDE par rahega.
+    */
+
+    lastWinningNumbers.push(number);
+
+
+    /*
+       SIRF LAST 4 RAKHNE HAIN
+    */
+
+    if(
+        lastWinningNumbers.length > 4
+    ){
+
+        lastWinningNumbers.shift();
+
+    }
+
+
+    /*
+       DISPLAY CLEAR
+    */
+
+    lastNumbers.innerHTML = "";
+
+
+    /*
+       PURANE SE NAYA
+       LEFT -> RIGHT
+    */
+
+    lastWinningNumbers.forEach(
+        function(num){
+
+            const span =
+                document.createElement(
+                    "span"
+                );
+
+            span.className =
+                "last-number";
+
+
+            if(num === 0){
+
+                span.classList.add(
+                    "zero"
+                );
+
+            }
+            else if(
+                redNumbers.includes(num)
+            ){
+
+                span.classList.add(
+                    "red"
+                );
+
+            }
+            else{
+
+                span.classList.add(
+                    "black"
+                );
+
+            }
+
+
+            span.textContent =
+                num;
+
+
+            lastNumbers.appendChild(
+                span
+            );
+
+        }
+    );
+
+
+    /*
+       4 SE KAM HAIN TO
+       EMPTY PLACEHOLDER
+    */
+
+    while(
+        lastNumbers.children.length < 4
+    ){
+
+        const span =
+            document.createElement(
+                "span"
+            );
+
+        span.className =
+            "last-number";
+
+        span.textContent =
+            "-";
+
+        lastNumbers.appendChild(
+            span
+        );
+
+    }
+
+}
+
 
 /* =========================
    NUMBER GRID
@@ -780,34 +1084,47 @@ const selectedBet =
 for(let i = 0; i <= 36; i++){
 
     const div =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
-    div.classList.add("number");
+    div.classList.add(
+        "number"
+    );
 
 
     if(i === 0){
 
-        div.classList.add("zero");
+        div.classList.add(
+            "zero"
+        );
 
     }
     else if(
         redNumbers.includes(i)
     ){
 
-        div.classList.add("red");
+        div.classList.add(
+            "red"
+        );
 
     }
     else{
 
-        div.classList.add("black");
+        div.classList.add(
+            "black"
+        );
 
     }
 
 
     const numberText =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
-    numberText.textContent = i;
+    numberText.textContent =
+        i;
 
     div.appendChild(
         numberText
@@ -815,12 +1132,15 @@ for(let i = 0; i <= 36; i++){
 
 
     const betCount =
-        document.createElement("span");
+        document.createElement(
+            "span"
+        );
 
     betCount.className =
         "bet-count";
 
-    betCount.textContent = "";
+    betCount.textContent =
+        "";
 
     div.appendChild(
         betCount
@@ -921,11 +1241,14 @@ function startHolding(
     stopHolding();
 
 
-    selectedNumber = number;
+    selectedNumber =
+        number;
 
-    currentBetDiv = div;
+    currentBetDiv =
+        div;
 
-    totalBet = 0;
+    totalBet =
+        0;
 
 
     /*
@@ -933,14 +1256,18 @@ function startHolding(
     */
 
     document
-        .querySelectorAll(".number")
-        .forEach(function(n){
+        .querySelectorAll(
+            ".number"
+        )
+        .forEach(
+            function(n){
 
-            n.classList.remove(
-                "pressed"
-            );
+                n.classList.remove(
+                    "pressed"
+                );
 
-        });
+            }
+        );
 
 
     div.classList.add(
@@ -964,40 +1291,43 @@ function startHolding(
     */
 
     pressTimer =
-        setInterval(function(){
+        setInterval(
+            function(){
 
-            if(!roundRunning){
+                if(!roundRunning){
 
-                stopHolding();
+                    stopHolding();
 
-                return;
+                    return;
 
-            }
-
-
-            if(spinning){
-
-                stopHolding();
-
-                return;
-
-            }
+                }
 
 
-            if(timeLeft <= 0){
+                if(spinning){
 
-                stopHolding();
+                    stopHolding();
 
-                return;
+                    return;
 
-            }
+                }
 
 
-            placeOnePointBet(
-                betCount
-            );
+                if(timeLeft <= 0){
 
-        },250);
+                    stopHolding();
+
+                    return;
+
+                }
+
+
+                placeOnePointBet(
+                    betCount
+                );
+
+            },
+            250
+        );
 
 }
 
@@ -1008,13 +1338,16 @@ function startHolding(
 
 function stopHolding(){
 
-    if(pressTimer !== null){
+    if(
+        pressTimer !== null
+    ){
 
         clearInterval(
             pressTimer
         );
 
-        pressTimer = null;
+        pressTimer =
+            null;
 
     }
 
@@ -1027,7 +1360,8 @@ function stopHolding(){
 
     }
 
-    currentBetDiv = null;
+    currentBetDiv =
+        null;
 
 }
 
@@ -1070,6 +1404,13 @@ function placeOnePointBet(
 
 
     /*
+       UPDATE BALANCE
+    */
+
+    updateBalance();
+
+
+    /*
        TOTAL BET
     */
 
@@ -1084,7 +1425,8 @@ function placeOnePointBet(
     if(betCount){
 
         betCount.textContent =
-            "BET " + totalBet;
+            "BET " +
+            totalBet;
 
     }
 
@@ -1122,7 +1464,9 @@ function placeOnePointBet(
 for(let i = 0; i <= 36; i++){
 
     const number =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
     number.className =
         "wheel-number";
@@ -1139,7 +1483,8 @@ for(let i = 0; i <= 36; i++){
         (i * 360 / 37) - 90;
 
 
-    const radius = 39;
+    const radius =
+        39;
 
 
     const angleRad =
@@ -1184,7 +1529,8 @@ for(let i = 0; i <= 36; i++){
 
 function lockBetting(){
 
-    roundRunning = false;
+    roundRunning =
+        false;
 
     stopHolding();
 
@@ -1199,9 +1545,11 @@ function spinWheel(){
 
     if(spinning) return;
 
-    spinning = true;
+    spinning =
+        true;
 
-    roundRunning = false;
+    roundRunning =
+        false;
 
     stopHolding();
 
@@ -1229,7 +1577,8 @@ function spinWheel(){
     */
 
     const targetAngle =
-        winningNumber * segment;
+        winningNumber *
+        segment;
 
 
     /*
@@ -1271,13 +1620,16 @@ function spinWheel(){
        SPIN COMPLETE
     */
 
-    setTimeout(function(){
+    setTimeout(
+        function(){
 
-        showWinningNumber(
-            winningNumber
-        );
+            showWinningNumber(
+                winningNumber
+            );
 
-    },4600);
+        },
+        4600
+    );
 
 }
 
@@ -1291,8 +1643,19 @@ function showWinningNumber(
 ){
 
     /*
-       WIN NUMBER
-       CENTER MEIN
+       AB SPIN COMPLETE HO CHUKA HAI
+
+       IS NUMBER KO LAST 4 WIN MEIN
+       ADD KARNA SAFE HAI.
+    */
+
+    addWinningNumber(
+        winningNumber
+    );
+
+
+    /*
+       WIN NUMBER CENTER MEIN
     */
 
     wheelCenter.classList.add(
@@ -1337,6 +1700,9 @@ function showWinningNumber(
                 totalPayout;
 
 
+            updateBalance();
+
+
             result.textContent =
                 "🎉 WIN! Number " +
                 winningNumber +
@@ -1371,68 +1737,85 @@ function showWinningNumber(
        4 SECOND WIN DISPLAY
     */
 
-    setTimeout(function(){
+    setTimeout(
+        function(){
 
-        wheelCenter.classList.remove(
-            "win"
-        );
+            wheelCenter.classList.remove(
+                "win"
+            );
 
-        wheelCenter.innerHTML =
-            "ZYNO";
-
-
-        /*
-           RESET BET
-        */
-
-        totalBet = 0;
-
-        selectedNumber = null;
+            wheelCenter.innerHTML =
+                "ZYNO";
 
 
-        document
-            .querySelectorAll(".number")
-            .forEach(function(n){
+            /*
+               RESET BET
+            */
 
-                n.classList.remove(
-                    "pressed"
+            totalBet =
+                0;
+
+            selectedNumber =
+                null;
+
+
+            document
+                .querySelectorAll(
+                    ".number"
+                )
+                .forEach(
+                    function(n){
+
+                        n.classList.remove(
+                            "pressed"
+                        );
+
+                    }
                 );
 
-            });
+
+            document
+                .querySelectorAll(
+                    ".bet-count"
+                )
+                .forEach(
+                    function(b){
+
+                        b.textContent =
+                            "";
+
+                    }
+                );
 
 
-        document
-            .querySelectorAll(".bet-count")
-            .forEach(function(b){
-
-                b.textContent = "";
-
-            });
+            selectedBet.textContent =
+                "Number select karo";
 
 
-        selectedBet.textContent =
-            "Number select karo";
+            /*
+               NEXT ROUND
+            */
+
+            timeLeft =
+                60;
+
+            bigTimer.textContent =
+                "60";
 
 
-        /*
-           NEXT ROUND
-        */
+            spinning =
+                false;
 
-        timeLeft = 60;
-
-        bigTimer.textContent =
-            "60";
+            roundRunning =
+                true;
 
 
-        spinning = false;
+            result.textContent =
+                "Number select karo";
 
-        roundRunning = true;
-
-
-        result.textContent =
-            "Number select karo";
-
-    },4000);
+        },
+        4000
+    );
 
 }
 
@@ -1441,56 +1824,69 @@ function showWinningNumber(
    BETTING TIMER
 ========================= */
 
-setInterval(function(){
+setInterval(
+    function(){
 
-    /*
-       SPIN KE TIME TIMER STOP
-    */
+        /*
+           SPIN KE TIME TIMER STOP
+        */
 
-    if(spinning){
+        if(spinning){
 
-        return;
+            return;
 
-    }
-
-
-    /*
-       COUNTDOWN
-    */
-
-    if(timeLeft > 0){
-
-        timeLeft--;
-
-    }
+        }
 
 
-    /*
-       TIMER DISPLAY
-    */
+        /*
+           COUNTDOWN
+        */
 
-    bigTimer.textContent =
-        timeLeft;
+        if(timeLeft > 0){
 
+            timeLeft--;
 
-    /*
-       ZERO PAR SPIN
-    */
-
-    if(timeLeft === 0){
-
-        lockBetting();
+        }
 
 
-        setTimeout(function(){
+        /*
+           TIMER DISPLAY
+        */
 
-            spinWheel();
+        bigTimer.textContent =
+            timeLeft;
 
-        },300);
 
-    }
+        /*
+           ZERO PAR SPIN
+        */
 
-},1000);
+        if(timeLeft === 0){
+
+            lockBetting();
+
+
+            setTimeout(
+                function(){
+
+                    spinWheel();
+
+                },
+                300
+            );
+
+        }
+
+    },
+    1000
+);
+
+
+/* =========================
+   INITIAL DISPLAY
+========================= */
+
+updateBalance();
 
 
 /* =========================
