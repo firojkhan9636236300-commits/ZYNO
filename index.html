@@ -3,905 +3,585 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ZYNO</title>
+
+<title>ZYNO Roulette</title>
 
 <style>
 *{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,body{
+    width:100%;
+    min-height:100%;
 }
 
 body{
-  font-family:Arial,sans-serif;
-  background:#06152d;
-  color:white;
-  min-height:100vh;
-padding-bottom:env(safe-area-inset-bottom);
+    font-family:Arial,sans-serif;
+    background:#020b18;
+    color:#fff;
+    overflow-x:hidden;
 }
-header{
-  padding:18px;
-  text-align:center;
-  border-bottom:1px solid #16345f;
+
+.container{
+    width:100%;
+    max-width:900px;
+    margin:auto;
+    padding:12px 10px 35px;
+}
+
+/* HEADER */
+.header{
+    text-align:center;
+    padding:10px 0 15px;
 }
 
 .logo{
-  font-size:32px;
-  font-weight:bold;
-  color:#00bfff;
-  letter-spacing:4px;
+    font-size:28px;
+    font-weight:bold;
+    color:#00c8ff;
+    letter-spacing:3px;
 }
 
-.hero{
-  text-align:center;
-  padding:30px 15px 20px;
+.subtitle{
+    color:#9db5c9;
+    font-size:12px;
+    margin-top:4px;
 }
 
-.hero h1{
-  font-size:36px;
-  margin-bottom:10px;
+/* GAME BOX */
+.game-box{
+    background:linear-gradient(145deg,#071b32,#03101f);
+    border:1px solid #12385c;
+    border-radius:18px;
+    padding:12px;
+    box-shadow:0 0 25px rgba(0,150,255,.12);
 }
 
-.hero p{
-  color:#b9c7da;
-  font-size:17px;
-  margin-bottom:20px;
+/* INFO */
+.info{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-bottom:12px;
 }
 
-.btn,
-.play-btn{
-  display:inline-block;
-  padding:11px 22px;
-  background:#00bfff;
-  color:#00152b;
-  text-decoration:none;
-  border-radius:9px;
-  font-weight:bold;
-  border:none;
+.info-box{
+    background:#06172a;
+    border:1px solid #16466d;
+    border-radius:10px;
+    text-align:center;
+    padding:8px 4px;
 }
 
-.games{
-  padding:20px 10px 50px;
-  text-align:center;
+.info-title{
+    color:#829bb0;
+    font-size:9px;
 }
 
-.games h2{
-  font-size:27px;
-  margin-bottom:20px;
-}
-
-/* MAIN GAME */
-
-.main-game{
-  max-width:900px;
-  margin:auto;
-  padding:20px 10px 30px;
-  background:linear-gradient(145deg,#211238,#090b16);
-  border:2px solid #00eaff;
-  border-radius:20px;
-  box-shadow:0 0 25px rgba(0,234,255,.18);
-}
-
-/* TIMER */
-
-.timer-box{
-  margin-bottom:15px;
-}
-
-.timer-label{
-  color:#b9c7da;
-  font-size:14px;
-  margin-bottom:4px;
-}
-
-#timer{
-  font-size:30px;
-  font-weight:bold;
-  color:#ffd34d;
+.info-value{
+    color:#00d5ff;
+    font-size:14px;
+    font-weight:bold;
+    margin-top:4px;
 }
 
 /* WHEEL */
-
-.wheel-box{
-  position:relative;
-  width:300px;
-  height:300px;
-  margin:0 auto 20px;
-}
-
-.pointer{
-  position:absolute;
-  top:-7px;
-  left:50%;
-  transform:translateX(-50%);
-  z-index:20;
-
-  width:0;
-  height:0;
-
-  border-left:11px solid transparent;
-  border-right:11px solid transparent;
-  border-top:25px solid #ffd34d;
-
-  filter:drop-shadow(0 0 6px #ffd34d);
+.wheel-area{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:8px 0 15px;
 }
 
 .wheel{
-  width:300px;
-  height:300px;
-  border-radius:50%;
-  position:relative;
-
-  background:
-    repeating-conic-gradient(
-      from 0deg,
-      #5b267d 0deg 9.73deg,
-      #111118 9.73deg 19.46deg
-    );
-
-  border:9px solid #ffd34d;
-
-  box-shadow:
-    0 0 25px rgba(255,211,77,.45),
-    inset 0 0 25px rgba(0,0,0,.9);
-
-  transition:transform 3s cubic-bezier(.12,.75,.18,1);
+    width:min(76vw,310px);
+    height:min(76vw,310px);
+    max-width:310px;
+    max-height:310px;
+    min-width:220px;
+    min-height:220px;
+    border-radius:50%;
+    position:relative;
+    border:10px solid #b68a35;
+    background:
+        repeating-conic-gradient(
+            from 0deg,
+            #c92323 0deg 9.73deg,
+            #111 9.73deg 19.46deg
+        );
+    box-shadow:
+        0 0 0 5px #38280d,
+        0 0 30px rgba(255,180,40,.25),
+        inset 0 0 20px #000;
 }
 
 .wheel::before{
-  content:"";
-  position:absolute;
-  inset:22px;
-  border-radius:50%;
-  border:3px solid #ffd34d;
+    content:"";
+    position:absolute;
+    inset:24%;
+    border-radius:50%;
+    background:radial-gradient(circle,#e4b84b 0 8%,#75521d 9% 14%,#101010 15% 100%);
+    border:5px solid #b68a35;
+    box-shadow:inset 0 0 15px #000;
 }
 
 .wheel::after{
-  content:"ZYNO";
-  position:absolute;
-  width:72px;
-  height:72px;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
+    content:"ZYNO";
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    font-weight:bold;
+    color:#fff;
+    letter-spacing:2px;
+    text-shadow:0 2px 5px #000;
+}
 
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  border-radius:50%;
-  background:#090b16;
-  border:4px solid #00eaff;
-  color:#00eaff;
-  font-size:17px;
-  font-weight:bold;
-  letter-spacing:2px;
-
-  box-shadow:0 0 18px rgba(0,234,255,.55);
+/* POINTER */
+.pointer{
+    position:absolute;
+    top:-5px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-top:20px solid #ffd34e;
+    z-index:5;
 }
 
 /* NUMBERS */
-
-.numbers{
-  position:absolute;
-  inset:0;
+.number-section{
+    margin-top:5px;
 }
 
-.number{
-  position:absolute;
-  left:50%;
-  top:50%;
-
-  width:26px;
-  height:26px;
-
-  margin-left:-13px;
-  margin-top:-13px;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  color:#fff;
-  font-size:9px;
-  font-weight:bold;
-
-  transform:
-    rotate(var(--angle))
-    translateY(-123px)
-    rotate(calc(var(--angle) * -1));
-}
-
-/* GAME INFO */
-
-.main-game h3{
-  font-size:28px;
-  color:#00eaff;
-  margin-bottom:7px;
-}
-
-.main-game p{
-  color:#b9c7da;
-  margin-bottom:15px;
-}
-
-#spinBtn{
-  padding:11px 27px;
-  background:#00eaff;
-  color:#00152b;
-  border:none;
-  border-radius:9px;
-  font-size:16px;
-  font-weight:bold;
-}
-
-#spinBtn:disabled{
-  opacity:.5;
-}
-
-/* RESULT */
-
-#result{
-  margin-top:13px;
-  min-height:25px;
-  color:#ffd34d;
-  font-weight:bold;
-  font-size:18px;
-}
-
-/* BETTING */
-
-.bet-title{
-  margin:25px 0 10px;
-  color:#00eaff;
-  font-size:20px;
-}
-
-.points{
-  margin-bottom:15px;
-  color:#ffd34d;
-  font-size:17px;
-  font-weight:bold;
+.number-title{
+    text-align:center;
+    color:#00c8ff;
+    font-weight:bold;
+    font-size:13px;
+    margin-bottom:8px;
 }
 
 .number-grid{
-  max-width:850px;
-  margin:auto;
-
-  display:grid;
-  grid-template-columns:repeat(6,1fr);
-  gap:7px;
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:4px;
 }
 
-.bet-number{
-  min-height:56px;
-  border:1px solid #5b267d;
-  border-radius:8px;
-  background:#10121c;
-  color:white;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-
-  user-select:none;
-  -webkit-user-select:none;
-  touch-action:none;
+.number{
+    min-height:39px;
+    border-radius:5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:14px;
+    font-weight:bold;
+    border:1px solid rgba(255,255,255,.15);
+    cursor:pointer;
+    user-select:none;
 }
 
-.bet-number strong{
-  font-size:15px;
+.number.red{
+    background:#c51f2b;
 }
 
-.bet-number small{
-  color:#ffd34d;
-  font-size:10px;
-  margin-top:3px;
+.number.black{
+    background:#15191e;
 }
 
-.bet-number.active{
-  border-color:#00eaff;
-  box-shadow:0 0 10px rgba(0,234,255,.45);
+.number.zero{
+    background:#078b4b;
+    grid-row:span 1;
 }
 
-.bet-number.locked{
-  opacity:.45;
-  pointer-events:none;
+.number.selected{
+    box-shadow:0 0 0 2px #00d9ff,0 0 12px #00d9ff;
+    transform:scale(.96);
 }
 
-/* OTHER GAMES */
-
-.game-grid{
-  max-width:900px;
-  margin:25px auto 0;
-
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:15px;
+/* BET OPTIONS */
+.bet-options{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:5px;
+    margin-top:10px;
 }
 
-.card{
-  padding:22px 15px;
-  background:#0b2345;
-  border:1px solid #163f70;
-  border-radius:17px;
+.bet-option{
+    background:#071b30;
+    border:1px solid #285273;
+    color:#fff;
+    border-radius:6px;
+    min-height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    font-weight:bold;
 }
 
-.card .icon{
-  font-size:38px;
-  margin-bottom:10px;
+/* BET AMOUNT */
+.bet-area{
+    margin-top:12px;
+    background:#06172a;
+    border:1px solid #16466d;
+    border-radius:12px;
+    padding:10px;
 }
 
-.card h3{
-  color:#00bfff;
-  margin-bottom:7px;
-  font-size:21px;
+.bet-label{
+    color:#8ea7ba;
+    font-size:11px;
+    margin-bottom:6px;
 }
 
-.card p{
-  color:#aebed3;
-  margin-bottom:16px;
+.bet-row{
+    display:flex;
+    gap:7px;
 }
 
-footer{
-  text-align:center;
-  padding:22px;
-  color:#71839d;
-  border-top:1px solid #16345f;
+.bet-input{
+    flex:1;
+    min-width:0;
+    background:#020c18;
+    border:1px solid #285273;
+    border-radius:7px;
+    color:#fff;
+    padding:10px;
+    font-size:14px;
+    outline:none;
+}
+
+.bet-button{
+    background:#00aeea;
+    color:#00101b;
+    border:none;
+    border-radius:7px;
+    padding:0 16px;
+    font-weight:bold;
+}
+
+/* SPIN */
+.spin-button{
+    width:100%;
+    margin-top:12px;
+    min-height:48px;
+    border:none;
+    border-radius:10px;
+    background:linear-gradient(90deg,#008fd1,#00d8ff);
+    color:#00101b;
+    font-size:17px;
+    font-weight:bold;
+    box-shadow:0 5px 18px rgba(0,200,255,.2);
+}
+
+.spin-button:active{
+    transform:scale(.98);
+}
+
+/* RESULT */
+.result{
+    text-align:center;
+    margin-top:12px;
+    min-height:25px;
+    color:#ffd34e;
+    font-weight:bold;
+    font-size:14px;
 }
 
 /* MOBILE */
+@media(max-width:480px){
 
-@media(max-width:600px){
+    .container{
+        padding:8px 7px 30px;
+    }
 
-  body{
-    padding-bottom:90px;
-    overflow-x:hidden;
-  }
+    .logo{
+        font-size:24px;
+    }
 
-  .hero{
-    padding:20px 8px 15px;
-  }
+    .game-box{
+        padding:9px;
+        border-radius:14px;
+    }
 
-  .hero h1{
-    font-size:30px;
-  }
+    .wheel{
+        width:70vw;
+        height:70vw;
+        min-width:215px;
+        min-height:215px;
+        border-width:8px;
+    }
 
-  .main-game{
-    width:100%;
-    padding:15px 8px 90px;
-    overflow:visible;
-  }
+    .number-grid{
+        gap:3px;
+    }
 
-  .wheel-box{
-    width:260px;
-    height:260px;
-    margin:0 auto 20px;
-  }
+    .number{
+        min-height:37px;
+        font-size:13px;
+    }
 
-  .wheel{
-    width:260px;
-    height:260px;
-  }
+    .bet-option{
+        min-height:34px;
+        font-size:10px;
+    }
 
-  .number{
-    width:22px;
-    height:22px;
-    margin-left:-11px;
-    margin-top:-11px;
-    font-size:8px;
+    .spin-button{
+        margin-bottom:8px;
+    }
+}
 
-    transform:
-      rotate(var(--angle))
-      translateY(-106px)
-      rotate(calc(var(--angle) * -1));
-  }
+@media(max-width:350px){
 
-  .wheel::before{
-    inset:18px;
-    border-width:2px;
-  }
+    .number{
+        min-height:34px;
+        font-size:12px;
+    }
 
-  .wheel::after{
-    width:60px;
-    height:60px;
-    font-size:14px;
-    border-width:3px;
-  }
-
-  .pointer{
-    top:-6px;
-    border-left-width:9px;
-    border-right-width:9px;
-    border-top-width:20px;
-  }
-
-  #spinBtn{
-    margin-bottom:20px;
-    padding:13px 30px;
-    font-size:17px;
-  }
-
-  .number-grid{
-    grid-template-columns:repeat(4,1fr);
-    gap:6px;
-    width:100%;
-  }
-
-  .bet-number{
-    min-height:54px;
-  }
-
-  .bet-number strong{
-    font-size:14px;
-  }
-
-  .bet-number small{
-    font-size:9px;
-  }
-
-  .game-grid{
-    grid-template-columns:1fr;
-  }
-
+    .info-value{
+        font-size:12px;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="logo">ZYNO</div>
-</header>
+<div class="container">
 
-<section class="hero">
-  <h1>Welcome to ZYNO</h1>
-  <p>Play. Enjoy. Experience ZYNO.</p>
-  <a href="#games" class="btn">Explore Games</a>
-</section>
+    <div class="header">
+        <div class="logo">ZYNO</div>
+        <div class="subtitle">ROULETTE • PLAY • WIN • REPEAT</div>
+    </div>
 
-<section class="games" id="games">
+    <div class="game-box">
 
-<h2>Our Games</h2>
+        <div class="info">
+            <div class="info-box">
+                <div class="info-title">BALANCE</div>
+                <div class="info-value" id="balance">10000</div>
+            </div>
 
-<div class="main-game">
+            <div class="info-box">
+                <div class="info-title">BET TIME</div>
+                <div class="info-value" id="timer">60</div>
+            </div>
 
-  <!-- TIMER -->
+            <div class="info-box">
+                <div class="info-title">LAST WIN</div>
+                <div class="info-value" id="lastWin">0</div>
+            </div>
+        </div>
 
-  <div class="timer-box">
-    <div class="timer-label">BETTING TIME</div>
-    <div id="timer">60</div>
-  </div>
+        <div class="wheel-area">
+            <div class="wheel">
+                <div class="pointer"></div>
+            </div>
+        </div>
 
-  <!-- WHEEL -->
+        <div class="number-section">
 
-  <div class="wheel-box">
+            <div class="number-title">
+                SELECT NUMBER 0 - 36
+            </div>
 
-    <div class="pointer"></div>
+            <div class="number-grid" id="numberGrid"></div>
 
-    <div class="wheel" id="wheel">
+        </div>
 
-      <div class="numbers">
+        <div class="bet-options">
+            <div class="bet-option">1 - 18</div>
+            <div class="bet-option">EVEN</div>
+            <div class="bet-option">RED</div>
+            <div class="bet-option">BLACK</div>
+            <div class="bet-option">ODD</div>
+            <div class="bet-option">19 - 36</div>
+        </div>
 
-        <span class="number" style="--angle:0deg">0</span>
-        <span class="number" style="--angle:9.73deg">1</span>
-        <span class="number" style="--angle:19.46deg">2</span>
-        <span class="number" style="--angle:29.19deg">3</span>
-        <span class="number" style="--angle:38.92deg">4</span>
-        <span class="number" style="--angle:48.65deg">5</span>
-        <span class="number" style="--angle:58.38deg">6</span>
-        <span class="number" style="--angle:68.11deg">7</span>
-        <span class="number" style="--angle:77.84deg">8</span>
-        <span class="number" style="--angle:87.57deg">9</span>
-        <span class="number" style="--angle:97.30deg">10</span>
-        <span class="number" style="--angle:107.03deg">11</span>
-        <span class="number" style="--angle:116.76deg">12</span>
-        <span class="number" style="--angle:126.49deg">13</span>
-        <span class="number" style="--angle:136.22deg">14</span>
-        <span class="number" style="--angle:145.95deg">15</span>
-        <span class="number" style="--angle:155.68deg">16</span>
-        <span class="number" style="--angle:165.41deg">17</span>
-        <span class="number" style="--angle:175.14deg">18</span>
-        <span class="number" style="--angle:184.87deg">19</span>
-        <span class="number" style="--angle:194.60deg">20</span>
-        <span class="number" style="--angle:204.33deg">21</span>
-        <span class="number" style="--angle:214.06deg">22</span>
-        <span class="number" style="--angle:223.79deg">23</span>
-        <span class="number" style="--angle:233.52deg">24</span>
-        <span class="number" style="--angle:243.25deg">25</span>
-        <span class="number" style="--angle:252.98deg">26</span>
-        <span class="number" style="--angle:262.71deg">27</span>
-        <span class="number" style="--angle:272.44deg">28</span>
-        <span class="number" style="--angle:282.17deg">29</span>
-        <span class="number" style="--angle:291.90deg">30</span>
-        <span class="number" style="--angle:301.63deg">31</span>
-        <span class="number" style="--angle:311.36deg">32</span>
-        <span class="number" style="--angle:321.09deg">33</span>
-        <span class="number" style="--angle:330.82deg">34</span>
-        <span class="number" style="--angle:340.55deg">35</span>
-        <span class="number" style="--angle:350.28deg">36</span>
+        <div class="bet-area">
 
-      </div>
+            <div class="bet-label">
+                BET AMOUNT
+            </div>
+
+            <div class="bet-row">
+                <input
+                    type="number"
+                    id="betAmount"
+                    class="bet-input"
+                    placeholder="Enter points"
+                    min="1"
+                >
+
+                <button class="bet-button" onclick="placeBet()">
+                    BET
+                </button>
+            </div>
+
+        </div>
+
+        <button class="spin-button" onclick="spinRoulette()">
+            SPIN
+        </button>
+
+        <div class="result" id="result">
+            Select a number and place your bet
+        </div>
 
     </div>
-  </div>
-
-  <h3>ZYNO Roulette 0–36</h3>
-  <p id="statusText">Betting is open.</p>
-
-  <button id="spinBtn" onclick="manualSpin()">SPIN</button>
-
-  <div id="result"></div>
-
-  <div class="bet-title">BET ON NUMBER</div>
-
-  <div class="points">
-    Demo Points: <span id="balance">1000</span>
-  </div>
-
-  <div class="number-grid" id="numberGrid"></div>
 
 </div>
-
-
-<!-- OTHER GAMES -->
-
-<div class="game-grid">
-
-  <div class="card">
-    <div class="icon">🎯</div>
-    <h3>ZYNO Roulette 0–11</h3>
-    <p>Fast and exciting ZYNO number game.</p>
-    <a href="#" class="play-btn">Play Now</a>
-  </div>
-
-  <div class="card">
-    <div class="icon">🎲</div>
-    <h3>Ludo</h3>
-    <p>Classic multiplayer board game experience.</p>
-    <a href="#" class="play-btn">Play Now</a>
-  </div>
-
-  <div class="card">
-    <div class="icon">🃏</div>
-    <h3>Teen Patti</h3>
-    <p>Enjoy the classic Indian card game.</p>
-    <a href="#" class="play-btn">Play Now</a>
-  </div>
-
-  <div class="card">
-    <div class="icon">♠️</div>
-    <h3>ZYNO Cards</h3>
-    <p>Our original ZYNO card game.</p>
-    <a href="#" class="play-btn">Coming Soon</a>
-  </div>
-
-</div>
-
-</section>
-
-<footer>
-© 2026 ZYNO. All rights reserved.
-</footer>
-
 
 <script>
 
-let currentRotation = 0;
-let spinning = false;
-let bettingOpen = true;
+let balance = 10000;
+let selectedNumber = null;
+let currentBet = 0;
 
-let balance = 1000;
+const redNumbers = [
+    1,3,5,7,9,12,14,16,18,
+    19,21,23,25,27,30,32,34,36
+];
 
-const bets = {};
-
-const numberGrid =
-  document.getElementById("numberGrid");
-
-const balanceElement =
-  document.getElementById("balance");
-
-const timerElement =
-  document.getElementById("timer");
-
-const resultElement =
-  document.getElementById("result");
-
-const statusText =
-  document.getElementById("statusText");
-
-const spinButton =
-  document.getElementById("spinBtn");
-
-
-/* CREATE BET NUMBERS */
+const numberGrid = document.getElementById("numberGrid");
 
 for(let i = 0; i <= 36; i++){
 
-  bets[i] = 0;
+    const div = document.createElement("div");
 
-  const button =
-    document.createElement("div");
+    div.classList.add("number");
 
-  button.className = "bet-number";
-
-  button.innerHTML =
-    "<strong>" + i + "</strong>" +
-    "<small>Bet: 0</small>";
-
-  numberGrid.appendChild(button);
-
-  let timer = null;
-
-  /*
-    1 POINT = 0.25 SECOND
-    यानी हर 250 milliseconds में 1 point
-  */
-
-  function startBet(e){
-
-    e.preventDefault();
-
-    if(!bettingOpen || spinning) return;
-
-    if(timer !== null) return;
-
-    /* पहला point तुरंत */
-
-    if(balance > 0){
-
-      balance--;
-      bets[i]++;
-
-      balanceElement.textContent = balance;
-
-      button.querySelector("small").textContent =
-        "Bet: " + bets[i];
-
-      button.classList.add("active");
+    if(i === 0){
+        div.classList.add("zero");
+    }
+    else if(redNumbers.includes(i)){
+        div.classList.add("red");
+    }
+    else{
+        div.classList.add("black");
     }
 
-    /*
-      उसके बाद हर 0.25 second में 1 point
-    */
+    div.textContent = i;
 
-    timer = setInterval(function(){
+    div.onclick = function(){
 
-      if(!bettingOpen || balance <= 0){
+        document.querySelectorAll(".number")
+        .forEach(n => n.classList.remove("selected"));
 
-        stopBet();
-        return;
-      }
+        div.classList.add("selected");
 
-      balance--;
-      bets[i]++;
+        selectedNumber = i;
 
-      balanceElement.textContent = balance;
+        document.getElementById("result").textContent =
+            "Number " + i + " selected";
+    };
 
-      button.querySelector("small").textContent =
-        "Bet: " + bets[i];
-
-      button.classList.add("active");
-
-    },250);
-  }
-
-  function stopBet(){
-
-    if(timer !== null){
-
-      clearInterval(timer);
-      timer = null;
-    }
-  }
-
-  button.addEventListener(
-    "pointerdown",
-    startBet
-  );
-
-  button.addEventListener(
-    "pointerup",
-    stopBet
-  );
-
-  button.addEventListener(
-    "pointercancel",
-    stopBet
-  );
-
-  button.addEventListener(
-    "pointerleave",
-    stopBet
-  );
-
-  button.addEventListener(
-    "pointerout",
-    stopBet
-  );
+    numberGrid.appendChild(div);
 }
 
 
-/* 60 SECOND BETTING TIMER */
+function placeBet(){
 
+    const amount =
+        Number(document.getElementById("betAmount").value);
+
+    if(selectedNumber === null){
+        document.getElementById("result").textContent =
+            "Pehle number select karo";
+        return;
+    }
+
+    if(!amount || amount < 1){
+        document.getElementById("result").textContent =
+            "Minimum bet 1 point hai";
+        return;
+    }
+
+    if(amount > balance){
+        document.getElementById("result").textContent =
+            "Balance kam hai";
+        return;
+    }
+
+    currentBet = amount;
+
+    document.getElementById("result").textContent =
+        "Bet placed: " + amount + " points on " + selectedNumber;
+}
+
+
+function spinRoulette(){
+
+    if(selectedNumber === null){
+        document.getElementById("result").textContent =
+            "Pehle number select karo";
+        return;
+    }
+
+    if(currentBet <= 0){
+        document.getElementById("result").textContent =
+            "Pehle bet amount enter karke BET dabao";
+        return;
+    }
+
+    const winningNumber =
+        Math.floor(Math.random() * 37);
+
+    if(winningNumber === selectedNumber){
+
+        const winAmount = currentBet * 35;
+
+        balance += winAmount;
+
+        document.getElementById("lastWin").textContent =
+            winAmount;
+
+        document.getElementById("result").textContent =
+            "🎉 WIN! Number " + winningNumber +
+            " — +" + winAmount + " points";
+
+    }else{
+
+        balance -= currentBet;
+
+        document.getElementById("lastWin").textContent =
+            0;
+
+        document.getElementById("result").textContent =
+            "Number " + winningNumber +
+            " aaya — Bet lost " + currentBet + " points";
+    }
+
+    document.getElementById("balance").textContent =
+        balance;
+
+    currentBet = 0;
+}
+
+
+/* 60 SECOND TIMER */
 let timeLeft = 60;
 
-function startBettingRound(){
+setInterval(function(){
 
-  bettingOpen = true;
-  spinning = false;
+    if(timeLeft > 0){
+        timeLeft--;
+    }else{
+        timeLeft = 60;
+    }
 
-  timeLeft = 60;
-
-  timerElement.textContent = timeLeft;
-
-  statusText.textContent =
-    "Betting is open.";
-
-  resultElement.textContent = "";
-
-  spinButton.disabled = true;
-
-  document
-    .querySelectorAll(".bet-number")
-    .forEach(function(button){
-
-      button.classList.remove("locked");
-
-    });
-
-  const countdown =
-    setInterval(function(){
-
-      if(!bettingOpen){
-
-        clearInterval(countdown);
-        return;
-      }
-
-      timeLeft--;
-
-      timerElement.textContent =
+    document.getElementById("timer").textContent =
         timeLeft;
 
-      if(timeLeft <= 0){
-
-        clearInterval(countdown);
-
-        bettingOpen = false;
-
-        closeBettingAndSpin();
-      }
-
-    },1000);
-}
-
-
-/* CLOSE BETTING + AUTO SPIN */
-
-function closeBettingAndSpin(){
-
-  bettingOpen = false;
-
-  document
-    .querySelectorAll(".bet-number")
-    .forEach(function(button){
-
-      button.classList.add("locked");
-
-    });
-
-  statusText.textContent =
-    "Bet Closed — Wheel is spinning...";
-
-  spinWheel();
-}
-
-
-/* SPIN WHEEL */
-
-function spinWheel(){
-
-  if(spinning) return;
-
-  spinning = true;
-
-  spinButton.disabled = true;
-  spinButton.textContent = "SPINNING...";
-
-  const wheel =
-    document.getElementById("wheel");
-
-  const winningNumber =
-    Math.floor(Math.random() * 37);
-
-  const extraSpins =
-    5 + Math.floor(Math.random() * 4);
-
-  const anglePerNumber =
-    360 / 37;
-
-  const targetAngle =
-    extraSpins * 360 +
-    (360 - winningNumber * anglePerNumber);
-
-  currentRotation += targetAngle;
-
-  wheel.style.transform =
-    "rotate(" + currentRotation + "deg)";
-
-  setTimeout(function(){
-
-    resultElement.textContent =
-      "Result: " + winningNumber;
-
-    statusText.textContent =
-      "Result declared. Next round starting...";
-
-    spinButton.textContent = "NEXT ROUND";
-
-    spinning = false;
-
-    /*
-      छोटा सा result display time,
-      फिर नया round automatically
-    */
-
-    setTimeout(function(){
-
-      resetBets();
-
-      spinButton.textContent = "SPIN";
-
-      startBettingRound();
-
-    },2000);
-
-  },3000);
-}
-
-
-/* RESET BETS FOR NEXT ROUND */
-
-function resetBets(){
-
-  for(let i = 0; i <= 36; i++){
-
-    bets[i] = 0;
-  }
-
-  document
-    .querySelectorAll(".bet-number")
-    .forEach(function(button){
-
-      button.classList.remove("active");
-      button.classList.remove("locked");
-
-      button.querySelector("small").textContent =
-        "Bet: 0";
-
-    });
-}
-
-
-/* MANUAL SPIN BUTTON
-   अभी demo के लिए रखा है.
-   Normal round में wheel automatic spin होगा.
-*/
-
-function manualSpin(){
-
-  if(!bettingOpen && !spinning){
-
-    spinWheel();
-  }
-}
-
-
-/* START FIRST ROUND */
-
-startBettingRound();
+},1000);
 
 </script>
 
