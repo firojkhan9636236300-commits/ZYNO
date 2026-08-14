@@ -7,6 +7,7 @@
 <title>ZYNO Roulette</title>
 
 <style>
+
 *{
     box-sizing:border-box;
     margin:0;
@@ -30,18 +31,18 @@ body{
     width:100%;
     max-width:900px;
     margin:auto;
-    padding:8px 7px 35px;
+    padding:5px 4px calc(60px + env(safe-area-inset-bottom));
 }
 
 /* HEADER */
 
 .header{
     text-align:center;
-    padding:4px 0 12px;
+    padding:3px 0 9px;
 }
 
 .logo{
-    font-size:28px;
+    font-size:24px;
     font-weight:bold;
     color:#00e5ff;
     letter-spacing:5px;
@@ -50,8 +51,8 @@ body{
 
 .subtitle{
     color:#9eb4ca;
-    font-size:10px;
-    margin-top:3px;
+    font-size:8px;
+    margin-top:2px;
 }
 
 /* GAME BOX */
@@ -67,10 +68,11 @@ body{
             #0b0b1e 100%
         );
 
-    border:4px solid #00e5ff;
-    border-radius:50px 50px 0 0;
+    border:3px solid #00e5ff;
 
-    padding:17px 12px 28px;
+    border-radius:38px 38px 0 0;
+
+    padding:11px 6px 20px;
 
     box-shadow:
         0 0 20px rgba(0,229,255,.18),
@@ -82,50 +84,50 @@ body{
 .info{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:6px;
-    margin-bottom:10px;
+    gap:4px;
+    margin-bottom:7px;
 }
 
 .info-box{
     background:rgba(8,12,30,.75);
     border:1px solid #31415f;
-    border-radius:9px;
+    border-radius:8px;
     text-align:center;
-    padding:7px 3px;
+    padding:6px 2px;
 }
 
 .info-title{
     color:#9daec5;
-    font-size:8px;
+    font-size:7px;
 }
 
 .info-value{
     color:#00e5ff;
-    font-size:13px;
+    font-size:12px;
     font-weight:bold;
-    margin-top:3px;
+    margin-top:2px;
 }
 
 /* TIMER */
 
 .betting-time{
     text-align:center;
-    margin:3px 0 0;
+    margin:2px 0 0;
 }
 
 .betting-title{
     color:#c1bfd7;
-    font-size:14px;
+    font-size:12px;
     letter-spacing:1px;
 }
 
 .timer-big{
     color:#ffd34e;
-    font-size:44px;
+    font-size:36px;
     line-height:1;
     font-weight:bold;
     text-shadow:0 0 18px rgba(255,211,78,.35);
-    margin-top:4px;
+    margin-top:3px;
 }
 
 /* WHEEL */
@@ -134,17 +136,17 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
-    padding:8px 0 16px;
+    padding:5px 0 10px;
 }
 
 .wheel{
-    width:min(64vw,290px);
-    height:min(64vw,290px);
+    width:min(57vw,245px);
+    height:min(57vw,245px);
 
     border-radius:50%;
     position:relative;
 
-    border:9px solid #ffd34e;
+    border:7px solid #ffd34e;
 
     background:
         repeating-conic-gradient(
@@ -154,9 +156,9 @@ body{
         );
 
     box-shadow:
-        0 0 0 4px #513814,
-        0 0 28px rgba(255,211,78,.35),
-        inset 0 0 35px #000;
+        0 0 0 3px #513814,
+        0 0 24px rgba(255,211,78,.35),
+        inset 0 0 30px #000;
 }
 
 /* INNER RING */
@@ -167,11 +169,11 @@ body{
 
     border-radius:50%;
 
-    border:4px solid #ffd34e;
+    border:3px solid #ffd34e;
 
     box-shadow:
-        0 0 15px rgba(255,211,78,.25),
-        inset 0 0 20px #000;
+        0 0 12px rgba(255,211,78,.25),
+        inset 0 0 18px #000;
 }
 
 /* CENTER */
@@ -179,8 +181,8 @@ body{
 .wheel-center{
     position:absolute;
 
-    width:30%;
-    height:30%;
+    width:29%;
+    height:29%;
 
     left:50%;
     top:50%;
@@ -191,20 +193,20 @@ body{
 
     background:#080b16;
 
-    border:6px solid #00e5ff;
+    border:5px solid #00e5ff;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
     color:#00e5ff;
-    font-size:16px;
+    font-size:13px;
     font-weight:bold;
-    letter-spacing:2px;
+    letter-spacing:1px;
 
     box-shadow:
-        0 0 20px rgba(0,229,255,.35),
-        inset 0 0 15px #000;
+        0 0 17px rgba(0,229,255,.35),
+        inset 0 0 13px #000;
 
     z-index:3;
 }
@@ -214,8 +216,8 @@ body{
 .wheel-number{
     position:absolute;
 
-    width:23px;
-    height:23px;
+    width:17px;
+    height:17px;
 
     display:flex;
     align-items:center;
@@ -223,10 +225,10 @@ body{
 
     color:#fff;
 
-    font-size:11px;
+    font-size:8px;
     font-weight:bold;
 
-    text-shadow:0 2px 4px #000;
+    text-shadow:0 2px 3px #000;
 
     z-index:4;
 
@@ -238,7 +240,7 @@ body{
 .pointer{
     position:absolute;
 
-    top:-11px;
+    top:-9px;
     left:50%;
 
     transform:translateX(-50%);
@@ -246,11 +248,11 @@ body{
     width:0;
     height:0;
 
-    border-left:10px solid transparent;
-    border-right:10px solid transparent;
-    border-top:21px solid #ffd34e;
+    border-left:8px solid transparent;
+    border-right:8px solid transparent;
+    border-top:18px solid #ffd34e;
 
-    filter:drop-shadow(0 0 7px rgba(255,211,78,.7));
+    filter:drop-shadow(0 0 6px rgba(255,211,78,.7));
 
     z-index:8;
 }
@@ -258,34 +260,34 @@ body{
 /* NUMBER SECTION */
 
 .number-section{
-    margin-top:1px;
+    margin-top:0;
 }
 
 .number-title{
     text-align:center;
     color:#00e5ff;
     font-weight:bold;
-    font-size:13px;
-    margin-bottom:8px;
+    font-size:12px;
+    margin-bottom:6px;
     letter-spacing:.5px;
 }
 
 .number-grid{
     display:grid;
     grid-template-columns:repeat(6,1fr);
-    gap:4px;
+    gap:3px;
 }
 
 .number{
-    min-height:38px;
+    min-height:33px;
 
-    border-radius:6px;
+    border-radius:5px;
 
     display:flex;
     align-items:center;
     justify-content:center;
 
-    font-size:13px;
+    font-size:11px;
     font-weight:bold;
 
     border:1px solid rgba(255,255,255,.15);
@@ -294,6 +296,8 @@ body{
     user-select:none;
 
     transition:.15s;
+
+    touch-action:manipulation;
 }
 
 .number.red{
@@ -313,30 +317,30 @@ body{
 
     box-shadow:
         0 0 0 2px rgba(0,229,255,.15),
-        0 0 15px rgba(0,229,255,.8);
+        0 0 12px rgba(0,229,255,.8);
 
     transform:scale(.94);
 }
 
-/* SELECTED BET */
+/* BET INFO */
 
 .selected-bet{
-    margin-top:9px;
+    margin-top:7px;
 
     background:
         linear-gradient(135deg,#24183d,#100d20);
 
     border:1px solid #5b4677;
 
-    border-radius:10px;
+    border-radius:8px;
 
-    padding:10px;
+    padding:8px;
 
     text-align:center;
 
     color:#bfc6d8;
 
-    font-size:12px;
+    font-size:11px;
 }
 
 .selected-bet strong{
@@ -350,15 +354,15 @@ body{
 
     grid-template-columns:repeat(3,1fr);
 
-    gap:6px;
+    gap:4px;
 
-    margin-top:10px;
+    margin-top:7px;
 }
 
 .game-button{
-    min-height:44px;
+    min-height:40px;
 
-    border-radius:9px;
+    border-radius:8px;
 
     border:1px solid #00bde9;
 
@@ -371,13 +375,15 @@ body{
 
     color:#00e5ff;
 
-    font-size:11px;
+    font-size:9px;
     font-weight:bold;
 
     box-shadow:
-        0 0 12px rgba(0,229,255,.12);
+        0 0 10px rgba(0,229,255,.12);
 
     cursor:pointer;
+
+    touch-action:manipulation;
 }
 
 .game-button:active{
@@ -389,81 +395,43 @@ body{
 .result{
     text-align:center;
 
-    margin-top:10px;
+    margin-top:7px;
 
-    min-height:24px;
+    min-height:21px;
 
     color:#ffd34e;
 
     font-weight:bold;
 
-    font-size:13px;
+    font-size:11px;
 }
 
-/* MOBILE */
-
-@media(max-width:480px){
-
-    .container{
-        padding:5px 5px 30px;
-    }
-
-    .logo{
-        font-size:25px;
-    }
-
-    .game-box{
-        padding:15px 8px 25px;
-        border-radius:45px 45px 0 0;
-    }
-
-    .timer-big{
-        font-size:42px;
-    }
-
-    .wheel{
-        width:64vw;
-        height:64vw;
-        border-width:8px;
-    }
-
-    .wheel-number{
-        width:21px;
-        height:21px;
-        font-size:10px;
-    }
-
-    .number-grid{
-        gap:3px;
-    }
-
-    .number{
-        min-height:37px;
-        font-size:12px;
-    }
-
-    .game-button{
-        font-size:10px;
-        min-height:43px;
-    }
-}
+/* SMALL PHONE */
 
 @media(max-width:350px){
 
     .wheel{
-        width:61vw;
-        height:61vw;
+        width:55vw;
+        height:55vw;
+    }
+
+    .wheel-number{
+        width:16px;
+        height:16px;
+        font-size:7px;
     }
 
     .number{
-        min-height:34px;
-        font-size:11px;
+        min-height:31px;
+        font-size:10px;
     }
 
     .game-button{
-        font-size:9px;
+        font-size:8px;
+        min-height:38px;
     }
 }
+
 </style>
 </head>
 
@@ -650,11 +618,13 @@ let balance = 10000;
 
 let selectedNumber = null;
 
-let currentBet = 0;
+let totalBet = 0;
 
 let timeLeft = 60;
 
 let spinning = false;
+
+let bettingInterval = null;
 
 
 /* =========================
@@ -708,7 +678,9 @@ for(let i = 0; i <= 36; i++){
     div.textContent = i;
 
 
-    /* NUMBER TAP */
+    /* =========================
+       NUMBER TAP
+    ========================= */
 
     div.onclick = function(){
 
@@ -730,48 +702,136 @@ for(let i = 0; i <= 36; i++){
 
         selectedNumber = i;
 
-
-        /*
-           AUTO BET
-
-           1 POINT AUTOMATICALLY
-           NUMBER TAP KARTE HI
-        */
-
-        const betAmount = 1;
+        totalBet = 0;
 
 
-        if(balance < betAmount){
+        /* STOP OLD BET TIMER */
 
-            document.getElementById("result")
-                .textContent =
-                "Balance kam hai";
+        if(bettingInterval){
 
-            return;
+            clearInterval(bettingInterval);
+
+            bettingInterval = null;
 
         }
 
 
-        currentBet = betAmount;
+        /* FIRST BET IMMEDIATELY */
+
+        placeOnePointBet();
 
 
-        document.getElementById("selectedBet")
-            .innerHTML =
-            "Number <strong>" +
-            i +
-            "</strong> par <strong>" +
-            betAmount +
-            "</strong> point bet laga";
+        /*
+           EVERY 0.25 SECOND
+           1 POINT BET
+        */
+
+        bettingInterval = setInterval(function(){
+
+            if(spinning){
+
+                clearInterval(bettingInterval);
+
+                bettingInterval = null;
+
+                return;
+
+            }
 
 
-        document.getElementById("result")
-            .textContent =
-            "Bet placed — number " + i;
+            if(timeLeft <= 0){
+
+                clearInterval(bettingInterval);
+
+                bettingInterval = null;
+
+                return;
+
+            }
+
+
+            placeOnePointBet();
+
+        },250);
 
     };
 
 
     numberGrid.appendChild(div);
+
+}
+
+
+/* =========================
+   ONE POINT BET
+========================= */
+
+function placeOnePointBet(){
+
+    const betAmount = 1;
+
+
+    if(selectedNumber === null){
+
+        return;
+
+    }
+
+
+    if(balance < betAmount){
+
+        document.getElementById("result")
+            .textContent =
+            "💰 Balance khatam ho gaya";
+
+        if(bettingInterval){
+
+            clearInterval(bettingInterval);
+
+            bettingInterval = null;
+
+        }
+
+        return;
+
+    }
+
+
+    /* BALANCE SE 1 POINT MINUS */
+
+    balance =
+        balance - betAmount;
+
+
+    /* TOTAL BET BADHAO */
+
+    totalBet =
+        totalBet + betAmount;
+
+
+    /* BALANCE DISPLAY */
+
+    document.getElementById("balance")
+        .textContent =
+        balance;
+
+
+    /* BET DISPLAY */
+
+    document.getElementById("selectedBet")
+        .innerHTML =
+        "Number <strong>" +
+        selectedNumber +
+        "</strong> par total <strong>" +
+        totalBet +
+        "</strong> points bet";
+
+
+    document.getElementById("result")
+        .textContent =
+        "⚡ Bet running — " +
+        totalBet +
+        " points";
 
 }
 
@@ -797,11 +857,6 @@ for(let i = 0; i <= 36; i++){
     number.textContent =
         i;
 
-
-    /*
-       37 NUMBERS
-       PERFECT CIRCLE
-    */
 
     const angle =
         (i * 360 / 37) - 90;
@@ -840,12 +895,34 @@ for(let i = 0; i <= 36; i++){
 
 
 /* =========================
+   STOP BETTING
+========================= */
+
+function stopAutomaticBetting(){
+
+    if(bettingInterval){
+
+        clearInterval(bettingInterval);
+
+        bettingInterval = null;
+
+    }
+
+}
+
+
+/* =========================
    AUTO ROUND
 ========================= */
 
 function finishRound(){
 
     if(spinning) return;
+
+
+    /* STOP 0.25 SECOND BETTING */
+
+    stopAutomaticBetting();
 
 
     if(selectedNumber === null){
@@ -859,7 +936,7 @@ function finishRound(){
     }
 
 
-    if(currentBet <= 0){
+    if(totalBet <= 0){
 
         document.getElementById("result")
             .textContent =
@@ -878,9 +955,7 @@ function finishRound(){
         "🎡 Result aa raha hai...";
 
 
-    /*
-       DEMO RESULT
-    */
+    /* DEMO RESULT */
 
     setTimeout(function(){
 
@@ -888,14 +963,31 @@ function finishRound(){
             Math.floor(Math.random() * 37);
 
 
+        /* WIN */
+
         if(winningNumber === selectedNumber){
 
+            /*
+               35:1 PROFIT + ORIGINAL BET RETURN
+
+               Total bet 100
+               Profit 3500
+               Return 3600
+            */
+
             const winAmount =
-                currentBet * 35;
+                totalBet * 35;
+
+            const returnedBet =
+                totalBet;
+
+
+            const totalPayout =
+                winAmount + returnedBet;
 
 
             balance =
-                balance + winAmount;
+                balance + totalPayout;
 
 
             document.getElementById("lastWin")
@@ -909,14 +1001,13 @@ function finishRound(){
                 winningNumber +
                 " — +" +
                 winAmount +
-                " points";
+                " profit";
 
         }
+
+        /* LOSS */
+
         else{
-
-            balance =
-                balance - currentBet;
-
 
             document.getElementById("lastWin")
                 .textContent =
@@ -927,19 +1018,23 @@ function finishRound(){
                 .textContent =
                 "Number " +
                 winningNumber +
-                " aaya — Bet lost " +
-                currentBet +
-                " point";
+                " aaya — " +
+                totalBet +
+                " points lost";
 
         }
 
+
+        /* UPDATE BALANCE */
 
         document.getElementById("balance")
             .textContent =
             balance;
 
 
-        currentBet = 0;
+        /* RESET */
+
+        totalBet = 0;
 
         selectedNumber = null;
 
@@ -951,6 +1046,11 @@ function finishRound(){
             .forEach(n =>
                 n.classList.remove("selected")
             );
+
+
+        document.getElementById("selectedBet")
+            .textContent =
+            "Number select karo";
 
 
     },1200);
