@@ -355,62 +355,72 @@ footer{
 
 @media(max-width:600px){
 
+  body{
+    padding-bottom:90px;
+    overflow-x:hidden;
+  }
+
+  .hero{
+    padding:20px 8px 15px;
+  }
+
   .hero h1{
     font-size:30px;
   }
 
   .main-game{
     width:100%;
-    padding-left:5px;
-    padding-right:5px;
-    overflow:hidden;
+    padding:15px 8px 90px;
+    overflow:visible;
   }
 
   .wheel-box{
-    width:225px;
-    height:225px;
+    width:260px;
+    height:260px;
     margin:0 auto 20px;
   }
 
   .wheel{
-    width:225px;
-    height:225px;
+    width:260px;
+    height:260px;
   }
 
   .number{
-    width:20px;
-    height:20px;
-
-    margin-left:-10px;
-    margin-top:-10px;
-
-    font-size:7px;
+    width:22px;
+    height:22px;
+    margin-left:-11px;
+    margin-top:-11px;
+    font-size:8px;
 
     transform:
       rotate(var(--angle))
-      translateY(-91px)
+      translateY(-106px)
       rotate(calc(var(--angle) * -1));
   }
 
   .wheel::before{
-    inset:16px;
+    inset:18px;
     border-width:2px;
   }
 
   .wheel::after{
-    width:55px;
-    height:55px;
-
-    font-size:13px;
+    width:60px;
+    height:60px;
+    font-size:14px;
     border-width:3px;
   }
 
   .pointer{
     top:-6px;
-
     border-left-width:9px;
     border-right-width:9px;
     border-top-width:20px;
+  }
+
+  #spinBtn{
+    margin-bottom:20px;
+    padding:13px 30px;
+    font-size:17px;
   }
 
   .number-grid{
