@@ -83,13 +83,12 @@ body{
     justify-content:center;
     align-items:center;
 
-    /* WHEEL THODA SA NEECHE */
     padding:12px 0 5px;
 }
 
 
 /* =========================
-   WHEEL
+   OUTER WHEEL - FIXED
 ========================= */
 
 .wheel{
@@ -114,14 +113,14 @@ body{
         0 0 24px rgba(255,211,78,.35),
         inset 0 0 30px #000;
 
-    transform:rotate(0deg);
+    transform:none;
 
-    will-change:transform;
+    will-change:auto;
 }
 
 
 /* =========================
-   INNER RING
+   INNER RING - FIXED
 ========================= */
 
 .wheel-ring{
@@ -136,11 +135,61 @@ body{
     box-shadow:
         0 0 12px rgba(255,211,78,.25),
         inset 0 0 18px #000;
+
+    z-index:2;
 }
 
 
 /* =========================
-   CENTER
+   MOVING NUMBER LAYER
+========================= */
+
+.wheel-numbers{
+    position:absolute;
+
+    inset:0;
+
+    border-radius:50%;
+
+    z-index:4;
+
+    transition:
+        transform 4.5s cubic-bezier(.12,.72,.18,1);
+
+    will-change:transform;
+}
+
+
+/* =========================
+   WHEEL NUMBERS
+========================= */
+
+.wheel-number{
+    position:absolute;
+
+    width:17px;
+    height:17px;
+
+    display:flex;
+
+    align-items:center;
+    justify-content:center;
+
+    color:#fff;
+
+    font-size:8px;
+
+    font-weight:bold;
+
+    text-shadow:
+        0 2px 3px #000;
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   CENTER - FIXED
 ========================= */
 
 .wheel-center{
@@ -202,37 +251,7 @@ body{
 
 
 /* =========================
-   WHEEL NUMBERS
-========================= */
-
-.wheel-number{
-    position:absolute;
-
-    width:17px;
-    height:17px;
-
-    display:flex;
-
-    align-items:center;
-    justify-content:center;
-
-    color:#fff;
-
-    font-size:8px;
-
-    font-weight:bold;
-
-    text-shadow:
-        0 2px 3px #000;
-
-    z-index:4;
-
-    pointer-events:none;
-}
-
-
-/* =========================
-   POINTER
+   POINTER - FIXED
 ========================= */
 
 .pointer{
@@ -380,7 +399,7 @@ body{
 
 
 /* =========================
-   BETTING TIME / TOP INFO
+   BALANCE / TIMER / LAST 4
 ========================= */
 
 .betting-time{
@@ -675,6 +694,13 @@ body{
 
     <div class="wheel-ring"></div>
 
+    <!-- ONLY THIS LAYER WILL ROTATE -->
+
+    <div
+        class="wheel-numbers"
+        id="wheelNumbers">
+    </div>
+
     <div
         class="wheel-center"
         id="wheelCenter">
@@ -720,9 +746,7 @@ body{
     <div class="info-box">
 
         <div class="info-title">
-
             BALANCE
-
         </div>
 
         <div
@@ -741,9 +765,7 @@ body{
     <div class="info-box">
 
         <div class="info-title">
-
             BETTING TIME
-
         </div>
 
         <div
@@ -762,9 +784,7 @@ body{
     <div class="info-box">
 
         <div class="info-title">
-
             LAST 4 WIN
-
         </div>
 
         <div
@@ -852,7 +872,6 @@ body{
 
 <script>
 
-
 /* =========================
    VARIABLES
 ========================= */
@@ -875,16 +894,249 @@ let currentBetDiv = null;
 
 let wheelRotation = 0;
 
+let lastWinningNumbers = [];
+
+
+/* =========================
+   SOUND SYSTEM
+========================= */
+
+let audioContext = null;
+
 
 /*
-   LAST 4 COMPLETED WINNING NUMBERS
-
-   IMPORTANT:
-   Newest number will be shown
-   on the RIGHT side.
+   iPhone/Safari par sound
+   user interaction ke baad chalega.
 */
 
-let lastWinningNumbers = [];
+function initAudio(){
+
+    if(!audioContext){
+
+        const AudioCtx =
+            window.AudioContext ||
+            window.webkitAudioContext;
+
+        if(AudioCtx){
+
+            audioContext =
+                new AudioCtx();
+
+        }
+
+    }
+
+
+    if(
+        audioContext &&
+        audioContext.state === "suspended"
+    ){
+
+        audioContext.resume();
+
+    }
+
+}
+
+
+/* =========================
+   BET SOUND
+========================= */
+
+function playBetSound(){
+
+    initAudio();
+
+    if(!audioContext) return;
+
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+
+    oscillator.type =
+        "sine";
+
+    oscillator.frequency.setValueAtTime(
+        520,
+        audioContext.currentTime
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        700,
+        audioContext.currentTime + 0.045
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.055,
+        audioContext.currentTime + 0.008
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        audioContext.currentTime + 0.055
+    );
+
+
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + 0.06
+    );
+
+}
+
+
+/* =========================
+   SPIN SOUND
+========================= */
+
+function playSpinSound(){
+
+    initAudio();
+
+    if(!audioContext) return;
+
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+
+    oscillator.type =
+        "triangle";
+
+    oscillator.frequency.setValueAtTime(
+        180,
+        audioContext.currentTime
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        90,
+        audioContext.currentTime + 4
+    );
+
+
+    gain.gain.setValueAtTime(
+        0.0001,
+        audioContext.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.08,
+        audioContext.currentTime + 0.05
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        audioContext.currentTime + 4
+    );
+
+
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + 4.05
+    );
+
+}
+
+
+/* =========================
+   WIN SOUND
+========================= */
+
+function playWinSound(){
+
+    initAudio();
+
+    if(!audioContext) return;
+
+
+    const now =
+        audioContext.currentTime;
+
+
+    [523,659,784].forEach(
+        function(freq,index){
+
+            const oscillator =
+                audioContext.createOscillator();
+
+            const gain =
+                audioContext.createGain();
+
+
+            oscillator.type =
+                "sine";
+
+            oscillator.frequency.value =
+                freq;
+
+
+            const start =
+                now +
+                index * 0.12;
+
+
+            gain.gain.setValueAtTime(
+                0.0001,
+                start
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.10,
+                start + 0.02
+            );
+
+            gain.gain.exponentialRampToValueAtTime(
+                0.0001,
+                start + 0.25
+            );
+
+
+            oscillator.connect(gain);
+
+            gain.connect(
+                audioContext.destination
+            );
+
+
+            oscillator.start(start);
+
+            oscillator.stop(
+                start + 0.27
+            );
+
+        }
+    );
+
+}
 
 
 /* =========================
@@ -913,6 +1165,11 @@ const numberGrid =
 const wheel =
     document.getElementById(
         "wheel"
+    );
+
+const wheelNumbers =
+    document.getElementById(
+        "wheelNumbers"
     );
 
 const wheelCenter =
@@ -965,17 +1222,16 @@ function updateBalance(){
 function addWinningNumber(number){
 
     /*
-       NEW NUMBER END MEIN ADD HOGA
-
-       Isliye latest winning number
-       RIGHT SIDE par rahega.
+       NEW NUMBER RIGHT SIDE MEIN
     */
 
-    lastWinningNumbers.push(number);
+    lastWinningNumbers.push(
+        number
+    );
 
 
     /*
-       SIRF LAST 4 RAKHNE HAIN
+       SIRF LAST 4
     */
 
     if(
@@ -987,17 +1243,8 @@ function addWinningNumber(number){
     }
 
 
-    /*
-       DISPLAY CLEAR
-    */
-
     lastNumbers.innerHTML = "";
 
-
-    /*
-       PURANE SE NAYA
-       LEFT -> RIGHT
-    */
 
     lastWinningNumbers.forEach(
         function(num){
@@ -1049,8 +1296,8 @@ function addWinningNumber(number){
 
 
     /*
-       4 SE KAM HAIN TO
-       EMPTY PLACEHOLDER
+       4 SE KAM HAIN
+       PLACEHOLDER
     */
 
     while(
@@ -1161,6 +1408,14 @@ for(let i = 0; i <= 36; i++){
 
             if(!roundRunning) return;
 
+
+            /*
+               SOUND USER GESTURE PAR
+            */
+
+            initAudio();
+
+
             startHolding(
                 i,
                 div,
@@ -1251,10 +1506,6 @@ function startHolding(
         0;
 
 
-    /*
-       OLD PRESSED REMOVE
-    */
-
     document
         .querySelectorAll(
             ".number"
@@ -1276,8 +1527,7 @@ function startHolding(
 
 
     /*
-       FIRST POINT
-       IMMEDIATELY
+       FIRST POINT IMMEDIATELY
     */
 
     placeOnePointBet(
@@ -1286,8 +1536,8 @@ function startHolding(
 
 
     /*
-       EVERY 0.25 SECOND
-       +1 POINT
+       EVERY 100ms
+       = 10 POINTS PER SECOND
     */
 
     pressTimer =
@@ -1326,7 +1576,7 @@ function startHolding(
                 );
 
             },
-            250
+            100
         );
 
 }
@@ -1403,11 +1653,14 @@ function placeOnePointBet(
         balance - 1;
 
 
+    updateBalance();
+
+
     /*
-       UPDATE BALANCE
+       BET SOUND
     */
 
-    updateBalance();
+    playBetSound();
 
 
     /*
@@ -1442,10 +1695,6 @@ function placeOnePointBet(
         totalBet +
         "</strong> points bet";
 
-
-    /*
-       RESULT
-    */
 
     result.textContent =
         "⚡ Number " +
@@ -1516,7 +1765,13 @@ for(let i = 0; i <= 36; i++){
         "translate(-50%,-50%)";
 
 
-    wheel.appendChild(
+    /*
+       IMPORTANT:
+       NUMBER WHEEL KE ANDAR
+       FIXED OUTER WHEEL KE NAHI
+    */
+
+    wheelNumbers.appendChild(
         number
     );
 
@@ -1538,12 +1793,13 @@ function lockBetting(){
 
 
 /* =========================
-   SPIN WHEEL
+   SPIN NUMBERS ONLY
 ========================= */
 
 function spinWheel(){
 
     if(spinning) return;
+
 
     spinning =
         true;
@@ -1552,6 +1808,13 @@ function spinWheel(){
         false;
 
     stopHolding();
+
+
+    /*
+       SPIN SOUND
+    */
+
+    playSpinSound();
 
 
     /*
@@ -1591,6 +1854,9 @@ function spinWheel(){
 
     /*
        FINAL ROTATION
+
+       IMPORTANT:
+       SIRF NUMBERS ROTATE
     */
 
     const finalRotation =
@@ -1599,10 +1865,11 @@ function spinWheel(){
         (360 - targetAngle);
 
 
-    wheel.style.transition =
+    wheelNumbers.style.transition =
         "transform 4.5s cubic-bezier(.12,.72,.18,1)";
 
-    wheel.style.transform =
+
+    wheelNumbers.style.transform =
         "rotate(" +
         finalRotation +
         "deg)";
@@ -1613,7 +1880,7 @@ function spinWheel(){
 
 
     result.textContent =
-        "🎡 Wheel ghoom raha hai...";
+        "🎡 Numbers ghoom rahe hain...";
 
 
     /*
@@ -1643,10 +1910,9 @@ function showWinningNumber(
 ){
 
     /*
-       AB SPIN COMPLETE HO CHUKA HAI
+       AB OFFICIAL WINNER HAI
 
-       IS NUMBER KO LAST 4 WIN MEIN
-       ADD KARNA SAFE HAI.
+       LAST 4 MEIN ADD HOGA
     */
 
     addWinningNumber(
@@ -1655,7 +1921,7 @@ function showWinningNumber(
 
 
     /*
-       WIN NUMBER CENTER MEIN
+       CENTER WIN
     */
 
     wheelCenter.classList.add(
@@ -1701,6 +1967,13 @@ function showWinningNumber(
 
 
             updateBalance();
+
+
+            /*
+               WIN SOUND
+            */
+
+            playWinSound();
 
 
             result.textContent =
