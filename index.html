@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>ZYNO Roulette</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    min-height:100%;
+}
+
+body{
+    background:
+        radial-gradient(circle at 50% 25%, #123d68 0%, #061426 38%, #020711 100%);
+    color:#fff;
+    font-family:Arial,Helvetica,sans-serif;
+    overflow-x:hidden;
+    padding-bottom:25px;
+}
+
+.app{
+    width:100%;
+    max-width:520px;
+    margin:auto;
+    padding:12px 12px 25px;
+}
+
+/* LOGO */
+.logo{
+    text-align:center;
+    font-size:30px;
+    font-weight:900;
+    letter-spacing:5px;
+    color:#00e5ff;
+    text-shadow:
+        0 0 7px #00e5ff,
+        0 0 18px #00e5ff,
+        0 0 35px #007cff;
+    margin-bottom:10px;
+}
+
+/* INFO */
+.info-row{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.info-box{
+    flex:1;
+    background:rgba(5,20,38,.88);
+    border:1px solid rgba(0,229,255,.35);
+    border-radius:12px;
+    padding:8px 10px;
+    text-align:center;
+    box-shadow:0 0 12px rgba(0,229,255,.08);
+}
+
+.info-title{
+    font-size:10px;
+    color:#8da7bd;
+    letter-spacing:1px;
+}
+
+.info-value{
+    margin-top:3px;
+    font-size:18px;
+    font-weight:bold;
+    color:#fff;
+}
+
+/* WHEEL */
+.wheel-area{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:5px;
+    margin-bottom:12px;
+}
+
+.wheel{
+    position:relative;
+    width:min(68vw,290px);
+    height:min(68vw,290px);
+    max-width:290px;
+    max-height:290px;
+    border-radius:50%;
+    border:5px solid #d5aa36;
+    background:
+        radial-gradient(circle,
+        #17304b 0%,
+        #081728 42%,
+        #020913 43%,
+        #071727 100%);
+    box-shadow:
+        0 0 8px rgba(255,211,78,.5),
+        0 0 25px rgba(0,229,255,.12),
+        inset 0 0 25px #000;
+    overflow:visible;
+}
+
+/* pointer */
+.pointer{
+    position:absolute;
+    z-index:20;
+    top:-11px;
+    left:50%;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-top:22px solid #ffd34e;
+    filter:drop-shadow(0 0 5px rgba(255,211,78,.5));
+}
+
+/* rotating number layer */
+.number-layer{
+    position:absolute;
+    inset:0;
+    border-radius:50%;
+}
+
+.wheel-number{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:34px;
+    height:34px;
+    margin-left:-17px;
+    margin-top:-17px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:14px;
+    font-weight:900;
+    color:#f3f7ff;
+    text-shadow:0 0 5px #000;
+
+    transform-origin:17px 17px;
+}
+
+.wheel-number.zero{
+    color:#00e5ff;
+}
+
+/* center */
+.wheel-center{
+    position:absolute;
+    z-index:10;
+    width:92px;
+    height:92px;
+    border-radius:50%;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+
+    background:
+        radial-gradient(circle,#102f4c,#030b15 70%);
+    border:2px solid rgba(255,211,78,.75);
+
+    box-shadow:
+        0 0 10px rgba(255,211,78,.25),
+        inset 0 0 15px #000;
+}
+
+.center-logo{
+    color:#00e5ff;
+    font-size:18px;
+    font-weight:900;
+    letter-spacing:2px;
+    text-shadow:0 0 8px #00e5ff;
+}
+
+.center-win{
+    color:#ffd34e;
+    font-size:12px;
+    font-weight:bold;
+    margin-top:4px;
+}
+
+/* TIMER */
+.timer-box{
+    text-align:center;
+    margin:4px 0 10px;
+}
+
+.timer-label{
+    font-size:11px;
+    color:#8fa8bd;
+    letter-spacing:2px;
+    margin-bottom:2px;
+}
+
+.timer{
+    font-size:28px;
+    font-weight:900;
+    color:#ffd34e;
+    text-shadow:0 0 10px rgba(255,211,78,.5);
+}
+
+.timer.closed{
+    color:#ff5964;
+}
+
+/* RESULT */
+.result{
+    min-height:34px;
+    text-align:center;
+    font-size:14px;
+    font-weight:bold;
+    color:#9db7ca;
+    margin-bottom:7px;
+}
+
+.result.win{
+    color:#00e5ff;
+}
+
+/* SELECTED BET */
+.selected-bet{
+    background:rgba(3,18,32,.9);
+    border:1px solid rgba(0,229,255,.28);
+    border-radius:10px;
+    padding:9px;
+    text-align:center;
+    font-size:13px;
+    color:#b5cada;
+    margin-bottom:9px;
+}
+
+.selected-bet strong{
+    color:#ffd34e;
+}
+
+/* NUMBER GRID */
+.grid-title{
+    text-align:center;
+    color:#7f9bb1;
+    font-size:10px;
+    letter-spacing:2px;
+    margin-bottom:7px;
+}
+
+.number-grid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:6px;
+}
+
+.bet-number{
+    min-height:48px;
+    border-radius:9px;
+    border:1px solid rgba(0,229,255,.25);
+    background:
+        linear-gradient(145deg,#0b2944,#061321);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action:none;
+    cursor:pointer;
+    box-shadow:
+        inset 0 0 8px rgba(0,0,0,.35);
+    transition:.08s;
+}
+
+.bet-number .num{
+    font-size:17px;
+    font-weight:900;
+}
+
+.bet-number .bet-count{
+    font-size:9px;
+    color:#7895aa;
+    margin-top:2px;
+}
+
+.bet-number.active{
+    border-color:#ffd34e;
+    background:
+        linear-gradient(145deg,#26425a,#102033);
+    box-shadow:
+        0 0 10px rgba(255,211,78,.25),
+        inset 0 0 10px rgba(255,211,78,.08);
+    transform:scale(.96);
+}
+
+.bet-number.has-bet .bet-count{
+    color:#ffd34e;
+}
+
+.bet-number.disabled{
+    opacity:.45;
+}
+
+/* LAST WINS */
+.last-title{
+    text-align:center;
+    font-size:10px;
+    color:#7f9bb1;
+    letter-spacing:2px;
+    margin:14px 0 7px;
+}
+
+.last-wins{
+    display:flex;
+    justify-content:center;
+    gap:7px;
+}
+
+.last-win{
+    width:42px;
+    height:34px;
+    border-radius:8px;
+    background:#071827;
+    border:1px solid rgba(0,229,255,.2);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    color:#dcecff;
+}
+
+/* GAME BUTTONS */
+.games{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-top:14px;
+}
+
+.game-btn{
+    min-height:42px;
+    border:1px solid rgba(0,229,255,.25);
+    border-radius:9px;
+    background:#071a2c;
+    color:#b8d7e9;
+    font-size:10px;
+    font-weight:bold;
+}
+
+/* MOBILE */
+@media(max-width:360px){
+    .app{
+        padding-left:8px;
+        padding-right:8px;
+    }
+
+    .wheel{
+        width:255px;
+        height:255px;
+    }
+
+    .number-grid{
+        gap:4px;
+    }
+
+    .bet-number{
+        min-height:45px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="logo">ZYNO</div>
+
+    <div class="info-row">
+
+        <div class="info-box">
+            <div class="info-title">BALANCE</div>
+            <div class="info-value" id="balance">10000</div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-title">LAST WIN</div>
+            <div class="info-value" id="lastWin">—</div>
+        </div>
+
+    </div>
+
+    <div class="wheel-area">
+
+        <div class="wheel">
+
+            <div class="pointer"></div>
+
+            <div class="number-layer" id="numberLayer"></div>
+
+            <div class="wheel-center">
+                <div class="center-logo" id="centerLogo">ZYNO</div>
+                <div class="center-win" id="centerWin"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="timer-box">
+        <div class="timer-label">BETTING TIME</div>
+        <div class="timer" id="timer">60</div>
+    </div>
+
+    <div class="result" id="result">
+        Number select karo
+    </div>
+
+    <div class="selected-bet" id="selectedBet">
+        Number select karo
+    </div>
+
+    <div class="grid-title">
+        HOLD NUMBER TO BET
+    </div>
+
+    <div class="number-grid" id="numberGrid"></div>
+
+    <div class="last-title">LAST 4 WIN</div>
+
+    <div class="last-wins">
+        <div class="last-win" id="win0">—</div>
+        <div class="last-win" id="win1">—</div>
+        <div class="last-win" id="win2">—</div>
+        <div class="last-win" id="win3">—</div>
+    </div>
+
+    <div class="games">
+
+        <button class="game-btn">🎲 ZYNO LUDO</button>
+        <button class="game-btn">🔢 ZYNO 0–11</button>
+        <button class="game-btn">🃏 TEEN PATTI</button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =========================
+   ZYNO ROULETTE
+========================= */
+
+const TOTAL_NUMBERS = 37;
+
+/*
+   IMPORTANT:
+
+   1 point = 0.10 second
+
+   0.10 sec = 1 point
+   0.20 sec = 2 points
+   1.00 sec = 10 points
+*/
+
+const POINT_INTERVAL = 100; // 100ms = 0.10 second
+
+let balance = 10000;
+let timeLeft = 60;
+
+let bettingOpen = true;
+let spinning = false;
+
+let selectedNumber = null;
+
+let bets = {};
+
+let holdTimer = null;
+let holdStart = 0;
+let holdLast = 0;
+
+let lastWins = [];
+
+let currentRotation = 0;
+
+/* DOM */
+const numberLayer = document.getElementById("numberLayer");
+const numberGrid = document.getElementById("numberGrid");
+
+const timerEl = document.getElementById("timer");
+const balanceEl = document.getElementById("balance");
+const lastWinEl = document.getElementById("lastWin");
+
+const selectedBetEl = document.getElementById("selectedBet");
+const resultEl = document.getElementById("result");
+
+const centerLogo = document.getElementById("centerLogo");
+const centerWin = document.getElementById("centerWin");
+
+
+/* =========================
+   WHEEL NUMBERS
+========================= */
+
+for(let i=0;i<TOTAL_NUMBERS;i++){
+
+    const el = document.createElement("div");
+
+    el.className = "wheel-number";
+
+    if(i === 0){
+        el.classList.add("zero");
+    }
+
+    el.textContent = i;
+
+    /*
+       Number 0 starts at top.
+       Other numbers placed equally around wheel.
+    */
+
+    const angle = i * (360 / TOTAL_NUMBERS);
+
+    const radius = 116;
+
+    const x =
+        Math.sin(angle * Math.PI / 180) * radius;
+
+    const y =
+        -Math.cos(angle * Math.PI / 180) * radius;
+
+    el.style.transform =
+        `translate(${x}px, ${y}px)`;
+
+    numberLayer.appendChild(el);
+}
+
+
+/* =========================
+   BET GRID
+========================= */
+
+for(let i=0;i<TOTAL_NUMBERS;i++){
+
+    bets[i] = 0;
+
+    const btn = document.createElement("div");
+
+    btn.className = "bet-number";
+
+    btn.dataset.number = i;
+
+    btn.innerHTML = `
+        <div class="num">${i}</div>
+        <div class="bet-count">BET 0</div>
+    `;
+
+    /*
+       TOUCH
+    */
+
+    btn.addEventListener(
+        "touchstart",
+        function(e){
+
+            e.preventDefault();
+
+            startBet(i, btn);
+
+        },
+        {passive:false}
+    );
+
+    btn.addEventListener(
+        "touchend",
+        function(e){
+
+            e.preventDefault();
+
+            stopBet();
+
+        },
+        {passive:false}
+    );
+
+    btn.addEventListener(
+        "touchcancel",
+        function(e){
+
+            e.preventDefault();
+
+            stopBet();
+
+        },
+        {passive:false}
+    );
+
+    /*
+       MOUSE / DESKTOP
+    */
+
+    btn.addEventListener(
+        "mousedown",
+        function(e){
+
+            e.preventDefault();
+
+            startBet(i, btn);
+
+        }
+    );
+
+    btn.addEventListener(
+        "mouseup",
+        function(){
+
+            stopBet();
+
+        }
+    );
+
+    btn.addEventListener(
+        "mouseleave",
+        function(){
+
+            if(holdTimer){
+                stopBet();
+            }
+
+        }
+    );
+
+    numberGrid.appendChild(btn);
+}
+
+
+/* =========================
+   START BET
+========================= */
+
+function startBet(number, button){
+
+    if(!bettingOpen || spinning){
+        return;
+    }
+
+    /*
+       अगर balance 0 है
+    */
+
+    if(balance <= 0){
+        resultEl.textContent = "Balance khatam hai";
+        return;
+    }
+
+    stopBet();
+
+    selectedNumber = number;
+
+    document
+        .querySelectorAll(".bet-number")
+        .forEach(x => x.classList.remove("active"));
+
+    button.classList.add("active");
+
+    updateSelectedBet();
+
+    holdStart = performance.now();
+    holdLast = holdStart;
+
+    /*
+       तुरंत 1 point नहीं लगेगा।
+
+       हर 100ms पर 1 point.
+    */
+
+    holdTimer = setInterval(() => {
+
+        if(!bettingOpen || spinning){
+            stopBet();
+            return;
+        }
+
+        if(balance <= 0){
+            stopBet();
+            return;
+        }
+
+        const now = performance.now();
+
+        /*
+           Exact elapsed time से calculate.
+           इससे device timer थोड़ा slow/fast होने पर
+           points double नहीं होंगे.
+        */
+
+        const elapsed = now - holdStart;
+
+        const totalPoints =
+            Math.floor(elapsed / POINT_INTERVAL);
+
+        const alreadyAdded =
+            Math.floor(
+                (holdLast - holdStart) / POINT_INTERVAL
+            );
+
+        const newPoints =
+            totalPoints - alreadyAdded;
+
+        if(newPoints > 0){
+
+            const add =
+                Math.min(newPoints, balance);
+
+            bets[number] += add;
+
+            balance -= add;
+
+            holdLast = holdStart +
+                (alreadyAdded + add) *
+                POINT_INTERVAL;
+
+            updateButton(number);
+            updateBalance();
+            updateSelectedBet();
+        }
+
+    }, 20);
+}
+
+
+/* =========================
+   STOP BET
+========================= */
+
+function stopBet(){
+
+    if(holdTimer !== null){
+
+        clearInterval(holdTimer);
+
+        holdTimer = null;
+    }
+
+    document
+        .querySelectorAll(".bet-number")
+        .forEach(x => x.classList.remove("active"));
+}
+
+
+/* =========================
+   BUTTON UPDATE
+========================= */
+
+function updateButton(number){
+
+    const btn =
+        document.querySelector(
+            `.bet-number[data-number="${number}"]`
+        );
+
+    if(!btn) return;
+
+    const count =
+        btn.querySelector(".bet-count");
+
+    count.textContent =
+        `BET ${bets[number]}`;
+
+    if(bets[number] > 0){
+        btn.classList.add("has-bet");
+    }else{
+        btn.classList.remove("has-bet");
+    }
+}
+
+
+/* =========================
+   BALANCE
+========================= */
+
+function updateBalance(){
+
+    balanceEl.textContent =
+        balance.toLocaleString();
+}
+
+
+/* =========================
+   SELECTED BET
+========================= */
+
+function updateSelectedBet(){
+
+    if(selectedNumber === null){
+
+        selectedBetEl.innerHTML =
+            "Number select karo";
+
+        return;
+    }
+
+    selectedBetEl.innerHTML =
+        `Number <strong>${selectedNumber}</strong> par total <strong>${bets[selectedNumber]}</strong> points bet`;
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+let timerInterval =
+    setInterval(() => {
+
+        if(!bettingOpen) return;
+
+        timeLeft--;
+
+        timerEl.textContent =
+            timeLeft;
+
+        /*
+           Last 4 seconds में betting बंद.
+           यानी 56 seconds remaining होते ही
+           नई betting बंद हो जाएगी.
+        */
+
+        if(timeLeft <= 4){
+
+            bettingOpen = false;
+
+            stopBet();
+
+            timerEl.classList.add("closed");
+
+            resultEl.textContent =
+                "Betting closed";
+
+        }
+
+        if(timeLeft <= 0){
+
+            clearInterval(timerInterval);
+
+            timeLeft = 0;
+
+            timerEl.textContent = "0";
+
+            bettingOpen = false;
+
+            stopBet();
+
+            spinWheel();
+
+        }
+
+    },1000);
+
+
+/* =========================
+   SPIN
+========================= */
+
+function spinWheel(){
+
+    if(spinning) return;
+
+    spinning = true;
+
+    stopBet();
+
+    resultEl.textContent =
+        "Wheel spinning...";
+
+    /*
+       Random winning number
+    */
+
+    const winningNumber =
+        Math.floor(
+            Math.random() * TOTAL_NUMBERS
+        );
+
+    /*
+       Wheel number position.
+
+       Winning number को pointer (top) पर लाना है.
+    */
+
+    const step =
+        360 / TOTAL_NUMBERS;
+
+    const targetAngle =
+        winningNumber * step;
+
+    /*
+       कई पूरे rounds.
+    */
+
+    const extraRounds = 6 * 360;
+
+    /*
+       Current rotation normalize.
+    */
+
+    const currentNormalized =
+        ((currentRotation % 360) + 360) % 360;
+
+    let finalRotation =
+        currentRotation +
+        extraRounds +
+        (360 - targetAngle - currentNormalized);
+
+    /*
+       CSS transition
+    */
+
+    numberLayer.style.transition =
+        "transform 4.5s cubic-bezier(.12,.75,.18,1)";
+
+    numberLayer.style.transform =
+        `rotate(${finalRotation}deg)`;
+
+    currentRotation = finalRotation;
+
+    setTimeout(() => {
+
+        finishRound(winningNumber);
+
+    },4700);
+}
+
+
+/* =========================
+   FINISH ROUND
+========================= */
+
+function finishRound(winningNumber){
+
+    spinning = false;
+
+    /*
+       WIN display
+    */
+
+    centerLogo.textContent =
+        "WIN";
+
+    centerWin.textContent =
+        winningNumber;
+
+    lastWinEl.textContent =
+        winningNumber;
+
+    /*
+       Last 4 results
+    */
+
+    lastWins.unshift(winningNumber);
+
+    if(lastWins.length > 4){
+        lastWins.pop();
+    }
+
+    for(let i=0;i<4;i++){
+
+        const el =
+            document.getElementById(
+                `win${i}`
+            );
+
+        el.textContent =
+            lastWins[i] !== undefined
+            ? lastWins[i]
+            : "—";
+    }
+
+    /*
+       Winner payout
+       35x + original bet return
+    */
+
+    const winningBet =
+        bets[winningNumber] || 0;
+
+    if(winningBet > 0){
+
+        const winAmount =
+            winningBet * 35;
+
+        const returnedBet =
+            winningBet;
+
+        const totalPayout =
+            winAmount + returnedBet;
+
+        balance += totalPayout;
+
+        resultEl.className =
+            "result win";
+
+        resultEl.textContent =
+            `WIN ${winningNumber} — +${totalPayout} points`;
+
+    }else{
+
+        resultEl.className =
+            "result";
+
+        resultEl.textContent =
+            `Winning Number: ${winningNumber}`;
+
+    }
+
+    /*
+       Reset bets
+    */
+
+    for(let i=0;i<TOTAL_NUMBERS;i++){
+
+        bets[i] = 0;
+
+        updateButton(i);
+    }
+
+    selectedNumber = null;
+
+    updateBalance();
+
+    updateSelectedBet();
+
+    /*
+       Center normal after 3 seconds
+    */
+
+    setTimeout(() => {
+
+        centerLogo.textContent =
+            "ZYNO";
+
+        centerWin.textContent = "";
+
+    },3000);
+
+    /*
+       Next round after short delay
+    */
+
+    setTimeout(() => {
+
+        resetRound();
+
+    },4000);
+}
+
+
+/* =========================
+   RESET ROUND
+========================= */
+
+function resetRound(){
+
+    timeLeft = 60;
+
+    bettingOpen = true;
+
+    spinning = false;
+
+    timerEl.classList.remove("closed");
+
+    timerEl.textContent =
+        timeLeft;
+
+    resultEl.className =
+        "result";
+
+    resultEl.textContent =
+        "Number select karo";
+
+    /*
+       Transition हटाकर next round
+       smooth start के लिए current rotation रखा जाता है.
+    */
+
+    numberLayer.style.transition =
+        "none";
+
+}
+
+
+/* =========================
+   SAFETY
+========================= */
+
+document.addEventListener(
+    "visibilitychange",
+    function(){
+
+        if(document.hidden){
+
+            stopBet();
+
+        }
+
+    }
+);
+
+
+/*
+   Prevent long-press browser menu
+*/
+
+document.addEventListener(
+    "contextmenu",
+    function(e){
+
+        if(e.target.closest(".bet-number")){
+
+            e.preventDefault();
+
+        }
+
+    }
+);
+
+</script>
+
+</body>
+</html>
