@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>ZYNO Roulette</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+}
+
+body{
+    font-family:Arial,sans-serif;
+    background:
+        radial-gradient(circle at top,#0a3154 0%,#041522 45%,#01070d 100%);
+    color:#fff;
+    user-select:none;
+    overflow:hidden;
+    position:fixed;
+    inset:0;
+}
+
+.app{
+    width:100%;
+    max-width:520px;
+    height:100dvh;
+    margin:auto;
+    padding:8px 10px 8px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+/* LOGO */
+
+.logo{
+    text-align:center;
+    font-size:32px;
+    font-weight:900;
+    letter-spacing:5px;
+    color:#00e5ff;
+    text-shadow:
+        0 0 8px #00e5ff,
+        0 0 18px #00e5ff,
+        0 0 35px rgba(0,229,255,.7);
+    margin-bottom:7px;
+}
+
+/* MODE */
+
+.modeRow{
+    display:flex;
+    gap:7px;
+    margin-bottom:7px;
+}
+
+.modeButton{
+    flex:1;
+    padding:8px 4px;
+    border-radius:9px;
+    border:1px solid rgba(0,229,255,.4);
+    background:#061a2b;
+    color:#d9f8ff;
+    font-size:11px;
+    font-weight:900;
+}
+
+.modeButton.active{
+    color:#00e5ff;
+    border-color:#00e5ff;
+    box-shadow:0 0 10px rgba(0,229,255,.25);
+}
+
+/* WHEEL */
+
+.wheelArea{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:1px 0 6px;
+}
+
+.wheel{
+    position:relative;
+    width:min(66vw,275px);
+    height:min(66vw,275px);
+    border-radius:50%;
+
+    /* GOLD HATA DIYA */
+    border:7px solid #00e5ff;
+
+    background:
+        radial-gradient(circle,#0a304c 0%,#031522 63%,#010910 100%);
+
+    box-shadow:
+        0 0 12px rgba(0,229,255,.8),
+        0 0 30px rgba(0,229,255,.35),
+        inset 0 0 30px rgba(0,229,255,.18);
+
+    overflow:hidden;
+}
+
+.wheelRing{
+    position:absolute;
+    inset:11px;
+    border:1px solid rgba(0,229,255,.5);
+    border-radius:50%;
+    pointer-events:none;
+}
+
+.wheelNumber{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:34px;
+    height:34px;
+    margin-left:-17px;
+    margin-top:-17px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:15px;
+    font-weight:900;
+    color:#fff;
+    text-shadow:0 0 5px #000;
+    pointer-events:none;
+}
+
+.pointer{
+    position:absolute;
+    left:50%;
+    top:-5px;
+    transform:translateX(-50%);
+    width:0;
+    height:0;
+    border-left:10px solid transparent;
+    border-right:10px solid transparent;
+    border-top:20px solid #ff4545;
+    filter:drop-shadow(0 0 5px #ff4545);
+    z-index:20;
+}
+
+.wheelCenter{
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    width:78px;
+    height:78px;
+    border-radius:50%;
+    background:#03111d;
+    border:3px solid #00e5ff;
+    box-shadow:
+        0 0 14px rgba(0,229,255,.8),
+        inset 0 0 14px rgba(0,229,255,.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    z-index:30;
+}
+
+.centerText{
+    color:#00e5ff;
+    font-size:18px;
+    font-weight:900;
+    line-height:20px;
+}
+
+/* RESULT */
+
+.result{
+    min-height:20px;
+    text-align:center;
+    color:#b9d6e5;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:4px;
+}
+
+/* LAST 4 */
+
+.lastTitle{
+    text-align:center;
+    color:#819caf;
+    font-size:10px;
+    margin-bottom:3px;
+}
+
+.lastWins{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-bottom:6px;
+}
+
+.lastNumber{
+    width:36px;
+    height:34px;
+    border-radius:8px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#061b2c;
+    border:1px solid rgba(0,229,255,.35);
+    color:#fff;
+    font-size:15px;
+    font-weight:900;
+}
+
+/* SELECTED BET */
+
+.selectedBet{
+    min-height:36px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6px;
+    margin-bottom:6px;
+    border-radius:10px;
+    border:1px solid rgba(0,229,255,.4);
+    background:rgba(4,20,34,.95);
+    font-size:12px;
+}
+
+.selectedBet span{
+    color:#00e5ff;
+    font-weight:900;
+}
+
+/* NUMBER GRID */
+
+.numberGrid{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:5px;
+}
+
+.betNumber{
+    min-height:48px;
+    border-radius:9px;
+    border:1px solid rgba(0,229,255,.4);
+    background:
+        linear-gradient(180deg,#092640,#031421);
+    color:#fff;
+    font-size:19px;
+    font-weight:900;
+    position:relative;
+    touch-action:none;
+    transition:transform .08s;
+}
+
+.betNumber:active{
+    transform:scale(.94);
+}
+
+.betNumber.selected{
+    border-color:#00e5ff;
+    box-shadow:
+        0 0 11px rgba(0,229,255,.55),
+        inset 0 0 9px rgba(0,229,255,.12);
+}
+
+.betNumber.disabled{
+    opacity:.45;
+}
+
+.betCount{
+    display:block;
+    color:#00e5ff;
+    font-size:8px;
+    line-height:10px;
+}
+
+/* BOTTOM BUTTONS */
+
+.gameButtons{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:6px;
+    margin-top:7px;
+}
+
+.gameButton{
+    border:1px solid rgba(0,229,255,.35);
+    background:#061a2b;
+    color:#d8f8ff;
+    border-radius:9px;
+    padding:8px 3px;
+    font-size:10px;
+    font-weight:900;
+}
+
+/* SMALL SCREEN */
+
+@media(max-width:360px){
+
+    .app{
+        padding-left:7px;
+        padding-right:7px;
+    }
+
+    .wheel{
+        width:250px;
+        height:250px;
+    }
+
+    .numberGrid{
+        gap:4px;
+    }
+
+    .betNumber{
+        min-height:45px;
+        font-size:18px;
+    }
+
+    .wheelNumber{
+        font-size:14px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="logo">ZYNO</div>
+
+    <div class="modeRow">
+
+        <button
+            class="modeButton active"
+            id="mode36">
+            🔴 ZYNO 0–36
+        </button>
+
+        <button
+            class="modeButton"
+            id="mode11">
+            🔢 ZYNO 0–11
+        </button>
+
+    </div>
+
+    <div class="wheelArea">
+
+        <div class="wheel" id="wheel">
+
+            <div class="pointer"></div>
+
+            <div class="wheelRing"></div>
+
+            <div class="wheelCenter">
+                <div
+                    class="centerText"
+                    id="centerText">
+                    ZYNO
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="result" id="result">
+        Number select karo
+    </div>
+
+    <div class="lastTitle">
+        LAST 4 WIN
+    </div>
+
+    <div class="lastWins" id="lastWins"></div>
+
+    <div class="selectedBet" id="selectedBet">
+        Number select karo
+    </div>
+
+    <div
+        class="numberGrid"
+        id="numberGrid">
+    </div>
+
+    <div class="gameButtons">
+
+        <button class="gameButton">
+            🎲 ZYNO LUDO
+        </button>
+
+        <button class="gameButton">
+            🔢 ZYNO 0–11
+        </button>
+
+        <button class="gameButton">
+            🃏 TEEN PATTI
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+/* =====================================================
+   ZYNO GAME SETTINGS
+===================================================== */
+
+const START_BALANCE = 10000;
+
+const ROUND_TIME = 60;
+
+const BET_CLOSE_TIME = 56;
+
+const BET_SPEED = 250;
+
+
+/* =====================================================
+   STATE
+===================================================== */
+
+let balance =
+    Number(localStorage.getItem("zyno_balance"));
+
+if(!Number.isFinite(balance)){
+    balance = START_BALANCE;
+}
+
+let mode =
+    localStorage.getItem("zyno_mode") || "36";
+
+let bets = {};
+
+let selectedNumber = null;
+
+let bettingOpen = true;
+
+let spinning = false;
+
+let roundStart = 0;
+
+let timerInterval = null;
+
+let lastWins =
+    JSON.parse(
+        localStorage.getItem("zyno_last_wins") || "[]"
+    );
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const timerEl =
+    document.getElementById("timer");
+
+const lastWinEl =
+    document.getElementById("lastWin");
+
+const lastWinsEl =
+    document.getElementById("lastWins");
+
+const selectedBetEl =
+    document.getElementById("selectedBet");
+
+const numberGrid =
+    document.getElementById("numberGrid");
+
+const resultEl =
+    document.getElementById("result");
+
+const wheel =
+    document.getElementById("wheel");
+
+const centerText =
+    document.getElementById("centerText");
+
+const mode36 =
+    document.getElementById("mode36");
+
+const mode11 =
+    document.getElementById("mode11");
+
+
+/* =====================================================
+   STORAGE
+===================================================== */
+
+function saveBalance(){
+
+    localStorage.setItem(
+        "zyno_balance",
+        String(Math.floor(balance))
+    );
+}
+
+function saveLastWins(){
+
+    localStorage.setItem(
+        "zyno_last_wins",
+        JSON.stringify(lastWins)
+    );
+}
+
+
+/* =====================================================
+   BALANCE
+===================================================== */
+
+function updateBalance(){
+
+    saveBalance();
+}
+
+
+/* =====================================================
+   MODE
+===================================================== */
+
+function maxNumber(){
+
+    return mode === "36" ? 36 : 11;
+}
+
+function setMode(newMode){
+
+    if(spinning) return;
+
+    mode = newMode;
+
+    localStorage.setItem(
+        "zyno_mode",
+        mode
+    );
+
+    mode36.classList.toggle(
+        "active",
+        mode === "36"
+    );
+
+    mode11.classList.toggle(
+        "active",
+        mode === "11"
+    );
+
+    bets = {};
+
+    selectedNumber = null;
+
+    centerText.textContent = "ZYNO";
+
+    resultEl.textContent =
+        "Number select karo";
+
+    selectedBetEl.textContent =
+        "Number select karo";
+
+    createWheel();
+
+    createNumberGrid();
+}
+
+
+/* =====================================================
+   WHEEL
+===================================================== */
+
+function createWheel(){
+
+    wheel
+        .querySelectorAll(".wheelNumber")
+        .forEach(el => el.remove());
+
+    const max =
+        maxNumber();
+
+    const total =
+        max + 1;
+
+    const radius =
+        wheel.clientWidth * 0.385;
+
+    for(let i=0;i<total;i++){
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "wheelNumber";
+
+        el.textContent =
+            i;
+
+        const angle =
+            (360 / total) * i - 90;
+
+        const rad =
+            angle * Math.PI / 180;
+
+        const x =
+            Math.cos(rad) * radius;
+
+        const y =
+            Math.sin(rad) * radius;
+
+        el.style.transform =
+            `translate(${x}px,${y}px)`;
+
+        wheel.appendChild(el);
+    }
+}
+
+
+/* =====================================================
+   NUMBER GRID
+===================================================== */
+
+function createNumberGrid(){
+
+    numberGrid.innerHTML = "";
+
+    for(
+        let number = 0;
+        number <= maxNumber();
+        number++
+    ){
+
+        createBetButton(number);
+    }
+}
+
+
+/* =====================================================
+   BET BUTTON
+===================================================== */
+
+function createBetButton(number){
+
+    const button =
+        document.createElement("button");
+
+    button.className =
+        "betNumber";
+
+    button.innerHTML = `
+        ${number}
+        <span
+            class="betCount"
+            id="bet-${number}">
+            BET 0
+        </span>
+    `;
+
+    let holdTimer = null;
+
+
+    function stopHold(){
+
+        if(holdTimer !== null){
+
+            clearInterval(holdTimer);
+
+            holdTimer = null;
+        }
+
+        button.classList.remove(
+            "selected"
+        );
+    }
+
+
+    function startHold(event){
+
+        event.preventDefault();
+
+        if(spinning) return;
+
+        if(!bettingOpen){
+
+            resultEl.textContent =
+                "Betting band hai";
+
+            return;
+        }
+
+        if(balance <= 0){
+
+            resultEl.textContent =
+                "Balance khatam hai";
+
+            return;
+        }
+
+        selectedNumber =
+            number;
+
+        button.classList.add(
+            "selected"
+        );
+
+        updateSelectedBet();
+
+
+        holdTimer =
+            setInterval(()=>{
+
+                if(
+                    spinning ||
+                    !bettingOpen ||
+                    balance <= 0
+                ){
+
+                    stopHold();
+
+                    return;
+                }
+
+                balance -= 1;
+
+                if(!bets[number]){
+                    bets[number] = 0;
+                }
+
+                bets[number]++;
+
+                updateBalance();
+
+                updateBetCount(number);
+
+                updateSelectedBet();
+
+            },BET_SPEED);
+    }
+
+
+    button.addEventListener(
+        "pointerdown",
+        startHold
+    );
+
+    button.addEventListener(
+        "pointerup",
+        stopHold
+    );
+
+    button.addEventListener(
+        "pointercancel",
+        stopHold
+    );
+
+    button.addEventListener(
+        "pointerleave",
+        stopHold
+    );
+
+    button.addEventListener(
+        "contextmenu",
+        e => e.preventDefault()
+    );
+
+    numberGrid.appendChild(button);
+}
+
+
+/* =====================================================
+   BET COUNT
+===================================================== */
+
+function updateBetCount(number){
+
+    const el =
+        document.getElementById(
+            `bet-${number}`
+        );
+
+    if(!el) return;
+
+    el.textContent =
+        `BET ${bets[number] || 0}`;
+}
+
+
+/* =====================================================
+   SELECTED BET
+===================================================== */
+
+function updateSelectedBet(){
+
+    if(selectedNumber === null){
+
+        selectedBetEl.textContent =
+            "Number select karo";
+
+        return;
+    }
+
+    const amount =
+        bets[selectedNumber] || 0;
+
+    selectedBetEl.innerHTML =
+        `Number <span>${selectedNumber}</span> par total <span>${amount}</span> points bet`;
+}
+
+
+/* =====================================================
+   TIMER
+===================================================== */
+
+function startRound(){
+
+    clearInterval(timerInterval);
+
+    roundStart =
+        Date.now();
+
+    localStorage.setItem(
+        "zyno_round_start",
+        String(roundStart)
+    );
+
+    bettingOpen = true;
+
+    spinning = false;
+
+    updateTimer();
+
+    timerInterval =
+        setInterval(
+            updateTimer,
+            250
+        );
+}
+
+
+function updateTimer(){
+
+    const elapsed =
+        Math.floor(
+            (Date.now() - roundStart) / 1000
+        );
+
+    let remaining =
+        ROUND_TIME - elapsed;
+
+    if(remaining < 0){
+        remaining = 0;
+    }
+
+
+    if(
+        remaining <= BET_CLOSE_TIME &&
+        bettingOpen
+    ){
+
+        bettingOpen = false;
+
+        document
+            .querySelectorAll(".betNumber")
+            .forEach(button=>{
+                button.classList.add(
+                    "disabled"
+                );
+            });
+
+        resultEl.textContent =
+            "Betting band — wheel spin hoga";
+    }
+
+
+    if(
+        remaining === 0 &&
+        !spinning
+    ){
+
+        clearInterval(timerInterval);
+
+        spinWheel();
+    }
+}
+
+
+/* =====================================================
+   WINNING NUMBER
+===================================================== */
+
+function randomWinner(){
+
+    return Math.floor(
+        Math.random() *
+        (maxNumber() + 1)
+    );
+}
+
+
+/* =====================================================
+   SPIN
+===================================================== */
+
+function spinWheel(){
+
+    if(spinning) return;
+
+    spinning = true;
+
+    bettingOpen = false;
+
+    document
+        .querySelectorAll(".betNumber")
+        .forEach(button=>{
+            button.classList.add(
+                "disabled"
+            );
+        });
+
+    resultEl.textContent =
+        "Wheel spin ho raha hai...";
+
+
+    const winner =
+        randomWinner();
+
+
+    const rotations =
+        5 + Math.floor(
+            Math.random() * 3
+        );
+
+    const randomAngle =
+        Math.floor(
+            Math.random() * 360
+        );
+
+    const rotation =
+        rotations * 360 +
+        randomAngle;
+
+
+    wheel.style.transition =
+        "transform 5.5s cubic-bezier(.12,.72,.12,1)";
+
+    wheel.style.transform =
+        `rotate(${rotation}deg)`;
+
+
+    setTimeout(()=>{
+
+        finishRound(winner);
+
+    },5700);
+}
+
+
+/* =====================================================
+   FINISH ROUND
+===================================================== */
+
+function finishRound(winner){
+
+    const winningBet =
+        bets[winner] || 0;
+
+
+    centerText.innerHTML =
+        `WIN<br>${winner}`;
+
+
+    addLastWin(winner);
+
+
+    if(mode === "11"){
+
+        if(winningBet > 0){
+
+            const payout =
+                winningBet * 10;
+
+            balance += payout;
+
+            resultEl.textContent =
+                `WIN ${winner} — ${payout} points mile`;
+
+        }else{
+
+            resultEl.textContent =
+                `Winning Number: ${winner}`;
+        }
+    }
+
+    else{
+
+        if(winningBet > 0){
+
+            const winAmount =
+                winningBet * 35;
+
+            const returnedBet =
+                winningBet;
+
+            const totalPayout =
+                winAmount +
+                returnedBet;
+
+            balance += totalPayout;
+
+            resultEl.textContent =
+                `WIN ${winner} — ${totalPayout} points mile`;
+
+        }else{
+
+            resultEl.textContent =
+                `Winning Number: ${winner}`;
+        }
+    }
+
+
+    updateBalance();
+
+
+    setTimeout(
+        resetRound,
+        3000
+    );
+}
+
+
+/* =====================================================
+   LAST 4 WIN
+===================================================== */
+
+function addLastWin(number){
+
+    lastWins.push(number);
+
+    if(lastWins.length > 4){
+
+        lastWins.shift();
+    }
+
+    saveLastWins();
+
+    renderLastWins();
+}
+
+
+function renderLastWins(){
+
+    lastWinsEl.innerHTML = "";
+
+    const values = [
+        null,
+        null,
+        null,
+        null
+    ];
+
+    const start =
+        4 - lastWins.length;
+
+    lastWins.forEach(
+        (number,index)=>{
+
+            values[
+                start + index
+            ] = number;
+        }
+    );
+
+
+    values.forEach(number=>{
+
+        const div =
+            document.createElement("div");
+
+        div.className =
+            "lastNumber";
+
+        div.textContent =
+            number === null
+            ? "—"
+            : number;
+
+        lastWinsEl.appendChild(
+            div
+        );
+    });
+}
+
+
+/* =====================================================
+   RESET ROUND
+===================================================== */
+
+function resetRound(){
+
+    wheel.style.transition =
+        "none";
+
+    wheel.style.transform =
+        "rotate(0deg)";
+
+
+    bets = {};
+
+    selectedNumber = null;
+
+    spinning = false;
+
+    bettingOpen = true;
+
+
+    centerText.textContent =
+        "ZYNO";
+
+    resultEl.textContent =
+        "Number select karo";
+
+    selectedBetEl.textContent =
+        "Number select karo";
+
+
+    createNumberGrid();
+
+    startRound();
+}
+
+
+/* =====================================================
+   MODE BUTTONS
+===================================================== */
+
+mode36.addEventListener(
+    "click",
+    ()=>{
+        setMode("36");
+    }
+);
+
+mode11.addEventListener(
+    "click",
+    ()=>{
+        setMode("11");
+    }
+);
+
+
+/* =====================================================
+   PAGE LOAD
+===================================================== */
+
+window.addEventListener(
+    "load",
+    ()=>{
+
+        renderLastWins();
+
+        setMode(mode);
+
+        startRound();
+    }
+);
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
+
+window.addEventListener(
+    "resize",
+    ()=>{
+        createWheel();
+    }
+);
+
+</script>
+
+</body>
+</html>
