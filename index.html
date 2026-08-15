@@ -1,0 +1,2007 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>ZYNO Roulette</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    min-height:100%;
+}
+
+body{
+    font-family:Arial,Helvetica,sans-serif;
+    color:#fff;
+
+    background:
+        radial-gradient(
+            circle at 50% 24%,
+            #102b52 0%,
+            #061326 38%,
+            #020811 78%
+        );
+
+    overflow-x:hidden;
+    overflow-y:auto;
+}
+
+.app{
+    width:100%;
+    max-width:520px;
+    min-height:100vh;
+    margin:auto;
+
+    padding:
+        max(10px,env(safe-area-inset-top))
+        12px
+        max(30px,env(safe-area-inset-bottom));
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header{
+    text-align:center;
+    margin-bottom:6px;
+}
+
+.logo{
+    font-size:29px;
+    font-weight:900;
+    letter-spacing:5px;
+
+    color:#00e5ff;
+
+    text-shadow:
+        0 0 6px rgba(0,229,255,.8),
+        0 0 18px rgba(0,229,255,.45);
+}
+
+.subtitle{
+    font-size:9px;
+    letter-spacing:3px;
+    color:#7894b5;
+    margin-top:1px;
+}
+
+
+/* =========================
+   WHEEL AREA
+========================= */
+
+.wheel-area{
+    position:relative;
+
+    width:100%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    padding-top:8px;
+    padding-bottom:6px;
+}
+
+.pointer{
+    position:absolute;
+
+    top:0;
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:0;
+    height:0;
+
+    border-left:8px solid transparent;
+    border-right:8px solid transparent;
+    border-top:17px solid #ffd34e;
+
+    filter:
+        drop-shadow(
+            0 0 4px rgba(255,211,78,.45)
+        );
+
+    z-index:40;
+}
+
+.wheel-wrap{
+    position:relative;
+
+    width:min(69vw,285px);
+    height:min(69vw,285px);
+
+    min-width:245px;
+    min-height:245px;
+
+    max-width:285px;
+    max-height:285px;
+
+    border-radius:50%;
+
+    padding:9px;
+
+    background:#06101f;
+
+    border:2px solid #d7ad36;
+
+    box-shadow:
+        0 0 7px rgba(255,211,78,.22),
+        0 0 24px rgba(0,0,0,.8),
+        inset 0 0 20px rgba(0,0,0,.9);
+}
+
+
+/* =========================
+   WHEEL
+========================= */
+
+.wheel{
+    position:relative;
+
+    width:100%;
+    height:100%;
+
+    border-radius:50%;
+
+    overflow:hidden;
+
+    background:
+        conic-gradient(
+            #b81722 0deg 9.73deg,
+            #101820 9.73deg 19.46deg,
+            #b81722 19.46deg 29.19deg,
+            #101820 29.19deg 38.92deg,
+            #b81722 38.92deg 48.65deg,
+            #101820 48.65deg 58.38deg,
+            #b81722 58.38deg 68.11deg,
+            #101820 68.11deg 77.84deg,
+            #b81722 77.84deg 87.57deg,
+            #101820 87.57deg 97.30deg,
+            #b81722 97.30deg 107.03deg,
+            #101820 107.03deg 116.76deg,
+            #b81722 116.76deg 126.49deg,
+            #101820 126.49deg 136.22deg,
+            #b81722 136.22deg 145.95deg,
+            #101820 145.95deg 155.68deg,
+            #b81722 155.68deg 165.41deg,
+            #101820 165.41deg 175.14deg,
+            #b81722 175.14deg 184.87deg,
+            #101820 184.87deg 194.60deg,
+            #b81722 194.60deg 204.33deg,
+            #101820 204.33deg 214.06deg,
+            #b81722 214.06deg 223.79deg,
+            #101820 223.79deg 233.52deg,
+            #b81722 233.52deg 243.25deg,
+            #101820 243.25deg 252.98deg,
+            #b81722 252.98deg 262.71deg,
+            #101820 262.71deg 272.44deg,
+            #b81722 272.44deg 282.17deg,
+            #101820 282.17deg 291.90deg,
+            #b81722 291.90deg 301.63deg,
+            #101820 301.63deg 311.36deg,
+            #b81722 311.36deg 321.09deg,
+            #101820 321.09deg 330.82deg,
+            #b81722 330.82deg 340.55deg,
+            #101820 340.55deg 350.28deg,
+            #b81722 350.28deg 360deg
+        );
+
+    border:2px solid #191f29;
+
+    transform:rotate(0deg);
+
+    transition:
+        transform 5.8s
+        cubic-bezier(.12,.72,.12,1);
+}
+
+
+/* =========================
+   LIGHT YELLOW INNER LINE
+========================= */
+
+.wheel::before{
+    content:"";
+
+    position:absolute;
+
+    inset:8px;
+
+    border-radius:50%;
+
+    border:
+        2px solid
+        rgba(255,211,78,.24);
+
+    box-shadow:
+        0 0 4px rgba(255,211,78,.08),
+        inset 0 0 7px rgba(255,211,78,.06);
+
+    z-index:4;
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   CENTER
+========================= */
+
+.wheel::after{
+    content:"";
+
+    position:absolute;
+
+    inset:31%;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #0c2945 0%,
+            #06111f 65%,
+            #020711 100%
+        );
+
+    border:
+        2px solid
+        rgba(255,211,78,.50);
+
+    box-shadow:
+        0 0 10px rgba(0,0,0,.9),
+        inset 0 0 14px rgba(0,0,0,.9);
+
+    z-index:5;
+}
+
+
+/* =========================
+   WHEEL NUMBERS
+========================= */
+
+.number{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    width:26px;
+    height:26px;
+
+    margin-left:-13px;
+    margin-top:-13px;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    color:#fff;
+
+    font-size:13px;
+
+    font-weight:900;
+
+    text-shadow:
+        0 1px 2px #000;
+
+    z-index:7;
+
+    transform:
+        rotate(var(--angle))
+        translateY(-104px)
+        rotate(calc(var(--angle) * -1));
+}
+
+.number.zero{
+    color:#ffd34e;
+}
+
+
+/* =========================
+   CENTER LOGO
+========================= */
+
+.center-logo{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index:12;
+
+    font-size:20px;
+
+    font-weight:900;
+
+    letter-spacing:3px;
+
+    color:#00e5ff;
+
+    text-shadow:
+        0 0 5px rgba(0,229,255,.8),
+        0 0 15px rgba(0,229,255,.45);
+
+    pointer-events:none;
+}
+
+.center-win{
+    position:absolute;
+
+    left:50%;
+    top:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index:13;
+
+    display:none;
+
+    font-size:17px;
+
+    font-weight:900;
+
+    color:#ffd34e;
+
+    text-shadow:
+        0 0 10px rgba(255,211,78,.7);
+
+    pointer-events:none;
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+.timer-area{
+    width:100%;
+
+    text-align:center;
+
+    margin:
+        2px 0 5px;
+}
+
+.timer-label{
+    font-size:9px;
+
+    color:#6f89a7;
+
+    letter-spacing:2px;
+
+    margin-bottom:2px;
+}
+
+.timer{
+    font-size:28px;
+
+    line-height:30px;
+
+    font-weight:900;
+
+    color:#ffd34e;
+
+    text-shadow:
+        0 0 10px rgba(255,211,78,.25);
+}
+
+.timer.closed{
+    color:#ff5964;
+}
+
+
+/* =========================
+   RESULT
+========================= */
+
+.result{
+    min-height:27px;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    color:#00e5ff;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    margin-bottom:5px;
+}
+
+
+/* =========================
+   BALANCE + LAST WIN
+========================= */
+
+.bottom-info{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:1fr 1.35fr;
+
+    gap:7px;
+
+    margin:
+        2px 0 7px;
+}
+
+.info-box{
+    min-height:46px;
+
+    padding:6px 10px;
+
+    border:
+        1px solid
+        rgba(0,229,255,.22);
+
+    border-radius:10px;
+
+    background:
+        rgba(4,17,34,.72);
+
+    box-shadow:
+        0 0 12px
+        rgba(0,229,255,.05);
+}
+
+.info-title{
+    color:#6883a5;
+
+    font-size:8px;
+
+    letter-spacing:1.5px;
+
+    text-transform:uppercase;
+}
+
+.info-value{
+    color:#fff;
+
+    font-size:15px;
+
+    font-weight:800;
+
+    margin-top:2px;
+}
+
+.last-wins{
+    display:flex;
+
+    gap:4px;
+
+    justify-content:flex-start;
+
+    margin-top:3px;
+}
+
+.last-number{
+    width:22px;
+    height:22px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    font-size:10px;
+
+    font-weight:900;
+
+    color:#fff;
+
+    background:#071a31;
+
+    border:
+        1px solid
+        rgba(255,255,255,.2);
+}
+
+
+/* =========================
+   SELECTED BET
+========================= */
+
+.selected{
+    width:100%;
+
+    min-height:38px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    text-align:center;
+
+    padding:
+        7px 10px;
+
+    border-radius:10px;
+
+    background:
+        rgba(7,23,43,.85);
+
+    border:
+        1px solid
+        rgba(0,229,255,.17);
+
+    color:#9ab3d0;
+
+    font-size:11px;
+
+    margin-bottom:7px;
+}
+
+.selected strong{
+    color:#ffd34e;
+
+    margin:
+        0 3px;
+}
+
+
+/* =========================
+   NUMBER GRID
+========================= */
+
+.grid{
+    width:100%;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,1fr);
+
+    gap:5px;
+
+    padding:0 2px;
+}
+
+.bet-number{
+    position:relative;
+
+    min-height:42px;
+
+    border-radius:8px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.13);
+
+    background:
+        linear-gradient(
+            145deg,
+            #0c2039,
+            #071322
+        );
+
+    color:#fff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:16px;
+
+    font-weight:900;
+
+    user-select:none;
+
+    -webkit-user-select:none;
+
+    touch-action:none;
+
+    box-shadow:
+        inset 0 0 8px rgba(0,0,0,.45),
+        0 2px 5px rgba(0,0,0,.25);
+}
+
+.bet-number.zero{
+    color:#ffd34e;
+
+    border-color:
+        rgba(255,211,78,.35);
+}
+
+.bet-number.active{
+    border-color:#00e5ff;
+
+    background:
+        linear-gradient(
+            145deg,
+            #103c59,
+            #082238
+        );
+
+    box-shadow:
+        0 0 10px
+        rgba(0,229,255,.28),
+
+        inset 0 0 10px
+        rgba(0,229,255,.08);
+}
+
+.bet-count{
+    min-height:10px;
+
+    margin-top:1px;
+
+    color:#ffd34e;
+
+    font-size:7px;
+
+    font-weight:900;
+
+    letter-spacing:.3px;
+}
+
+.bet-number.winner{
+    border-color:#ffd34e;
+
+    box-shadow:
+        0 0 15px
+        rgba(255,211,78,.7),
+
+        inset 0 0 10px
+        rgba(255,211,78,.15);
+
+    animation:
+        winnerPulse .8s
+        ease-in-out 3;
+}
+
+@keyframes winnerPulse{
+
+    50%{
+        transform:scale(1.08);
+    }
+
+}
+
+
+/* =========================
+   GAME BUTTONS
+========================= */
+
+.games{
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:6px;
+
+    margin-top:9px;
+}
+
+.game-btn{
+    min-height:34px;
+
+    border:
+        1px solid
+        rgba(0,229,255,.18);
+
+    border-radius:8px;
+
+    background:#071a30;
+
+    color:#8ca7c5;
+
+    font-size:8px;
+
+    font-weight:800;
+
+    letter-spacing:.4px;
+}
+
+.game-btn:active{
+    transform:scale(.97);
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:360px){
+
+    .app{
+        padding-left:8px;
+        padding-right:8px;
+    }
+
+    .wheel-wrap{
+        min-width:235px;
+        min-height:235px;
+    }
+
+    .number{
+
+        width:25px;
+        height:25px;
+
+        margin-left:-12.5px;
+        margin-top:-12.5px;
+
+        font-size:12px;
+
+        transform:
+            rotate(var(--angle))
+            translateY(-97px)
+            rotate(calc(var(--angle) * -1));
+    }
+
+    .bet-number{
+        min-height:39px;
+        font-size:15px;
+    }
+
+    .grid{
+        gap:4px;
+    }
+
+    .bottom-info{
+        gap:5px;
+    }
+
+}
+
+
+/* =========================
+   VERY SMALL SCREEN
+========================= */
+
+@media(max-width:330px){
+
+    .wheel-wrap{
+        min-width:225px;
+        min-height:225px;
+    }
+
+    .number{
+        transform:
+            rotate(var(--angle))
+            translateY(-92px)
+            rotate(calc(var(--angle) * -1));
+    }
+
+    .bet-number{
+        min-height:37px;
+        font-size:14px;
+    }
+
+    .games{
+        gap:4px;
+    }
+
+    .game-btn{
+        font-size:7px;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="logo">
+            ZYNO
+        </div>
+
+        <div class="subtitle">
+            ROULETTE 0 — 36
+        </div>
+
+    </div>
+
+
+    <!-- WHEEL -->
+
+    <div class="wheel-area">
+
+        <div class="pointer"></div>
+
+        <div class="wheel-wrap">
+
+            <div class="wheel" id="wheel">
+
+                <div
+                    class="center-logo"
+                    id="centerLogo">
+                    ZYNO
+                </div>
+
+                <div
+                    class="center-win"
+                    id="centerWin">
+                    WIN
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TIMER -->
+
+    <div class="timer-area">
+
+        <div class="timer-label">
+            BETTING TIME
+        </div>
+
+        <div
+            class="timer"
+            id="timer">
+            60
+        </div>
+
+    </div>
+
+
+    <!-- RESULT -->
+
+    <div
+        class="result"
+        id="result">
+        Number select karo
+    </div>
+
+
+    <!-- BALANCE + LAST WIN -->
+
+    <div class="bottom-info">
+
+        <div class="info-box">
+
+            <div class="info-title">
+                Balance
+            </div>
+
+            <div class="info-value">
+                <span id="balance">
+                    10000
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="info-box">
+
+            <div class="info-title">
+                Last Win
+            </div>
+
+            <div
+                class="last-wins"
+                id="lastWins">
+
+                <span class="last-number">
+                    -
+                </span>
+
+                <span class="last-number">
+                    -
+                </span>
+
+                <span class="last-number">
+                    -
+                </span>
+
+                <span class="last-number">
+                    -
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- SELECTED BET -->
+
+    <div
+        class="selected"
+        id="selected">
+
+        Koi number select nahi hai
+
+    </div>
+
+
+    <!-- NUMBER GRID -->
+
+    <div
+        class="grid"
+        id="grid">
+    </div>
+
+
+    <!-- GAME BUTTONS -->
+
+    <div class="games">
+
+        <button
+            class="game-btn"
+            type="button">
+            🎲 ZYNO LUDO
+        </button>
+
+        <button
+            class="game-btn"
+            type="button">
+            🔢 ZYNO 0–11
+        </button>
+
+        <button
+            class="game-btn"
+            type="button">
+            🃏 TEEN PATTI
+        </button>
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+/* =====================================================
+   ZYNO ROULETTE
+   ===================================================== */
+
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const wheel =
+    document.getElementById("wheel");
+
+const grid =
+    document.getElementById("grid");
+
+const timerEl =
+    document.getElementById("timer");
+
+const balanceEl =
+    document.getElementById("balance");
+
+const resultEl =
+    document.getElementById("result");
+
+const selectedEl =
+    document.getElementById("selected");
+
+const lastWinsEl =
+    document.getElementById("lastWins");
+
+const centerLogo =
+    document.getElementById("centerLogo");
+
+const centerWin =
+    document.getElementById("centerWin");
+
+
+/* =========================
+   GAME VARIABLES
+========================= */
+
+let balance = 10000;
+
+let timeLeft = 60;
+
+let bettingOpen = true;
+
+let spinning = false;
+
+let selectedNumber = null;
+
+let bets = {};
+
+let lastWins = [];
+
+let wheelRotation = 0;
+
+let currentPress = null;
+
+
+/* =========================
+   ROULETTE WHEEL ORDER
+========================= */
+
+const wheelNumbers = [
+
+    0,
+    32,
+    15,
+    19,
+    4,
+    21,
+    2,
+    25,
+    17,
+    34,
+    6,
+    27,
+    13,
+    36,
+    11,
+    30,
+    8,
+    23,
+    10,
+    5,
+    24,
+    16,
+    33,
+    1,
+    20,
+    14,
+    31,
+    9,
+    22,
+    18,
+    29,
+    7,
+    28,
+    12,
+    35,
+    3,
+    26
+
+];
+
+
+/* =========================
+   CREATE WHEEL NUMBERS
+========================= */
+
+wheelNumbers.forEach(
+    (num,index)=>{
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "number" +
+            (num === 0 ? " zero" : "");
+
+        const angle =
+            index *
+            (360 / wheelNumbers.length);
+
+        el.style.setProperty(
+            "--angle",
+            angle + "deg"
+        );
+
+        el.textContent =
+            num;
+
+        wheel.appendChild(el);
+
+    }
+);
+
+
+/* =========================
+   CREATE NUMBER GRID
+========================= */
+
+for(
+    let i = 0;
+    i <= 36;
+    i++
+){
+
+    const btn =
+        document.createElement("div");
+
+    btn.className =
+        "bet-number" +
+        (i === 0 ? " zero" : "");
+
+    btn.dataset.number =
+        i;
+
+    btn.innerHTML = `
+
+        <div>${i}</div>
+
+        <div
+            class="bet-count"
+            id="count-${i}">
+        </div>
+
+    `;
+
+    grid.appendChild(btn);
+
+
+    let pressInterval = null;
+
+    let pressing = false;
+
+
+    /* =========================
+       START PRESS
+    ========================= */
+
+    function startBet(e){
+
+        if(
+            !bettingOpen ||
+            spinning
+        ){
+            return;
+        }
+
+        if(
+            balance <= 0
+        ){
+            resultEl.textContent =
+                "Balance khatam ho gaya";
+
+            return;
+        }
+
+        e.preventDefault();
+
+        selectedNumber = i;
+
+        updateSelected();
+
+        pressing = true;
+
+        currentPress = btn;
+
+        btn.classList.add(
+            "active"
+        );
+
+
+        /*
+            First point immediately
+        */
+
+        addBet(i,1);
+
+
+        /*
+            Every 0.25 second
+            = 1 point
+        */
+
+        pressInterval =
+            setInterval(
+                ()=>{
+
+                    if(
+                        !pressing ||
+                        !bettingOpen ||
+                        spinning
+                    ){
+
+                        stopBet();
+
+                        return;
+
+                    }
+
+                    if(
+                        balance <= 0
+                    ){
+
+                        stopBet();
+
+                        resultEl.textContent =
+                            "Balance khatam ho gaya";
+
+                        return;
+
+                    }
+
+                    addBet(i,1);
+
+                },
+                250
+            );
+
+    }
+
+
+    /* =========================
+       STOP PRESS
+    ========================= */
+
+    function stopBet(){
+
+        pressing = false;
+
+        if(
+            pressInterval !== null
+        ){
+
+            clearInterval(
+                pressInterval
+            );
+
+            pressInterval =
+                null;
+
+        }
+
+        btn.classList.remove(
+            "active"
+        );
+
+        if(
+            currentPress === btn
+        ){
+
+            currentPress =
+                null;
+
+        }
+
+    }
+
+
+    /* =========================
+       POINTER EVENTS
+    ========================= */
+
+    btn.addEventListener(
+        "pointerdown",
+        startBet
+    );
+
+    btn.addEventListener(
+        "pointerup",
+        stopBet
+    );
+
+    btn.addEventListener(
+        "pointercancel",
+        stopBet
+    );
+
+    btn.addEventListener(
+        "pointerleave",
+        stopBet
+    );
+
+    btn.addEventListener(
+        "lostpointercapture",
+        stopBet
+    );
+
+}
+
+
+/* =========================
+   ADD BET
+========================= */
+
+function addBet(
+    number,
+    amount
+){
+
+    if(
+        !bettingOpen ||
+        spinning
+    ){
+        return;
+    }
+
+    if(
+        balance < amount
+    ){
+        return;
+    }
+
+    balance -= amount;
+
+    bets[number] =
+        (bets[number] || 0)
+        + amount;
+
+    updateBalance();
+
+    updateBetCount(
+        number
+    );
+
+    updateSelected();
+
+}
+
+
+/* =========================
+   BALANCE
+========================= */
+
+function updateBalance(){
+
+    balanceEl.textContent =
+        Math.floor(balance);
+
+}
+
+
+/* =========================
+   BET COUNT
+========================= */
+
+function updateBetCount(
+    number
+){
+
+    const el =
+        document.getElementById(
+            "count-" + number
+        );
+
+    if(!el){
+        return;
+    }
+
+    const amount =
+        bets[number] || 0;
+
+    el.textContent =
+        amount > 0
+            ? "BET " + amount
+            : "";
+
+}
+
+
+/* =========================
+   SELECTED BET
+========================= */
+
+function updateSelected(){
+
+    if(
+        selectedNumber === null
+    ){
+
+        selectedEl.innerHTML =
+            "Koi number select nahi hai";
+
+        return;
+
+    }
+
+    const total =
+        bets[selectedNumber] || 0;
+
+    if(total <= 0){
+
+        selectedEl.innerHTML =
+
+            "Number " +
+
+            "<strong>" +
+            selectedNumber +
+            "</strong>" +
+
+            " select kiya hai";
+
+        return;
+
+    }
+
+    selectedEl.innerHTML =
+
+        "Number " +
+
+        "<strong>" +
+        selectedNumber +
+        "</strong>" +
+
+        " par total " +
+
+        "<strong>" +
+        total +
+        "</strong>" +
+
+        " points bet";
+
+}
+
+
+/* =========================
+   TIMER
+========================= */
+
+const timerInterval =
+    setInterval(
+        ()=>{
+
+            if(
+                spinning
+            ){
+                return;
+            }
+
+
+            /*
+                60 → 59 → ... → 56
+
+                At 56:
+                betting closes.
+            */
+
+            if(
+                timeLeft > 0
+            ){
+
+                timeLeft--;
+
+                timerEl.textContent =
+                    timeLeft;
+
+            }
+
+
+            /*
+                LAST 4 SECONDS
+
+                When timer becomes 56,
+                no new bets allowed.
+            */
+
+            if(
+                timeLeft <= 56 &&
+                bettingOpen
+            ){
+
+                bettingOpen = false;
+
+                timerEl.classList.add(
+                    "closed"
+                );
+
+                stopAllBetting();
+
+                resultEl.textContent =
+                    "Betting closed — wheel spin ho raha hai";
+
+            }
+
+
+            /*
+                At 0:
+                Spin.
+            */
+
+            if(
+                timeLeft <= 0 &&
+                !spinning
+            ){
+
+                spinWheel();
+
+            }
+
+        },
+        1000
+    );
+
+
+/* =========================
+   STOP ALL BETTING
+========================= */
+
+function stopAllBetting(){
+
+    document
+        .querySelectorAll(
+            ".bet-number"
+        )
+        .forEach(
+            el=>{
+
+                el.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================
+   SPIN WHEEL
+========================= */
+
+function spinWheel(){
+
+    if(
+        spinning
+    ){
+        return;
+    }
+
+    spinning = true;
+
+    bettingOpen = false;
+
+    stopAllBetting();
+
+
+    /*
+        Random winner
+    */
+
+    const winner =
+        Math.floor(
+            Math.random() * 37
+        );
+
+
+    const index =
+        wheelNumbers.indexOf(
+            winner
+        );
+
+
+    const slice =
+        360 /
+        wheelNumbers.length;
+
+
+    /*
+        We want winner
+        directly under pointer.
+
+        Pointer = top.
+
+        Add 8 full rotations.
+    */
+
+    const target =
+        360 * 8
+        - (
+            index * slice
+        );
+
+
+    wheelRotation +=
+        target;
+
+
+    wheel.style.transform =
+        "rotate(" +
+        wheelRotation +
+        "deg)";
+
+
+    resultEl.textContent =
+        "Wheel spinning...";
+
+
+    /*
+        Wheel animation:
+        5.8 seconds
+    */
+
+    setTimeout(
+        ()=>{
+            showWinner(
+                winner
+            );
+        },
+        5900
+    );
+
+}
+
+
+/* =========================
+   SHOW WINNER
+========================= */
+
+function showWinner(
+    winner
+){
+
+    document
+        .querySelectorAll(
+            ".bet-number"
+        )
+        .forEach(
+            el=>{
+
+                el.classList.remove(
+                    "winner"
+                );
+
+            }
+        );
+
+
+    const winnerBtn =
+        document.querySelector(
+            '.bet-number[data-number="' +
+            winner +
+            '"]'
+        );
+
+
+    if(
+        winnerBtn
+    ){
+
+        winnerBtn.classList.add(
+            "winner"
+        );
+
+    }
+
+
+    /*
+        Center winner
+    */
+
+    centerLogo.style.display =
+        "none";
+
+    centerWin.textContent =
+        "WIN " + winner;
+
+    centerWin.style.display =
+        "block";
+
+
+    /*
+        Calculate payout
+    */
+
+    const winningBet =
+        bets[winner] || 0;
+
+
+    if(
+        winningBet > 0
+    ){
+
+        /*
+            Roulette payout:
+            35:1 profit
+            + original stake returned
+        */
+
+        const winAmount =
+            winningBet * 35;
+
+        const returnedBet =
+            winningBet;
+
+        const totalPayout =
+            winAmount +
+            returnedBet;
+
+
+        balance +=
+            totalPayout;
+
+
+        resultEl.textContent =
+
+            "WIN " +
+            winner +
+            " — +" +
+            totalPayout +
+            " points";
+
+    }
+    else{
+
+        resultEl.textContent =
+            "Winning Number: " +
+            winner;
+
+    }
+
+
+    updateBalance();
+
+    addLastWin(
+        winner
+    );
+
+
+    /*
+        Keep result visible
+        for 4 seconds.
+    */
+
+    setTimeout(
+        ()=>{
+
+            centerWin.style.display =
+                "none";
+
+            centerLogo.style.display =
+                "block";
+
+            resetGame();
+
+        },
+        4000
+    );
+
+}
+
+
+/* =========================
+   LAST 4 WIN
+========================= */
+
+function addLastWin(
+    number
+){
+
+    lastWins.unshift(
+        number
+    );
+
+
+    if(
+        lastWins.length > 4
+    ){
+
+        lastWins.pop();
+
+    }
+
+
+    renderLastWins();
+
+}
+
+
+function renderLastWins(){
+
+    lastWinsEl.innerHTML =
+        "";
+
+
+    const list =
+        [...lastWins];
+
+
+    while(
+        list.length < 4
+    ){
+
+        list.push("-");
+
+    }
+
+
+    /*
+        Oldest → newest
+    */
+
+    list.reverse();
+
+
+    list.forEach(
+        num=>{
+
+            const el =
+                document.createElement(
+                    "span"
+                );
+
+            el.className =
+                "last-number";
+
+            el.textContent =
+                num;
+
+            lastWinsEl.appendChild(
+                el
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================
+   RESET GAME
+========================= */
+
+function resetGame(){
+
+    bets = {};
+
+    selectedNumber =
+        null;
+
+
+    /*
+        Clear all bet labels
+    */
+
+    document
+        .querySelectorAll(
+            ".bet-count"
+        )
+        .forEach(
+            el=>{
+
+                el.textContent =
+                    "";
+
+            }
+        );
+
+
+    /*
+        Clear winner highlight
+    */
+
+    document
+        .querySelectorAll(
+            ".bet-number"
+        )
+        .forEach(
+            el=>{
+
+                el.classList.remove(
+                    "winner"
+                );
+
+                el.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    selectedEl.innerHTML =
+        "Koi number select nahi hai";
+
+
+    /*
+        New 60 second round
+    */
+
+    timeLeft = 60;
+
+    timerEl.textContent =
+        "60";
+
+    timerEl.classList.remove(
+        "closed"
+    );
+
+
+    resultEl.textContent =
+        "Number select karo";
+
+
+    bettingOpen = true;
+
+    spinning = false;
+
+}
+
+
+/* =========================
+   TOUCH PROTECTION
+========================= */
+
+document.addEventListener(
+    "touchmove",
+    function(e){
+
+        if(
+            e.target.closest(
+                ".bet-number"
+            )
+        ){
+
+            e.preventDefault();
+
+        }
+
+    },
+    {
+        passive:false
+    }
+);
+
+
+/* =========================
+   PREVENT CONTEXT MENU
+========================= */
+
+document.addEventListener(
+    "contextmenu",
+    function(e){
+
+        if(
+            e.target.closest(
+                ".bet-number"
+            )
+        ){
+
+            e.preventDefault();
+
+        }
+
+    }
+);
+
+
+/* =========================
+   INITIAL
+========================= */
+
+updateBalance();
+
+renderLastWins();
+
+</script>
+
+</body>
+</html>
