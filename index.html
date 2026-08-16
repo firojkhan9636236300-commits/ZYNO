@@ -733,7 +733,7 @@ function resetLudo(){
 
 const wheel=document.getElementById("wheel"),grid=document.getElementById("grid"),timerEl=document.getElementById("timer"),balanceEl=document.getElementById("balance"),homeBalance=document.getElementById("homeBalance"),resultEl=document.getElementById("result"),selectedEl=document.getElementById("selected"),lastWinsEl=document.getElementById("lastWins"),centerLogo=document.getElementById("centerLogo"),centerWin=document.getElementById("centerWin");
 let balance=10000,timeLeft=60,bettingOpen=true,spinning=false,selectedNumber=null,bets={},lastWins=[],wheelRotation=0,currentPress=null,currentPressTimer=null,currentPressing=false,currentPressNumber=null,currentPressStart=0,currentPressPoints=0;
-const POINT_TIME=100;
+const POINT_TIME=40;
 const wheelNumbers=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26],slice=360/wheelNumbers.length;
 
 wheelNumbers.forEach((num,index)=>{const el=document.createElement("div");el.className="number"+(num===0?" zero":"");el.style.setProperty("--angle",index*slice+"deg");el.textContent=num;wheel.appendChild(el)});
