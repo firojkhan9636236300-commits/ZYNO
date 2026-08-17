@@ -2711,7 +2711,11 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 
-window.zynoAdminLogin = async function () {
+/* =========================
+   ADMIN LOGIN
+========================= */
+
+window.zynoAdminLogin = async function(){
 
   const email =
     document.getElementById("adminEmail").value.trim();
@@ -2723,7 +2727,7 @@ window.zynoAdminLogin = async function () {
     document.getElementById("adminMessage");
 
 
-  if (!email || !password) {
+  if(!email || !password){
 
     message.textContent =
       "Email aur Password bharo";
@@ -2736,7 +2740,7 @@ window.zynoAdminLogin = async function () {
     "LOGIN CHECKING...";
 
 
-  try {
+  try{
 
     const result =
       await signInWithEmailAndPassword(
@@ -2751,14 +2755,14 @@ window.zynoAdminLogin = async function () {
 
 
     const adminRef =
-      doc(db, "users", "admin");
+      doc(db,"users","admin");
 
 
     const adminSnap =
       await getDoc(adminRef);
 
 
-    if (!adminSnap.exists()) {
+    if(!adminSnap.exists()){
 
       await signOut(auth);
 
@@ -2773,16 +2777,44 @@ window.zynoAdminLogin = async function () {
       adminSnap.data();
 
 
-    if (
-      adminData.uid !== uid ||
-      adminData.role !== "admin" ||
-      adminData.approved !== true
-    ) {
+    const uidOK =
+      adminData.uid === uid;
+
+    const roleOK =
+      adminData.role === "admin";
+
+    const approvedOK =
+      adminData.approved === true;
+
+
+    if(!uidOK){
 
       await signOut(auth);
 
       message.textContent =
-        "Admin access denied";
+        "Admin UID match nahi hua";
+
+      return;
+    }
+
+
+    if(!roleOK){
+
+      await signOut(auth);
+
+      message.textContent =
+        "Admin role galat hai";
+
+      return;
+    }
+
+
+    if(!approvedOK){
+
+      await signOut(auth);
+
+      message.textContent =
+        "Admin approval false hai";
 
       return;
     }
@@ -2792,83 +2824,151 @@ window.zynoAdminLogin = async function () {
       "ADMIN LOGIN SUCCESS";
 
 
-    document.getElementById("adminLogin").style.display =
-      "none";
+    document
+      .getElementById("adminLogin")
+      .classList.remove("active");
 
-    document.getElementById("adminPanel").style.display =
-      "block";
+    document
+      .getElementById("adminPanel")
+      .classList.add("active");
+
+    window.scrollTo(0,0);
 
 
-  } catch (error) {
+  }catch(error){
 
-    console.error(error);
+    console.error("ZYNO ADMIN LOGIN ERROR:",error);
 
-    message.textContent =
-      "Email ya Password galat hai";
+    if(error.code === "auth/invalid-credential"){
+
+      message.textContent =
+        "Email ya Password galat hai";
+
+    }else if(error.code === "auth/user-not-found"){
+
+      message.textContent =
+        "Admin user nahi mila";
+
+    }else if(error.code === "auth/wrong-password"){
+
+      message.textContent =
+        "Password galat hai";
+
+    }else{
+
+      message.textContent =
+        "Login error: "+error.code;
+    }
   }
 };
 
 
+/* =========================
+   ADMIN LOGOUT
+========================= */
 
-window.zynoAdminLogout = async function () {
+window.zynoAdminLogout = async function(){
 
-  await signOut(auth);
+  try{
 
+    await signOut(auth);
 
-  document.getElementById("adminPanel").style.display =
-    "none";
+    document
+      .getElementById("adminPanel")
+      .classList.remove("active");
 
+    document
+      .getElementById("adminLogin")
+      .classList.add("active");
 
-  document.getElementById("adminLogin").style.display =
-    "block";
+    document
+      .getElementById("adminMessage")
+      .textContent = "";
 
+    document
+      .getElementById("adminEmail")
+      .value = "";
 
-  document.getElementById("adminMessage").textContent =
-    "";
+    document
+      .getElementById("adminPassword")
+      .value = "";
+
+    window.scrollTo(0,0);
+
+  }catch(error){
+
+    console.error("LOGOUT ERROR:",error);
+  }
 };
 
 
+/* =========================
+   CHECK EXISTING LOGIN
+========================= */
 
-onAuthStateChanged(auth, async (user) => {
+onAuthStateChanged(auth,async(user)=>{
 
-  if (!user) return;
+  if(!user){
+
+    document
+      .getElementById("adminPanel")
+      .classList.remove("active");
+
+    return;
+  }
 
 
-  try {
+  try{
 
     const adminRef =
-      doc(db, "users", "admin");
+      doc(db,"users","admin");
 
 
     const snap =
       await getDoc(adminRef);
 
 
-    if (
-      snap.exists() &&
-      snap.data().uid === user.uid &&
-      snap.data().role === "admin" &&
-      snap.data().approved === true
-    ) {
+    if(!snap.exists()){
 
-      document.getElementById("adminLogin").style.display =
-        "none";
+      await signOut(auth);
 
-      document.getElementById("adminPanel").style.display =
-        "block";
+      return;
+    }
 
-    } else {
+
+    const data =
+      snap.data();
+
+
+    if(
+      data.uid === user.uid &&
+      data.role === "admin" &&
+      data.approved === true
+    ){
+
+      document
+        .getElementById("adminLogin")
+        .classList.remove("active");
+
+      document
+        .getElementById("adminPanel")
+        .classList.add("active");
+
+    }else{
 
       await signOut(auth);
     }
 
 
-  } catch (error) {
+  }catch(error){
 
-    console.error(error);
+    console.error(
+      "ADMIN CHECK ERROR:",
+      error
+    );
   }
-});
 
+});
 </script>
 </body>
 </html>
