@@ -2567,6 +2567,198 @@ syncZ11Balance();
 renderZ11Last();
 
 </script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDpQHse79QRukas1LD_GTLf-CmDWtArA_c",
+  authDomain: "zyno-dc777.firebaseapp.com",
+  projectId: "zyno-dc777",
+  storageBucket: "zyno-dc777.firebasestorage.app",
+  messagingSenderId: "59378366235",
+  appId: "1:59378366235:web:72021899a3de7bf3a705be"
+};
+
+
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+
+window.zynoAdminLogin = async function () {
+
+  const email =
+    document.getElementById("adminEmail").value.trim();
+
+  const password =
+    document.getElementById("adminPassword").value;
+
+  const message =
+    document.getElementById("adminMessage");
+
+
+  if (!email || !password) {
+
+    message.textContent =
+      "Email aur Password bharo";
+
+    return;
+  }
+
+
+  message.textContent =
+    "LOGIN CHECKING...";
+
+
+  try {
+
+    const result =
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+
+    const uid =
+      result.user.uid;
+
+
+    const adminRef =
+      doc(db, "users", "admin");
+
+
+    const adminSnap =
+      await getDoc(adminRef);
+
+
+    if (!adminSnap.exists()) {
+
+      await signOut(auth);
+
+      message.textContent =
+        "Admin document nahi mila";
+
+      return;
+    }
+
+
+    const adminData =
+      adminSnap.data();
+
+
+    if (
+      adminData.uid !== uid ||
+      adminData.role !== "admin" ||
+      adminData.approved !== true
+    ) {
+
+      await signOut(auth);
+
+      message.textContent =
+        "Admin access denied";
+
+      return;
+    }
+
+
+    message.textContent =
+      "ADMIN LOGIN SUCCESS";
+
+
+    document.getElementById("adminLogin").style.display =
+      "none";
+
+    document.getElementById("adminPanel").style.display =
+      "block";
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    message.textContent =
+      "Email ya Password galat hai";
+  }
+};
+
+
+
+window.zynoAdminLogout = async function () {
+
+  await signOut(auth);
+
+
+  document.getElementById("adminPanel").style.display =
+    "none";
+
+
+  document.getElementById("adminLogin").style.display =
+    "block";
+
+
+  document.getElementById("adminMessage").textContent =
+    "";
+};
+
+
+
+onAuthStateChanged(auth, async (user) => {
+
+  if (!user) return;
+
+
+  try {
+
+    const adminRef =
+      doc(db, "users", "admin");
+
+
+    const snap =
+      await getDoc(adminRef);
+
+
+    if (
+      snap.exists() &&
+      snap.data().uid === user.uid &&
+      snap.data().role === "admin" &&
+      snap.data().approved === true
+    ) {
+
+      document.getElementById("adminLogin").style.display =
+        "none";
+
+      document.getElementById("adminPanel").style.display =
+        "block";
+
+    } else {
+
+      await signOut(auth);
+    }
+
+
+  } catch (error) {
+
+    console.error(error);
+  }
+});
+
+</script>
 </body>
 </html>
