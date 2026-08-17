@@ -737,7 +737,117 @@ button{
 
 </div>
 </section>
+<!-- ZYNO ADMIN LOGIN -->
 
+<section id="adminLogin" class="view">
+
+  <div class="topbar">
+    <div class="rlogo">ZYNO</div>
+    <div style="width:63px"></div>
+  </div>
+
+  <div class="balance-card" style="margin-top:40px">
+
+    <div class="balance-title">ADMIN ACCESS</div>
+
+    <input
+      id="adminEmail"
+      type="email"
+      placeholder="Email"
+      style="
+        width:100%;
+        margin-top:15px;
+        padding:13px;
+        border-radius:10px;
+        border:1px solid rgba(0,229,255,.25);
+        background:#061322;
+        color:#fff;
+        outline:none;
+      "
+    >
+
+    <input
+      id="adminPassword"
+      type="password"
+      placeholder="Password"
+      style="
+        width:100%;
+        margin-top:10px;
+        padding:13px;
+        border-radius:10px;
+        border:1px solid rgba(0,229,255,.25);
+        background:#061322;
+        color:#fff;
+        outline:none;
+      "
+    >
+
+    <button
+      onclick="zynoAdminLogin()"
+      style="
+        width:100%;
+        margin-top:14px;
+        padding:13px;
+        border-radius:10px;
+        background:#00e5ff;
+        color:#001018;
+        font-weight:1000;
+      "
+    >
+      LOGIN
+    </button>
+
+    <div
+      id="adminMessage"
+      style="
+        text-align:center;
+        margin-top:12px;
+        color:#ffd34e;
+        font-size:10px;
+        font-weight:900;
+      "
+    ></div>
+
+  </div>
+
+</section>
+
+
+<!-- ZYNO ADMIN PANEL -->
+
+<section id="adminPanel" class="view">
+
+  <div class="topbar">
+    <div class="rlogo">ZYNO ADMIN</div>
+
+    <button
+      class="back"
+      onclick="zynoAdminLogout()"
+    >
+      LOGOUT
+    </button>
+  </div>
+
+  <div class="balance-card" style="margin-top:20px">
+
+    <div class="balance-title">
+      ADMIN CONTROL
+    </div>
+
+    <div
+      style="
+        margin-top:10px;
+        color:#00e5ff;
+        font-size:18px;
+        font-weight:1000;
+      "
+    >
+      ADMIN ACCESS ACTIVE
+    </div>
+
+  </div>
+
+</section>
 
 <!-- 0-11 -->
 <section id="zero11" class="view">
