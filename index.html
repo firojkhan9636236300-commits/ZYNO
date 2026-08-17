@@ -1333,7 +1333,18 @@ function goHome(){
 
   window.scrollTo(0,0);
 }
+function openAdminLogin(){
 
+  document.querySelectorAll(".view").forEach(v=>{
+    v.classList.remove("active");
+  });
+
+  document
+    .getElementById("adminLogin")
+    .classList.add("active");
+
+  window.scrollTo(0,0);
+}
 
 /* =========================
    GLOBAL BALANCE
