@@ -3214,6 +3214,83 @@ onAuthStateChanged(auth,async(user)=>{
 balance = Number(data.points) || 0;
 
 updateBalance();
+const usersSnapshot = await getDocs(
+  collection(db, "users")
+);
+
+const usersList =
+  document.getElementById("adminUsersList");
+
+const usersMessage =
+  document.getElementById("adminUsersMessage");
+
+usersList.innerHTML = "";
+
+let userCount = 0;
+
+usersSnapshot.forEach((userDoc) => {
+
+  if(userDoc.id === "admin") return;
+
+  const userData = userDoc.data();
+
+  userCount++;
+
+  const userBox =
+    document.createElement("div");
+
+  userBox.style.cssText = `
+    padding:12px;
+    margin-top:10px;
+    border:1px solid rgba(0,229,255,.18);
+    border-radius:12px;
+    background:#061322;
+  `;
+
+  userBox.innerHTML = `
+    <div style="
+      color:#00e5ff;
+      font-weight:1000;
+    ">
+      ${userData.username || "No Username"}
+    </div>
+
+    <div style="
+      margin-top:5px;
+      color:#8faac2;
+      font-size:9px;
+    ">
+      ${userData.email || "No Email"}
+    </div>
+
+    <div style="
+      margin-top:8px;
+      color:#fff;
+      font-size:10px;
+    ">
+      POINTS: ${Number(userData.points) || 0}
+    </div>
+
+    <div style="
+      margin-top:5px;
+      color:#ffd34e;
+      font-size:9px;
+    ">
+      ${
+        userData.approved === true
+        ? "APPROVED"
+        : "APPROVAL PENDING"
+      }
+    </div>
+  `;
+
+  usersList.appendChild(userBox);
+});
+
+usersMessage.textContent =
+  userCount === 0
+    ? "NO USERS FOUND"
+    : userCount + " USER(S) FOUND";
       document
         .getElementById("adminLogin")
         .classList.remove("active");
