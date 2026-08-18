@@ -1333,7 +1333,7 @@ function goHome(){
 
   window.scrollTo(0,0);
 }
-function openAdminLogin(){
+window.openAdminLogin = function(){
 
   document.querySelectorAll(".view").forEach(v=>{
     v.classList.remove("active");
