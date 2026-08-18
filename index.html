@@ -2974,7 +2974,9 @@ onAuthStateChanged(auth,async(user)=>{
       data.role === "admin" &&
       data.approved === true
     ){
+balance = Number(data.points) || 0;
 
+updateBalance();
       document
         .getElementById("adminLogin")
         .classList.remove("active");
