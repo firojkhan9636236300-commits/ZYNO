@@ -2846,7 +2846,8 @@ window.zynoAdminLogin = async function(){
 
       return;
     }
-
+balance = Number(adminData.points) || 0;
+updateBalance();
 
     message.textContent =
       "ADMIN LOGIN SUCCESS";
