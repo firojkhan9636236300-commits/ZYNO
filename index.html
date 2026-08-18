@@ -754,7 +754,97 @@ button{
 
 </div>
 </section>
-<!-- ZYNO ADMIN LOGIN -->
+
+<!-- ZYNO USER REGISTER -->
+
+<section id="userRegister" class="view">
+
+  <div class="topbar">
+    <div class="rlogo">ZYNO</div>
+    <div style="width:63px"></div>
+  </div>
+
+  <div class="balance-card" style="margin-top:40px">
+
+    <div class="balance-title">CREATE ZYNO ACCOUNT</div>
+
+    <input
+      id="registerUsername"
+      type="text"
+      placeholder="Username"
+      style="
+        width:100%;
+        margin-top:15px;
+        padding:13px;
+        border-radius:10px;
+        border:1px solid rgba(0,229,255,.25);
+        background:#061322;
+        color:#fff;
+        outline:none;
+      "
+    >
+
+    <input
+      id="registerEmail"
+      type="email"
+      placeholder="Email"
+      style="
+        width:100%;
+        margin-top:10px;
+        padding:13px;
+        border-radius:10px;
+        border:1px solid rgba(0,229,255,.25);
+        background:#061322;
+        color:#fff;
+        outline:none;
+      "
+    >
+
+    <input
+      id="registerPassword"
+      type="password"
+      placeholder="Password"
+      style="
+        width:100%;
+        margin-top:10px;
+        padding:13px;
+        border-radius:10px;
+        border:1px solid rgba(0,229,255,.25);
+        background:#061322;
+        color:#fff;
+        outline:none;
+      "
+    >
+
+    <button
+      onclick="zynoUserRegister()"
+      style="
+        width:100%;
+        margin-top:14px;
+        padding:13px;
+        border-radius:10px;
+        background:#00e5ff;
+        color:#001018;
+        font-weight:1000;
+      "
+    >
+      CREATE ACCOUNT
+    </button>
+
+    <div
+      id="registerMessage"
+      style="
+        text-align:center;
+        margin-top:12px;
+        color:#ffd34e;
+        font-size:10px;
+        font-weight:900;
+      "
+    ></div>
+
+  </div>
+
+</section><!-- ZYNO ADMIN LOGIN -->
 
 <section id="adminLogin" class="view">
 
