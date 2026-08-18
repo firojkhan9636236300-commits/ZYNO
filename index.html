@@ -3298,54 +3298,7 @@ usersSnapshot.forEach((userDoc) => {
       }
     </div>
   `;
-    if(userData.approved !== true){
-
-    const approveBtn =
-      document.createElement("button");
-
-    approveBtn.innerText = "APPROVE USER";
-
-    approveBtn.style.cssText = `
-      width:100%;
-      margin-top:10px;
-      padding:10px;
-      border:none;
-      border-radius:10px;
-      background:#00e5ff;
-      color:#001018;
-      font-weight:1000;
-      font-size:11px;
-      cursor:pointer;
-    `;
-
-    approveBtn.onclick = async () => {
-
-      try {
-
-        await updateDoc(
-          doc(db, "users", userDoc.id),
-          {
-            approved: true
-          }
-        );
-
-        alert("USER APPROVED");
-
-        loadUsers();
-
-      } catch(error) {
-
-        console.error(error);
-
-        alert("APPROVE FAILED");
-
-      }
-
-    };
-
-    userBox.appendChild(approveBtn);
-
-  }
+    
 const approveBtn = document.createElement("button");
 
 approveBtn.textContent =
