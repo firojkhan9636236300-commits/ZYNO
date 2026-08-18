@@ -686,7 +686,12 @@ button{
 
 <header class="home-head">
   <div class="logo">ZYNO</div>
-  <button class="profile">👤 PROFILE</button>
+  <button
+  class="profile"
+  onclick="document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById('userRegister').classList.add('active'); window.scrollTo(0,0);"
+>
+  👤 REGISTER
+</button>
 </header>
 
 <div class="balance-card">
