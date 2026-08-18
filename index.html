@@ -2828,7 +2828,108 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 const db = getFirestore(app);
+/* =========================
+   USER REGISTER
+========================= */
 
+window.zynoUserRegister = async function(){
+
+  const username =
+    document.getElementById("registerUsername").value.trim();
+
+  const email =
+    document.getElementById("registerEmail").value.trim();
+
+  const password =
+    document.getElementById("registerPassword").value;
+
+  const message =
+    document.getElementById("registerMessage");
+
+
+  if(!username || !email || !password){
+
+    message.textContent =
+      "Username, Email aur Password bharo";
+
+    return;
+  }
+
+
+  if(password.length < 6){
+
+    message.textContent =
+      "Password kam se kam 6 characters ka hona chahiye";
+
+    return;
+  }
+
+
+  message.textContent =
+    "ACCOUNT CREATING...";
+
+
+  try{
+
+    const result =
+      await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+
+    const uid =
+      result.user.uid;
+
+
+    await setDoc(
+      doc(db,"users",uid),
+      {
+        uid: uid,
+        username: username,
+        email: email,
+        role: "user",
+        approved: false,
+        points: 0
+      }
+    );
+
+
+    message.textContent =
+      "ACCOUNT CREATED • ADMIN APPROVAL PENDING";
+
+
+  }catch(error){
+
+    console.error(
+      "ZYNO USER REGISTER ERROR:",
+      error
+    );
+
+
+    if(error.code === "auth/email-already-in-use"){
+
+      message.textContent =
+        "Ye Email pehle se registered hai";
+
+    }else if(error.code === "auth/invalid-email"){
+
+      message.textContent =
+        "Email galat hai";
+
+    }else if(error.code === "auth/weak-password"){
+
+      message.textContent =
+        "Password weak hai";
+
+    }else{
+
+      message.textContent =
+        "Register error: "+error.code;
+    }
+  }
+};
 
 /* =========================
    ADMIN LOGIN
