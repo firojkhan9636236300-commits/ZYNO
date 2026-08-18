@@ -3298,7 +3298,68 @@ usersSnapshot.forEach((userDoc) => {
       }
     </div>
   `;
+const approveBtn = document.createElement("button");
 
+approveBtn.textContent =
+  userData.approved === true
+  ? "APPROVED"
+  : "APPROVE USER";
+
+approveBtn.style.cssText = `
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:9px;
+  border:1px solid rgba(0,229,255,.25);
+  background:#071a30;
+  color:#00e5ff;
+  font-size:9px;
+  font-weight:1000;
+`;
+
+approveBtn.disabled =
+  userData.approved === true;
+
+approveBtn.onclick = async () => {
+
+  approveBtn.textContent =
+    "APPROVING...";
+
+  try {
+
+    await updateDoc(
+      doc(db, "users", userDoc.id),
+      {
+        approved: true
+      }
+    );
+
+    approveBtn.textContent =
+      "APPROVED";
+
+    approveBtn.disabled = true;
+
+    const status =
+      userBox.querySelector(".user-status");
+
+    if(status){
+      status.textContent =
+        "APPROVED";
+    }
+
+  } catch(error) {
+
+    console.error(
+      "APPROVE USER ERROR:",
+      error
+    );
+
+    approveBtn.textContent =
+      "APPROVE USER";
+  }
+};
+
+userBox.appendChild(approveBtn);
   usersList.appendChild(userBox);
 });
 
