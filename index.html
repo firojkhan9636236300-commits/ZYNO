@@ -2978,6 +2978,154 @@ const auth = getAuth(app);
 
 const db = getFirestore(app);
 /* =========================
+   USER LOGIN
+========================= */
+
+window.openUserLogin = function(){
+
+  document.querySelectorAll(".view").forEach(v=>{
+    v.classList.remove("active");
+  });
+
+  document.getElementById("userLogin").classList.add("active");
+
+  window.scrollTo(0,0);
+};
+
+
+window.openUserRegister = function(){
+
+  document.querySelectorAll(".view").forEach(v=>{
+    v.classList.remove("active");
+  });
+
+  document.getElementById("userRegister").classList.add("active");
+
+  window.scrollTo(0,0);
+};
+
+
+window.zynoUserLogin = async function(){
+
+  const email =
+    document.getElementById("userLoginEmail").value.trim();
+
+  const password =
+    document.getElementById("userLoginPassword").value;
+
+  const message =
+    document.getElementById("userLoginMessage");
+
+  if(!email || !password){
+
+    message.textContent =
+      "Email aur Password bharo";
+
+    return;
+  }
+
+  message.textContent =
+    "LOGIN CHECKING...";
+
+  try{
+
+    const result =
+      await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+    const uid =
+      result.user.uid;
+
+    const userRef =
+      doc(db,"users",uid);
+
+    const userSnap =
+      await getDoc(userRef);
+
+    if(!userSnap.exists()){
+
+      await signOut(auth);
+
+      message.textContent =
+        "User profile nahi mila";
+
+      return;
+    }
+
+    const userData =
+      userSnap.data();
+
+    if(userData.role !== "user"){
+
+      await signOut(auth);
+
+      message.textContent =
+        "Ye normal user account nahi hai";
+
+      return;
+    }
+
+    if(userData.approved !== true){
+
+      await signOut(auth);
+
+      message.textContent =
+        "Admin approval pending hai";
+
+      return;
+    }
+
+    balance =
+      Number(userData.points) || 0;
+
+    updateBalance();
+
+    message.textContent =
+      "LOGIN SUCCESS";
+
+    document
+      .getElementById("userLogin")
+      .classList.remove("active");
+
+    document
+      .getElementById("home")
+      .classList.add("active");
+
+    window.scrollTo(0,0);
+
+  }catch(error){
+
+    console.error(
+      "ZYNO USER LOGIN ERROR:",
+      error
+    );
+
+    if(error.code === "auth/invalid-credential"){
+
+      message.textContent =
+        "Email ya Password galat hai";
+
+    }else if(error.code === "auth/user-not-found"){
+
+      message.textContent =
+        "User account nahi mila";
+
+    }else if(error.code === "auth/wrong-password"){
+
+      message.textContent =
+        "Password galat hai";
+
+    }else{
+
+      message.textContent =
+        "Login error: "+error.code;
+    }
+  }
+};
+/* =========================
    USER REGISTER
 ========================= */
 
