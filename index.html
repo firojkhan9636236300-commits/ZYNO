@@ -1718,12 +1718,14 @@ function z11StartBet(n,b){
 
       balance-=add;
 
-      z11Bets[n]=(z11Bets[n]||0)+add;
+z11Bets[n]=(z11Bets[n]||0)+add;
 
-      z11PressPoints+=add;
+z11PressPoints+=add;
 
-      syncZ11Balance();
+syncZ11Balance();
 
+saveUserPoints();
+      
       z11UpdateBet(n);
 
       z11UpdateSelected();
