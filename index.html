@@ -3359,7 +3359,77 @@ approveBtn.onclick = async () => {
       "APPROVE USER";
   }
 };
+const addPointsBtn = document.createElement("button");
 
+addPointsBtn.textContent = "ADD POINTS";
+
+addPointsBtn.style.cssText = `
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:9px;
+  border:1px solid rgba(255,211,78,.25);
+  background:#071a30;
+  color:#ffd34e;
+  font-size:9px;
+  font-weight:1000;
+`;
+
+addPointsBtn.onclick = async () => {
+
+  const amount = prompt("Kitne points add karne hain?");
+
+  if(amount === null) return;
+
+  const pointsToAdd = Number(amount);
+
+  if(!Number.isFinite(pointsToAdd) || pointsToAdd <= 0){
+    alert("Valid points enter karo");
+    return;
+  }
+
+  addPointsBtn.textContent = "ADDING...";
+
+  try {
+
+    const currentPoints =
+      Number(userData.points) || 0;
+
+    const newPoints =
+      currentPoints + pointsToAdd;
+
+    await updateDoc(
+      doc(db, "users", userDoc.id),
+      {
+        points: newPoints
+      }
+    );
+
+    userData.points = newPoints;
+
+    const pointsElement =
+      userBox.querySelector(".user-points");
+
+    if(pointsElement){
+      pointsElement.textContent = newPoints;
+    }
+
+    addPointsBtn.textContent = "ADD POINTS";
+
+  } catch(error) {
+
+    console.error(
+      "ADD POINTS ERROR:",
+      error
+    );
+
+    addPointsBtn.textContent = "ADD POINTS";
+
+    alert("Points add nahi ho paye");
+  }
+};
+
+userBox.appendChild(addPointsBtn);
 userBox.appendChild(approveBtn);
   usersList.appendChild(userBox);
 });
