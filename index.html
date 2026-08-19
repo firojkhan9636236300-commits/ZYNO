@@ -2982,7 +2982,7 @@ const db = getFirestore(app);
    ZYNO BALANCE SAVE
 ========================= */
 
-async function saveUserBalance(){
+window.saveUserBalance = async function(){
 
   const user = auth.currentUser;
 
@@ -2999,6 +2999,11 @@ async function saveUserBalance(){
       }
     );
 
+    console.log(
+      "BALANCE SAVED:",
+      Math.floor(balance)
+    );
+
   }catch(error){
 
     console.error(
@@ -3007,7 +3012,7 @@ async function saveUserBalance(){
     );
 
   }
-}
+};
 /* =========================
    USER LOGIN
 ========================= */
