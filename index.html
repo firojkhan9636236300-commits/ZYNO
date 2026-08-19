@@ -2251,7 +2251,7 @@ function addBet(number,amount){
     (bets[number]||0)+amount;
 
   updateBalance();
-
+saveUserPoints();
   updateBetCount(number);
 
   updateSelected();
