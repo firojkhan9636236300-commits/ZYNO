@@ -2248,6 +2248,9 @@ function addBet(number,amount){
     Math.min(amount,Math.floor(balance));
 
   balance-=amount;
+  if(balance<=0){
+  window.saveUserBalance();
+}
 
   bets[number]=
     (bets[number]||0)+amount;
