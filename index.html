@@ -3470,275 +3470,540 @@ onAuthStateChanged(auth,async(user)=>{
   if(!user){
 
     document
+
       .getElementById("adminPanel")
+
       .classList.remove("active");
 
     return;
-  }
 
+  }
 
   try{
 
-    const adminRef =
-      doc(db,"users","admin");
+    const userRef =
 
+      doc(db,"users",user.uid);
 
-    const snap =
-      await getDoc(adminRef);
+    const userSnap =
 
+      await getDoc(userRef);
 
-    if(!snap.exists()){
+    if(!userSnap.exists()){
 
       await signOut(auth);
 
       return;
-    }
 
+    }
 
     const data =
-      snap.data();
 
+      userSnap.data();
+
+    /* =========================
+
+       NORMAL USER
+
+    ========================= */
 
     if(
-      data.uid === user.uid &&
-      data.role === "admin" &&
-      data.approved === true
+
+      data.role === "user"
+
     ){
-balance = Number(data.points) || 0;
 
-updateBalance();
-const usersSnapshot = await getDocs(
-  collection(db, "users")
-);
+      if(data.approved !== true){
 
-const usersList =
-  document.getElementById("adminUsersList");
+        await signOut(auth);
 
-const usersMessage =
-  document.getElementById("adminUsersMessage");
+        return;
 
-usersList.innerHTML = "";
-
-let userCount = 0;
-
-usersSnapshot.forEach((userDoc) => {
-
-  if(userDoc.id === "admin") return;
-
-  const userData = userDoc.data();
-
-  userCount++;
-
-  const userBox =
-    document.createElement("div");
-
-  userBox.style.cssText = `
-    padding:12px;
-    margin-top:10px;
-    border:1px solid rgba(0,229,255,.18);
-    border-radius:12px;
-    background:#061322;
-  `;
-
-  userBox.innerHTML = `
-    <div style="
-      color:#00e5ff;
-      font-weight:1000;
-    ">
-      ${userData.username || "No Username"}
-    </div>
-
-    <div style="
-      margin-top:5px;
-      color:#8faac2;
-      font-size:9px;
-    ">
-      ${userData.email || "No Email"}
-    </div>
-
-    <div style="
-  margin-top:8px;
-  color:#fff;
-  font-size:10px;
-">
-  POINTS: <span class="user-points">${Number(userData.points) || 0}</span>
-</div>
-
-    <div style="
-      margin-top:5px;
-      color:#ffd34e;
-      font-size:9px;
-    ">
-      ${
-        userData.approved === true
-        ? "APPROVED"
-        : "APPROVAL PENDING"
       }
-    </div>
-  `;
-    
-const approveBtn = document.createElement("button");
 
-approveBtn.textContent =
-  userData.approved === true
-  ? "APPROVED"
-  : "APPROVE USER";
+      balance =
 
-approveBtn.style.cssText = `
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:9px;
-  border:1px solid rgba(0,229,255,.25);
-  background:#071a30;
-  color:#00e5ff;
-  font-size:9px;
-  font-weight:1000;
-`;
+        Number(data.points) || 0;
 
-approveBtn.disabled =
-  userData.approved === true;
+      updateBalance();
 
-approveBtn.onclick = async () => {
+      return;
 
-  approveBtn.textContent =
-    "APPROVING...";
-
-  try {
-
-    await updateDoc(
-      doc(db, "users", userDoc.id),
-      {
-        approved: true
-      }
-    );
-
-    approveBtn.textContent =
-      "APPROVED";
-
-    approveBtn.disabled = true;
-
-    const status =
-      userBox.querySelector(".user-status");
-
-    if(status){
-      status.textContent =
-        "APPROVED";
     }
 
-  } catch(error) {
+    /* =========================
 
-    console.error(
-      "APPROVE USER ERROR:",
-      error
-    );
+       ADMIN
 
-    approveBtn.textContent =
-      "APPROVE USER";
-  }
-};
-const addPointsBtn = document.createElement("button");
+    ========================= */
 
-addPointsBtn.textContent = "ADD POINTS";
+    if(
 
-addPointsBtn.style.cssText = `
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:9px;
-  border:1px solid rgba(255,211,78,.25);
-  background:#071a30;
-  color:#ffd34e;
-  font-size:9px;
-  font-weight:1000;
-`;
+      data.role === "admin" &&
 
-addPointsBtn.onclick = async () => {
+      data.approved === true
 
-  const amount = prompt("Kitne points add karne hain?");
+    ){
 
-  if(amount === null) return;
+      balance =
 
-  const pointsToAdd = Number(amount);
+        Number(data.points) || 0;
 
-  if(!Number.isFinite(pointsToAdd) || pointsToAdd <= 0){
-    alert("Valid points enter karo");
-    return;
-  }
+      updateBalance();
 
-  addPointsBtn.textContent = "ADDING...";
+      const usersSnapshot =
 
-  try {
+        await getDocs(
 
-    const currentPoints =
-      Number(userData.points) || 0;
+          collection(db,"users")
 
-    const newPoints =
-      currentPoints + pointsToAdd;
+        );
 
-    await updateDoc(
-      doc(db, "users", userDoc.id),
-      {
-        points: newPoints
-      }
-    );
+      const usersList =
 
-    userData.points = newPoints;
+        document.getElementById(
 
-    const pointsElement =
-      userBox.querySelector(".user-points");
+          "adminUsersList"
 
-    if(pointsElement){
-      pointsElement.textContent = newPoints;
-    }
+        );
 
-    addPointsBtn.textContent = "ADD POINTS";
+      const usersMessage =
 
-  } catch(error) {
+        document.getElementById(
 
-    console.error(
-      "ADD POINTS ERROR:",
-      error
-    );
+          "adminUsersMessage"
 
-    addPointsBtn.textContent = "ADD POINTS";
+        );
 
-    alert("Points add nahi ho paye");
-  }
-};
+      usersList.innerHTML = "";
 
-userBox.appendChild(addPointsBtn);
-userBox.appendChild(approveBtn);
-  usersList.appendChild(userBox);
-});
+      let userCount = 0;
 
-usersMessage.textContent =
-  userCount === 0
-    ? "NO USERS FOUND"
-    : userCount + " USER(S) FOUND";
+      usersSnapshot.forEach((userDoc)=>{
+
+        if(userDoc.id === "admin") return;
+
+        const userData =
+
+          userDoc.data();
+
+        userCount++;
+
+        const userBox =
+
+          document.createElement("div");
+
+        userBox.style.cssText = `
+
+          padding:12px;
+
+          margin-top:10px;
+
+          border:1px solid rgba(0,229,255,.18);
+
+          border-radius:12px;
+
+          background:#061322;
+
+        `;
+
+        userBox.innerHTML = `
+
+          <div style="
+
+            color:#00e5ff;
+
+            font-weight:1000;
+
+          ">
+
+            ${userData.username || "No Username"}
+
+          </div>
+
+          <div style="
+
+            margin-top:5px;
+
+            color:#8faac2;
+
+            font-size:9px;
+
+          ">
+
+            ${userData.email || "No Email"}
+
+          </div>
+
+          <div style="
+
+            margin-top:8px;
+
+            color:#fff;
+
+            font-size:10px;
+
+          ">
+
+            POINTS:
+
+            <span class="user-points">
+
+              ${Number(userData.points) || 0}
+
+            </span>
+
+          </div>
+
+          <div
+
+            class="user-status"
+
+            style="
+
+              margin-top:5px;
+
+              color:#ffd34e;
+
+              font-size:9px;
+
+            "
+
+          >
+
+            ${
+
+              userData.approved === true
+
+              ? "APPROVED"
+
+              : "APPROVAL PENDING"
+
+            }
+
+          </div>
+
+        `;
+
+        const approveBtn =
+
+          document.createElement("button");
+
+        approveBtn.textContent =
+
+          userData.approved === true
+
+          ? "APPROVED"
+
+          : "APPROVE USER";
+
+        approveBtn.style.cssText = `
+
+          width:100%;
+
+          margin-top:10px;
+
+          padding:10px;
+
+          border-radius:9px;
+
+          border:1px solid rgba(0,229,255,.25);
+
+          background:#071a30;
+
+          color:#00e5ff;
+
+          font-size:9px;
+
+          font-weight:1000;
+
+        `;
+
+        approveBtn.disabled =
+
+          userData.approved === true;
+
+        approveBtn.onclick =
+
+          async()=>{
+
+            approveBtn.textContent =
+
+              "APPROVING...";
+
+            try{
+
+              await updateDoc(
+
+                doc(
+
+                  db,
+
+                  "users",
+
+                  userDoc.id
+
+                ),
+
+                {
+
+                  approved:true
+
+                }
+
+              );
+
+              approveBtn.textContent =
+
+                "APPROVED";
+
+              approveBtn.disabled = true;
+
+              const status =
+
+                userBox.querySelector(
+
+                  ".user-status"
+
+                );
+
+              if(status){
+
+                status.textContent =
+
+                  "APPROVED";
+
+              }
+
+            }catch(error){
+
+              console.error(
+
+                "APPROVE USER ERROR:",
+
+                error
+
+              );
+
+              approveBtn.textContent =
+
+                "APPROVE USER";
+
+            }
+
+          };
+
+        const addPointsBtn =
+
+          document.createElement("button");
+
+        addPointsBtn.textContent =
+
+          "ADD POINTS";
+
+        addPointsBtn.style.cssText = `
+
+          width:100%;
+
+          margin-top:10px;
+
+          padding:10px;
+
+          border-radius:9px;
+
+          border:1px solid rgba(255,211,78,.25);
+
+          background:#071a30;
+
+          color:#ffd34e;
+
+          font-size:9px;
+
+          font-weight:1000;
+
+        `;
+
+        addPointsBtn.onclick =
+
+          async()=>{
+
+            const amount =
+
+              prompt(
+
+                "Kitne points add karne hain?"
+
+              );
+
+            if(amount === null) return;
+
+            const pointsToAdd =
+
+              Number(amount);
+
+            if(
+
+              !Number.isFinite(pointsToAdd) ||
+
+              pointsToAdd <= 0
+
+            ){
+
+              alert(
+
+                "Valid points enter karo"
+
+              );
+
+              return;
+
+            }
+
+            addPointsBtn.textContent =
+
+              "ADDING...";
+
+            try{
+
+              const currentPoints =
+
+                Number(userData.points) || 0;
+
+              const newPoints =
+
+                currentPoints +
+
+                pointsToAdd;
+
+              await updateDoc(
+
+                doc(
+
+                  db,
+
+                  "users",
+
+                  userDoc.id
+
+                ),
+
+                {
+
+                  points:newPoints
+
+                }
+
+              );
+
+              userData.points =
+
+                newPoints;
+
+              const pointsElement =
+
+                userBox.querySelector(
+
+                  ".user-points"
+
+                );
+
+              if(pointsElement){
+
+                pointsElement.textContent =
+
+                  newPoints;
+
+              }
+
+              addPointsBtn.textContent =
+
+                "ADD POINTS";
+
+            }catch(error){
+
+              console.error(
+
+                "ADD POINTS ERROR:",
+
+                error
+
+              );
+
+              addPointsBtn.textContent =
+
+                "ADD POINTS";
+
+              alert(
+
+                "Points add nahi ho paye"
+
+              );
+
+            }
+
+          };
+
+        userBox.appendChild(
+
+          addPointsBtn
+
+        );
+
+        userBox.appendChild(
+
+          approveBtn
+
+        );
+
+        usersList.appendChild(
+
+          userBox
+
+        );
+
+      });
+
+      usersMessage.textContent =
+
+        userCount === 0
+
+        ? "NO USERS FOUND"
+
+        : userCount + " USER(S) FOUND";
+
       document
+
         .getElementById("adminLogin")
+
         .classList.remove("active");
 
       document
+
         .getElementById("adminPanel")
+
         .classList.add("active");
 
-    }else{
+      return;
 
-      await signOut(auth);
     }
 
+    /* UNKNOWN ROLE */
+
+    await signOut(auth);
 
   }catch(error){
 
     console.error(
-      "ADMIN CHECK ERROR:",
+
+      "AUTH CHECK ERROR:",
+
       error
+
     );
+
   }
 
-});
+})
 </script>
 </body>
 </html>
