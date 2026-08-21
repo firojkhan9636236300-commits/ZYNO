@@ -3151,6 +3151,11 @@ if(savedUserBets){
       Number(userData.points) || 0;
 window.zynoCurrentUserUID = uid;
     updateBalance();
+    Object.keys(bets).forEach(number=>{
+  updateBetCount(Number(number));
+});
+
+updateSelected();
 
     message.textContent =
       "LOGIN SUCCESS";
