@@ -2018,6 +2018,9 @@ let spinning=false;
 let selectedNumber=null;
 let bets={};
 let savedBets=localStorage.getItem("zynoRouletteBets");
+if(window.zynoCurrentUserUID){
+  savedBets=localStorage.getItem("zynoRouletteBets_"+window.zynoCurrentUserUID);
+}
 if(savedBets){
   bets=JSON.parse(savedBets);
 }
