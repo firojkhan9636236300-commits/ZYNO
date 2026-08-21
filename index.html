@@ -3089,7 +3089,7 @@ window.zynoUserLogin = async function(){
 
     const uid =
       result.user.uid;
-
+window.zynoCurrentUserUID = uid;
     const userRef =
       doc(db,"users",uid);
 
