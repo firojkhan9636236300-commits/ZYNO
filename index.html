@@ -2018,6 +2018,9 @@ let spinning=false;
 let selectedNumber=null;
 let bets={};
 let savedBets=localStorage.getItem("zynoRouletteBets");
+if(savedBets){
+  bets=JSON.parse(savedBets);
+}
 let lastWins=[];
 let wheelRotation=0;
 
