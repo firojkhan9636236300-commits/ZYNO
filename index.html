@@ -3567,6 +3567,64 @@ usersSnapshot.forEach((userDoc) => {
 
   const userBox =
     document.createElement("div");
+    const viewBetsBtn = document.createElement("button");
+
+viewBetsBtn.textContent = "VIEW ROULETTE BETS";
+
+viewBetsBtn.style.cssText = `
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:9px;
+  border:1px solid rgba(0,229,255,.25);
+  background:#071a30;
+  color:#00e5ff;
+  font-size:9px;
+  font-weight:1000;
+`;
+
+viewBetsBtn.onclick = () => {
+
+  const savedUserBets =
+    localStorage.getItem(
+      "zynoRouletteBets_" + userDoc.id
+    );
+
+  if(!savedUserBets){
+
+    alert("Is user ke Roulette bets nahi hain");
+
+    return;
+  }
+
+  const userBets =
+    JSON.parse(savedUserBets);
+
+  const betNumbers =
+    Object.keys(userBets)
+    .filter(number => Number(userBets[number]) > 0);
+
+  if(betNumbers.length === 0){
+
+    alert("Is user ke Roulette bets nahi hain");
+
+    return;
+  }
+
+  let text =
+    "ROULETTE BETS\\n\\n";
+
+  betNumbers.forEach(number => {
+
+    text +=
+      "Number " + number +
+      " = " + userBets[number] +
+      " points\\n";
+
+  });
+
+  alert(text);
+};
 
   userBox.style.cssText = `
     padding:12px;
