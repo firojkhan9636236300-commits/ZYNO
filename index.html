@@ -2256,6 +2256,8 @@ function addBet(number,amount){
 
   bets[number]=
     (bets[number]||0)+amount;
+    
+    localStorage.setItem("zynoRouletteBets",JSON.stringify(bets));
 
   updateBalance();
 
