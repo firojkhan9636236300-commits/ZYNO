@@ -2950,7 +2950,11 @@ updateBalance();
 renderLastWins();
 syncZ11Balance();
 renderZ11Last();
+const savedScreen=localStorage.getItem("zynoCurrentScreen");
 
+if(savedScreen){
+  openGame(savedScreen);
+}
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
