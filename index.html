@@ -3098,6 +3098,16 @@ window.zynoUserLogin = async function(){
     const uid =
       result.user.uid;
 window.zynoCurrentUserUID = uid;
+bets = {};
+
+const savedUserBets =
+  localStorage.getItem(
+    "zynoRouletteBets_" + uid
+  );
+
+if(savedUserBets){
+  bets = JSON.parse(savedUserBets);
+}
     const userRef =
       doc(db,"users",uid);
 
