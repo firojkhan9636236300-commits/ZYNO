@@ -1538,7 +1538,7 @@ function openGame(game){
   });
 
   document.getElementById(game).classList.add("active");
-
+localStorage.setItem("zynoCurrentScreen",game);
   if(game==="zero11"){
     syncZ11Balance();
   }
