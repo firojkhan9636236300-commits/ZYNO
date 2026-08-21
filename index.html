@@ -2017,7 +2017,7 @@ let bettingOpen=true;
 let spinning=false;
 let selectedNumber=null;
 let bets={};
-let savedBets=localStorage.getItem("zynoRouletteBets");
+let savedBets=null;
 if(window.zynoCurrentUserUID){
   savedBets=localStorage.getItem("zynoRouletteBets_"+window.zynoCurrentUserUID);
 }
