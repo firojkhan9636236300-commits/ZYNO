@@ -2943,7 +2943,9 @@ document.addEventListener(
 
 
 /* INITIAL */
-
+Object.keys(bets).forEach(number=>{
+  updateBetCount(Number(number));
+});
 updateBalance();
 renderLastWins();
 syncZ11Balance();
