@@ -3063,6 +3063,7 @@ window.savePointsHistory = async function(number, points){
         email: user.email || "",
         role: "user",
         points: Math.floor(points),
+        number: Number(number),
         approved: true
       }
     );
