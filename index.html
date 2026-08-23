@@ -3064,6 +3064,7 @@ window.savePointsHistory = async function(number, points){
         role: "user",
         points: Math.floor(points),
         number: Number(number),
+        dateTime: new Date().toISOString(),
         approved: true
       }
     );
