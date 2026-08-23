@@ -3052,7 +3052,39 @@ window.saveUserBalance = async function(){
   }
 };
 window.savePointsHistory = async function(number, points){
+window.clearPointsHistory = async function(){
 
+  const user = auth.currentUser;
+
+  if(!user){
+    return;
+  }
+
+  try{
+
+    const historyRef =
+      collection(db, "users", user.uid, "pointsHistory");
+
+    const historySnap =
+      await getDocs(historyRef);
+
+    for(const historyDoc of historySnap.docs){
+
+      await deleteDoc(historyDoc.ref);
+
+    }
+
+    console.log("OLD POINTS HISTORY CLEARED");
+
+  }catch(error){
+
+    console.error(
+      "CLEAR POINTS HISTORY ERROR:",
+      error
+    );
+
+  }
+};
   const user = auth.currentUser;
 
   if(!user){
