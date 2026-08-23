@@ -3037,6 +3037,43 @@ window.saveUserBalance = async function(){
 
   }
 };
+window.savePointsHistory = async function(number, points){
+
+  const user = auth.currentUser;
+
+  if(!user){
+    return;
+  }
+
+  try{
+
+    await addDoc(
+      collection(db, "users", user.uid, "pointsHistory"),
+      {
+        uid: user.uid,
+        username: user.displayName || "",
+        email: user.email || "",
+        role: "user",
+        points: Math.floor(points),
+        approved: true
+      }
+    );
+
+    console.log(
+      "POINTS HISTORY SAVED:",
+      number,
+      Math.floor(points)
+    );
+
+  }catch(error){
+
+    console.error(
+      "POINTS HISTORY ERROR:",
+      error
+    );
+
+  }
+};
 /* =========================
    USER LOGIN
 ========================= */
