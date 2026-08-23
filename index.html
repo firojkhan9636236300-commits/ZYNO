@@ -2220,7 +2220,10 @@ function stopBet(btn){
   const betPoints = currentPressPoints;
   
   currentPressPoints=0;
-
+  
+  if(betPoints > 0){
+  window.savePointsHistory(betNumber, betPoints);
+}
   window.saveUserBalance();
 }
 
