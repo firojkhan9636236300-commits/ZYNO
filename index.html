@@ -2471,9 +2471,11 @@ function showWinner(winner){
 
     centerLogo.style.display="block";
 
-    resetGame();
+    await window.clearPointsHistory();
 
-  },2000);
+  resetGame();
+
+},2000);
 }
 
 
