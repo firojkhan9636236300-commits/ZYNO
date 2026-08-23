@@ -2524,7 +2524,9 @@ async function resetGame(){
     "zynoRouletteBets_"+window.zynoCurrentUserUID
   );
 }
-
+if(window.clearPointsHistory){
+  await window.clearPointsHistory();
+}
   selectedNumber=null;
 
   document.querySelectorAll(".bet-count")
