@@ -2518,6 +2518,11 @@ function resetGame(){
   stopAllBetting();
 
   bets={};
+  if(window.zynoCurrentUserUID){
+  localStorage.removeItem(
+    "zynoRouletteBets_"+window.zynoCurrentUserUID
+  );
+}
 
   selectedNumber=null;
 
