@@ -3587,8 +3587,10 @@ window.zynoAdminLogout = async function(){
 ========================= */
 
 onAuthStateChanged(auth,async(user)=>{
+  
+window.zynoCurrentUserUID = user ? user.uid : null;
 
-  if(!user){
+if(!user){
 
     document
       .getElementById("adminPanel")
