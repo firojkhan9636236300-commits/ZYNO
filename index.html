@@ -2380,8 +2380,7 @@ async function spinWheel(){
 
   stopAllBetting();
 
-  const winner=
-    Math.floor(Math.random()*37);
+  const winner = await getSharedRouletteWinner();
 
   const index=
     wheelNumbers.indexOf(winner);
