@@ -2377,8 +2377,9 @@ async function spinWheel(){
   const now = Date.now();
   
 resultEl.textContent="GETTING WINNER...";
+console.log("BEFORE GET WINNER");
 const roundSnap = await getDoc(roundRef);
-
+console.log("AFTER GET WINNER");
 let winner;
 
 if(roundSnap.exists()){
