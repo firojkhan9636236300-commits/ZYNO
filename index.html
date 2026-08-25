@@ -3021,6 +3021,31 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 window.zynoCurrentUserUID = null;
 const db = getFirestore(app);
+async function getSharedRouletteWinner(){
+
+  const roundRef = doc(db,"rouletteRounds","current");
+
+  const winner = await runTransaction(db,async(transaction)=>{
+
+    const snap = await transaction.get(roundRef);
+
+    if(snap.exists() && snap.data().winner !== undefined){
+      return Number(snap.data().winner);
+    }
+
+    const newWinner =
+      Math.floor(Math.random()*37);
+
+    transaction.set(roundRef,{
+      winner:newWinner,
+      createdAt:Date.now()
+    });
+
+    return newWinner;
+  });
+
+  return winner;
+}
 /* =========================
    ZYNO BALANCE SAVE
 ========================= */
