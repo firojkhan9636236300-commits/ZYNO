@@ -2015,6 +2015,8 @@ const centerLogo=document.getElementById("centerLogo");
 const centerWin=document.getElementById("centerWin");
 
 let timeLeft=60;
+const savedRouletteTime = localStorage.getItem("zynoRouletteTime");
+if(savedRouletteTime !== null) timeLeft = Number(savedRouletteTime);
 let bettingOpen=true;
 let spinning=false;
 let selectedNumber=null;
