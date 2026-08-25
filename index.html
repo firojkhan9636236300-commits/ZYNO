@@ -2369,7 +2369,21 @@ async function spinWheel(){
 
   stopAllBetting();
 
-  const winner = 7;
+  const roundRef = doc(db, "rouletteRounds", "current");
+
+const roundSnap = await getDoc(roundRef);
+
+let winner;
+
+if(roundSnap.exists()){
+  winner = Number(roundSnap.data().winner);
+}else{
+  winner = Math.floor(Math.random()*37);
+
+  await setDoc(roundRef, {
+    winner: winner
+  });
+}
 
   const index=
     wheelNumbers.indexOf(winner);
