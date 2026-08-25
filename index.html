@@ -2000,7 +2000,7 @@ function z11Reset(){
 }
 <script>
 /* =========================
-   ROULETTE 0–36
+   SHARED ROULETTE 0–36
 ========================= */
 
 const wheel=document.getElementById("wheel");
@@ -2385,25 +2385,41 @@ function updateSelected(){
 
 
 /* =========================
-   ROULETTE TIMER
+   SHARED ROULETTE TIMER
 ========================= */
 
-setInterval(()=>{
+function getSharedTimeLeft(){
 
-  if(spinning)return;
+  const now=Date.now();
 
-  if(timeLeft>0){
+  const elapsed=
+    now % 60000;
 
-    timeLeft--;
+  const seconds=
+    Math.floor(elapsed/1000);
+
+  return 60-seconds;
+}
+
+
+function syncSharedTimer(){
+
+  const sharedTime=
+    getSharedTimeLeft();
+
+  timeLeft=sharedTime;
+
+  if(timerEl){
 
     timerEl.textContent=
-      timeLeft;
+      String(sharedTime);
   }
 
   if(
-    timeLeft<=4 &&
-    timeLeft>0 &&
-    bettingOpen
+    sharedTime<=4 &&
+    sharedTime>0 &&
+    bettingOpen &&
+    !spinning
   ){
 
     bettingOpen=false;
@@ -2417,18 +2433,20 @@ setInterval(()=>{
   }
 
   if(
-    timeLeft<=0 &&
+    sharedTime<=0 &&
     !spinning
   ){
 
-    timeLeft=0;
-
-    timerEl.textContent="0";
-
     spinWheel();
   }
+}
 
-},1000);
+
+setInterval(()=>{
+
+  syncSharedTimer();
+
+},250);
 
 
 /* =========================
@@ -2498,9 +2516,9 @@ async function spinWheel(){
     resultEl.textContent=
       "Wheel spinning...";
 
-    setTimeout(()=>{
+    setTimeout(async()=>{
 
-      showWinner(winner);
+      await showWinner(winner);
 
     },5900);
 
@@ -2520,9 +2538,11 @@ async function spinWheel(){
 
     setTimeout(()=>{
 
-      timeLeft=60;
+      timeLeft=
+        getSharedTimeLeft();
 
-      timerEl.textContent="60";
+      timerEl.textContent=
+        String(timeLeft);
 
       timerEl.classList.remove("closed");
 
@@ -2542,7 +2562,7 @@ async function spinWheel(){
    WINNER
 ========================= */
 
-function showWinner(winner){
+async function showWinner(winner){
 
   document
     .querySelectorAll(".bet-number")
@@ -2596,7 +2616,7 @@ function showWinner(winner){
     window.saveUserBalance();
   }
 
-  addLastWin(winner);
+  await syncSharedLastWins();
 
   setTimeout(()=>{
 
@@ -2610,15 +2630,38 @@ function showWinner(winner){
 }
 
 
-function addLastWin(number){
+/* =========================
+   SHARED LAST 4 WINNERS
+========================= */
 
-  lastWins.unshift(number);
+async function syncSharedLastWins(){
 
-  if(lastWins.length>4){
-    lastWins.pop();
+  if(
+    !window.zynoGetSharedLastWins
+  ){
+
+    return;
   }
 
-  renderLastWins();
+  try{
+
+    const shared=
+      await window.zynoGetSharedLastWins();
+
+    lastWins=
+      Array.isArray(shared)
+      ?shared
+      :[];
+
+    renderLastWins();
+
+  }catch(error){
+
+    console.error(
+      "SHARED LAST 4 ERROR:",
+      error
+    );
+  }
 }
 
 
@@ -2632,17 +2675,20 @@ function renderLastWins(){
     list.push("-");
   }
 
-  list.reverse().forEach(num=>{
+  list
+    .slice(0,4)
+    .reverse()
+    .forEach(num=>{
 
-    const el=
-      document.createElement("span");
+      const el=
+        document.createElement("span");
 
-    el.className="last-number";
+      el.className="last-number";
 
-    el.textContent=num;
+      el.textContent=num;
 
-    lastWinsEl.appendChild(el);
-  });
+      lastWinsEl.appendChild(el);
+    });
 }
 
 
@@ -2690,9 +2736,11 @@ async function resetGame(){
   selectedEl.textContent=
     "Koi number select nahi hai";
 
-  timeLeft=60;
+  timeLeft=
+    getSharedTimeLeft();
 
-  timerEl.textContent="60";
+  timerEl.textContent=
+    String(timeLeft);
 
   timerEl.classList.remove("closed");
 
@@ -2704,188 +2752,8 @@ async function resetGame(){
   spinning=false;
 
   updateBalance();
-}
 
-
-/* =========================
-   LUDO
-========================= */
-
-let ludoPosition=0;
-let ludoRolling=false;
-
-function rollLudoDice(){
-
-  if(ludoRolling)return;
-
-  ludoRolling=true;
-
-  const diceValue=
-    document.getElementById("diceValue");
-
-  const status=
-    document.getElementById("ludoStatus");
-
-  diceValue.textContent="...";
-
-  status.textContent=
-    "DICE ROLLING...";
-
-  let ticks=0;
-
-  const anim=setInterval(()=>{
-
-    diceValue.textContent=
-      String(
-        1+
-        Math.floor(
-          Math.random()*6
-        )
-      );
-
-    ticks++;
-
-    if(ticks>=8){
-
-      clearInterval(anim);
-
-      const n=
-        1+
-        Math.floor(
-          Math.random()*6
-        );
-
-      diceValue.textContent=n;
-
-      ludoPosition=
-        Math.min(
-          20,
-          ludoPosition+n
-        );
-
-      status.textContent=
-        n===6
-        ?"NICE! 6 AAYA"
-        :"YOU MOVED "+
-         n+
-         " STEP"+
-         (n>1?"S":"");
-
-      ludoRolling=false;
-
-      if(ludoPosition>=20){
-
-        status.textContent=
-          "🏆 ZYNO LUDO — YOU WIN!";
-
-        ludoPosition=0;
-      }
-    }
-
-  },80);
-}
-
-
-function resetLudo(){
-
-  ludoPosition=0;
-
-  ludoRolling=false;
-
-  const d=
-    document.getElementById(
-      "diceValue"
-    );
-
-  const s=
-    document.getElementById(
-      "ludoStatus"
-    );
-
-  if(d)d.textContent="ROLL";
-
-  if(s)s.textContent="YOUR TURN";
-}
-
-
-/* =========================
-   TEEN PATTI
-========================= */
-
-const tpCards=
-  document.querySelectorAll(".tp-card");
-
-const tpResult=
-  document.getElementById("tpResult");
-
-let tpReady=true;
-
-function dealTeenPatti(){
-
-  if(!tpReady)return;
-
-  tpReady=false;
-
-  tpResult.textContent=
-    "DEALING...";
-
-  tpCards.forEach(c=>{
-    c.textContent="?";
-  });
-
-  let count=0;
-
-  const timer=setInterval(()=>{
-
-    const c=tpCards[count];
-
-    const suits=[
-      "♠","♥","♦","♣"
-    ];
-
-    const ranks=[
-      "A","K","Q","J","10",
-      "9","8","7","6"
-    ];
-
-    c.textContent=
-      ranks[
-        Math.floor(
-          Math.random()*ranks.length
-        )
-      ]+
-      suits[
-        Math.floor(
-          Math.random()*4
-        )
-      ];
-
-    count++;
-
-    if(count>=3){
-
-      clearInterval(timer);
-
-      tpResult.textContent=
-        "CARDS DEALT";
-
-      tpReady=true;
-    }
-
-  },350);
-}
-
-
-function resetTeenPatti(){
-
-  tpReady=true;
-
-  tpResult.textContent=
-    "DEAL CARDS";
-
-  tpCards.forEach(c=>{
-    c.textContent="?";
-  });
+  syncSharedLastWins();
 }
 
 
@@ -3192,8 +3060,16 @@ Object.keys(bets).forEach(number=>{
 
 updateBalance();
 renderLastWins();
-syncZ11Balance();
-renderZ11Last();
+
+if(typeof syncZ11Balance==="function"){
+  syncZ11Balance();
+}
+
+if(typeof renderZ11Last==="function"){
+  renderZ11Last();
+}
+
+syncSharedTimer();
 
 const savedScreen=
   localStorage.getItem(
@@ -3275,7 +3151,7 @@ window.zynoCurrentUserUID=null;
 
 
 /* =========================
-   SHARED ROULETTE WINNER
+   SHARED ROULETTE ROUND
 ========================= */
 
 async function getSharedRouletteWinner(){
@@ -3284,6 +3160,8 @@ async function getSharedRouletteWinner(){
     Math.floor(
       Date.now()/60000
     );
+
+  zynoRoundId=roundId;
 
   const roundRef=
     doc(
@@ -3320,8 +3198,14 @@ async function getSharedRouletteWinner(){
         transaction.set(
           roundRef,
           {
+            roundId:roundId,
+
             winner:newWinner,
+
             createdAt:Date.now()
+          },
+          {
+            merge:true
           }
         );
 
@@ -3329,8 +3213,69 @@ async function getSharedRouletteWinner(){
       }
     );
 
-  return winner;
+  zynoRoundWinner=
+    Number(winner);
+
+  return Number(winner);
 }
+
+
+/* =========================
+   SHARED LAST 4
+========================= */
+
+window.zynoGetSharedLastWins=
+  async function(){
+
+    try{
+
+      const currentRoundId=
+        Math.floor(
+          Date.now()/60000
+        );
+
+      const shared=[];
+
+      for(let i=1;i<=4;i++){
+
+        const roundId=
+          currentRoundId-i;
+
+        const roundRef=
+          doc(
+            db,
+            "rouletteRounds",
+            String(roundId)
+          );
+
+        const snap=
+          await getDoc(roundRef);
+
+        if(
+          snap.exists() &&
+          snap.data().winner !== undefined
+        ){
+
+          shared.push(
+            Number(
+              snap.data().winner
+            )
+          );
+        }
+      }
+
+      return shared;
+
+    }catch(error){
+
+      console.error(
+        "GET SHARED LAST 4 ERROR:",
+        error
+      );
+
+      return [];
+    }
+  };
 
 
 /* =========================
@@ -3664,6 +3609,8 @@ window.zynoUserLogin=
       );
 
       updateSelected();
+
+      await syncSharedLastWins();
 
       message.textContent=
         "LOGIN SUCCESS";
@@ -4130,6 +4077,8 @@ onAuthStateChanged(
           Number(data.points)||0;
 
         updateBalance();
+
+        await syncSharedLastWins();
 
         const usersSnapshot=
           await getDocs(
@@ -4621,6 +4570,8 @@ onAuthStateChanged(
             );
 
             updateSelected();
+
+            await syncSharedLastWins();
 
             document
               .getElementById("home")
