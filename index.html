@@ -1998,6 +1998,7 @@ function z11Reset(){
 
   syncZ11Balance();
 }
+<script>
 /* =========================
    ROULETTE 0–36
 ========================= */
@@ -2005,8 +2006,10 @@ function z11Reset(){
 const wheel=document.getElementById("wheel");
 const grid=document.getElementById("grid");
 const timerEl=document.getElementById("timer");
+
 let zynoRoundId = null;
 let zynoRoundWinner = null;
+
 const balanceEl=document.getElementById("balance");
 const resultEl=document.getElementById("result");
 const selectedEl=document.getElementById("selected");
@@ -2020,12 +2023,22 @@ let spinning=false;
 let selectedNumber=null;
 let bets={};
 let savedBets=null;
+
 if(window.zynoCurrentUserUID){
-  savedBets=localStorage.getItem("zynoRouletteBets_"+window.zynoCurrentUserUID);
+  savedBets=
+    localStorage.getItem(
+      "zynoRouletteBets_"+window.zynoCurrentUserUID
+    );
 }
+
 if(savedBets){
-  bets=JSON.parse(savedBets);
+  try{
+    bets=JSON.parse(savedBets);
+  }catch(error){
+    bets={};
+  }
 }
+
 let lastWins=[];
 let wheelRotation=0;
 
@@ -2087,31 +2100,43 @@ for(let i=0;i<=36;i++){
 
   grid.appendChild(btn);
 
-  btn.addEventListener("pointerdown",e=>{
+  btn.addEventListener(
+    "pointerdown",
+    e=>{
 
-    e.preventDefault();
+      e.preventDefault();
 
-    if(!currentPressing){
-      startBet(i,btn);
-    }
+      if(!currentPressing){
+        startBet(i,btn);
+      }
 
-  },{passive:false});
+    },
+    {passive:false}
+  );
 
-  btn.addEventListener("pointerup",e=>{
+  btn.addEventListener(
+    "pointerup",
+    e=>{
 
-    e.preventDefault();
+      e.preventDefault();
 
-    stopBet(btn);
+      stopBet(btn);
 
-  },{passive:false});
+    },
+    {passive:false}
+  );
 
-  btn.addEventListener("pointercancel",e=>{
+  btn.addEventListener(
+    "pointercancel",
+    e=>{
 
-    e.preventDefault();
+      e.preventDefault();
 
-    stopBet(btn);
+      stopBet(btn);
 
-  },{passive:false});
+    },
+    {passive:false}
+  );
 }
 
 
@@ -2161,7 +2186,9 @@ function startBet(number,btn){
       !currentPressing ||
       !bettingOpen ||
       spinning
-    )return;
+    ){
+      return;
+    }
 
     if(balance<=0){
 
@@ -2214,19 +2241,33 @@ function stopBet(btn){
   }
 
   currentPress=null;
-  
-  const betNumber = currentPressNumber;
+
+  const betNumber=
+    currentPressNumber;
+
   currentPressNumber=null;
+
   currentPressStart=0;
-  
-  const betPoints = currentPressPoints;
-  
+
+  const betPoints=
+    currentPressPoints;
+
   currentPressPoints=0;
-  
-  if(betPoints > 0){
-  window.savePointsHistory(betNumber, betPoints);
-}
-  window.saveUserBalance();
+
+  if(
+    betPoints>0 &&
+    window.savePointsHistory
+  ){
+
+    window.savePointsHistory(
+      betNumber,
+      betPoints
+    );
+  }
+
+  if(window.saveUserBalance){
+    window.saveUserBalance();
+  }
 }
 
 
@@ -2247,7 +2288,9 @@ function stopAllBetting(){
   currentPressPoints=0;
 
   document.querySelectorAll(".bet-number")
-    .forEach(el=>el.classList.remove("active"));
+    .forEach(el=>
+      el.classList.remove("active")
+    );
 }
 
 
@@ -2257,38 +2300,53 @@ function addBet(number,amount){
     !bettingOpen ||
     spinning ||
     amount<=0
-  )return;
+  ){
+    return;
+  }
 
   amount=
-    Math.min(amount,Math.floor(balance));
+    Math.min(
+      amount,
+      Math.floor(balance)
+    );
+
+  if(amount<=0)return;
 
   balance-=amount;
-  if(balance<=0){
-  window.saveUserBalance();
-}
 
   bets[number]=
     (bets[number]||0)+amount;
-    
-    if(window.zynoCurrentUserUID){
-  localStorage.setItem(
-    "zynoRouletteBets_"+window.zynoCurrentUserUID,
-    JSON.stringify(bets)
-  );
-}
+
+  if(window.zynoCurrentUserUID){
+
+    localStorage.setItem(
+      "zynoRouletteBets_"+
+      window.zynoCurrentUserUID,
+      JSON.stringify(bets)
+    );
+  }
 
   updateBalance();
 
   updateBetCount(number);
 
   updateSelected();
+
+  if(balance<=0){
+
+    if(window.saveUserBalance){
+      window.saveUserBalance();
+    }
+  }
 }
 
 
 function updateBetCount(number){
 
   const el=
-    document.getElementById("count-"+number);
+    document.getElementById(
+      "count-"+number
+    );
 
   if(el){
 
@@ -2315,18 +2373,22 @@ function updateSelected(){
 
   selectedEl.innerHTML=
     total>0
-    ?"Number <strong>"+selectedNumber+
-     "</strong> par total <strong>"+total+
-     "</strong> points bet"
-    :"Number <strong>"+selectedNumber+
-     "</strong> select kiya hai";
+    ?"Number <strong>"+
+      selectedNumber+
+      "</strong> par total <strong>"+
+      total+
+      "</strong> points bet"
+    :"Number <strong>"+
+      selectedNumber+
+      "</strong> select kiya hai";
 }
 
 
-/* ROULETTE TIMER */
+/* =========================
+   ROULETTE TIMER
+========================= */
 
 setInterval(()=>{
-
 
   if(spinning)return;
 
@@ -2334,7 +2396,8 @@ setInterval(()=>{
 
     timeLeft--;
 
-    timerEl.textContent=timeLeft;
+    timerEl.textContent=
+      timeLeft;
   }
 
   if(
@@ -2368,11 +2431,11 @@ setInterval(()=>{
 },1000);
 
 
-/* SPIN */
+/* =========================
+   SPIN
+========================= */
 
 async function spinWheel(){
-  
-  const roundRef = doc(db,"rouletteRounds","current");
 
   if(spinning)return;
 
@@ -2382,53 +2445,116 @@ async function spinWheel(){
 
   stopAllBetting();
 
-  const winner = await getSharedRouletteWinner();
+  try{
 
-  const index=
-    wheelNumbers.indexOf(winner);
+    const winner=
+      await getSharedRouletteWinner();
 
-  const targetAngle=
-    -(index*slice);
+    const index=
+      wheelNumbers.indexOf(winner);
 
-  const currentNormalized=
-    (wheelRotation%360+360)%360;
+    if(index===-1){
 
-  const targetNormalized=
-    (targetAngle%360+360)%360;
+      console.error(
+        "INVALID ROULETTE WINNER:",
+        winner
+      );
 
-  let difference=
-    targetNormalized-
-    currentNormalized;
+      spinning=false;
 
-  if(difference<0){
-    difference+=360;
+      resultEl.textContent=
+        "Roulette winner error";
+
+      setTimeout(()=>{
+        resetGame();
+      },1500);
+
+      return;
+    }
+
+    const targetAngle=
+      -(index*slice);
+
+    const currentNormalized=
+      (wheelRotation%360+360)%360;
+
+    const targetNormalized=
+      (targetAngle%360+360)%360;
+
+    let difference=
+      targetNormalized-
+      currentNormalized;
+
+    if(difference<0){
+      difference+=360;
+    }
+
+    wheelRotation+=
+      360*8+difference;
+
+    wheel.style.transform=
+      "rotate("+wheelRotation+"deg)";
+
+    resultEl.textContent=
+      "Wheel spinning...";
+
+    setTimeout(()=>{
+
+      showWinner(winner);
+
+    },5900);
+
+  }catch(error){
+
+    console.error(
+      "ROULETTE SPIN ERROR:",
+      error
+    );
+
+    spinning=false;
+
+    bettingOpen=false;
+
+    resultEl.textContent=
+      "Roulette error — retrying...";
+
+    setTimeout(()=>{
+
+      timeLeft=60;
+
+      timerEl.textContent="60";
+
+      timerEl.classList.remove("closed");
+
+      bettingOpen=true;
+
+      spinning=false;
+
+      resultEl.textContent=
+        "Number select karo";
+
+    },2000);
   }
-
-  wheelRotation+=
-    360*8+difference;
-
-  wheel.style.transform=
-    "rotate("+wheelRotation+"deg)";
-
-  resultEl.textContent=
-    "Wheel spinning...";
-
-  setTimeout(()=>{
-    showWinner(winner);
-  },5900);
 }
 
 
-/* WINNER */
+/* =========================
+   WINNER
+========================= */
 
 function showWinner(winner){
 
-  document.querySelectorAll(".bet-number")
-    .forEach(el=>el.classList.remove("winner"));
+  document
+    .querySelectorAll(".bet-number")
+    .forEach(el=>
+      el.classList.remove("winner")
+    );
 
   const winnerBtn=
     document.querySelector(
-      '.bet-number[data-number="'+winner+'"]'
+      '.bet-number[data-number="'+
+      winner+
+      '"]'
     );
 
   if(winnerBtn){
@@ -2465,6 +2591,11 @@ function showWinner(winner){
 
   updateBalance();
 
+  if(window.saveUserBalance){
+
+    window.saveUserBalance();
+  }
+
   addLastWin(winner);
 
   setTimeout(()=>{
@@ -2472,11 +2603,10 @@ function showWinner(winner){
     centerWin.style.display="none";
 
     centerLogo.style.display="block";
-    
-spinning=false;
-  resetGame();
 
-},2000);
+    resetGame();
+
+  },2000);
 }
 
 
@@ -2516,28 +2646,45 @@ function renderLastWins(){
 }
 
 
+/* =========================
+   RESET ROULETTE
+========================= */
+
 async function resetGame(){
 
   stopAllBetting();
 
   bets={};
+
   if(window.zynoCurrentUserUID){
-  localStorage.removeItem(
-    "zynoRouletteBets_"+window.zynoCurrentUserUID
-  );
-}
-if(window.clearPointsHistory){
-  await window.clearPointsHistory();
-}
+
+    localStorage.removeItem(
+      "zynoRouletteBets_"+
+      window.zynoCurrentUserUID
+    );
+  }
+
+  if(window.clearPointsHistory){
+
+    await window.clearPointsHistory();
+  }
+
   selectedNumber=null;
 
-  document.querySelectorAll(".bet-count")
-    .forEach(el=>el.textContent="");
+  document
+    .querySelectorAll(".bet-count")
+    .forEach(el=>
+      el.textContent=""
+    );
 
-  document.querySelectorAll(".bet-number")
+  document
+    .querySelectorAll(".bet-number")
     .forEach(el=>{
+
       el.classList.remove("winner");
+
       el.classList.remove("active");
+
     });
 
   selectedEl.textContent=
@@ -2589,7 +2736,12 @@ function rollLudoDice(){
   const anim=setInterval(()=>{
 
     diceValue.textContent=
-      String(1+Math.floor(Math.random()*6));
+      String(
+        1+
+        Math.floor(
+          Math.random()*6
+        )
+      );
 
     ticks++;
 
@@ -2598,17 +2750,26 @@ function rollLudoDice(){
       clearInterval(anim);
 
       const n=
-        1+Math.floor(Math.random()*6);
+        1+
+        Math.floor(
+          Math.random()*6
+        );
 
       diceValue.textContent=n;
 
       ludoPosition=
-        Math.min(20,ludoPosition+n);
+        Math.min(
+          20,
+          ludoPosition+n
+        );
 
       status.textContent=
         n===6
         ?"NICE! 6 AAYA"
-        :"YOU MOVED "+n+" STEP"+(n>1?"S":"");
+        :"YOU MOVED "+
+         n+
+         " STEP"+
+         (n>1?"S":"");
 
       ludoRolling=false;
 
@@ -2632,10 +2793,14 @@ function resetLudo(){
   ludoRolling=false;
 
   const d=
-    document.getElementById("diceValue");
+    document.getElementById(
+      "diceValue"
+    );
 
   const s=
-    document.getElementById("ludoStatus");
+    document.getElementById(
+      "ludoStatus"
+    );
 
   if(d)d.textContent="ROLL";
 
@@ -2684,8 +2849,16 @@ function dealTeenPatti(){
     ];
 
     c.textContent=
-      ranks[Math.floor(Math.random()*ranks.length)] +
-      suits[Math.floor(Math.random()*4)];
+      ranks[
+        Math.floor(
+          Math.random()*ranks.length
+        )
+      ]+
+      suits[
+        Math.floor(
+          Math.random()*4
+        )
+      ];
 
     count++;
 
@@ -2732,7 +2905,11 @@ function clashMove(move){
 
   const cpu=
     ["attack","shield","power"]
-    [Math.floor(Math.random()*3)];
+    [
+      Math.floor(
+        Math.random()*3
+      )
+    ];
 
   let yours=
     move==="attack"
@@ -2751,17 +2928,28 @@ function clashMove(move){
   let outcome="";
 
   if(move==="shield"){
-    cpuHit=Math.max(0,cpuHit-2);
+    cpuHit=
+      Math.max(
+        0,
+        cpuHit-2
+      );
   }
 
   if(cpu==="shield"){
-    yours=Math.max(0,yours-2);
+    yours=
+      Math.max(
+        0,
+        yours-2
+      );
   }
 
   if(yours>cpuHit){
 
     cpuPower=
-      Math.max(0,cpuPower-yours);
+      Math.max(
+        0,
+        cpuPower-yours
+      );
 
     outcome=
       "⚡ YOU WIN THIS CLASH";
@@ -2769,7 +2957,10 @@ function clashMove(move){
   }else if(cpuHit>yours){
 
     yourPower=
-      Math.max(0,yourPower-cpuHit);
+      Math.max(
+        0,
+        yourPower-cpuHit
+      );
 
     outcome=
       "CPU WINS THIS CLASH";
@@ -2779,13 +2970,16 @@ function clashMove(move){
     outcome="DRAW";
   }
 
-  document.getElementById("yourPower")
+  document
+    .getElementById("yourPower")
     .textContent=yourPower;
 
-  document.getElementById("cpuPower")
+  document
+    .getElementById("cpuPower")
     .textContent=cpuPower;
 
-  document.getElementById("clashResult")
+  document
+    .getElementById("clashResult")
     .textContent=outcome;
 
   if(
@@ -2793,13 +2987,17 @@ function clashMove(move){
     cpuPower<=0
   ){
 
-    document.getElementById("clashResult")
+    document
+      .getElementById("clashResult")
       .textContent=
       cpuPower<=0
       ?"🏆 YOU WIN ZYNO CLASH"
       :"CPU WINS";
 
-    setTimeout(resetClash,1600);
+    setTimeout(
+      resetClash,
+      1600
+    );
   }
 
   setTimeout(()=>{
@@ -2816,16 +3014,21 @@ function resetClash(){
 
   clashBusy=false;
 
-  document.getElementById("yourPower")
+  document
+    .getElementById("yourPower")
     .textContent=10;
 
-  document.getElementById("cpuPower")
+  document
+    .getElementById("cpuPower")
     .textContent=10;
 
-  document.getElementById("clashResult")
+  document
+    .getElementById("clashResult")
     .textContent=
-    "CHOOSE YOUR MOVE";
+      "CHOOSE YOUR MOVE";
 }
+
+
 /* =========================
    ANTI COPY / PASTE
 ========================= */
@@ -2846,9 +3049,11 @@ function isBetNumber(target){
 document.addEventListener(
   "selectstart",
   e=>{
+
     if(isBetNumber(e.target)){
       e.preventDefault();
     }
+
   }
 );
 
@@ -2858,6 +3063,7 @@ document.addEventListener(
 document.addEventListener(
   "copy",
   e=>{
+
     if(
       isBetNumber(e.target) ||
       currentPressing ||
@@ -2865,6 +3071,7 @@ document.addEventListener(
     ){
       e.preventDefault();
     }
+
   }
 );
 
@@ -2874,6 +3081,7 @@ document.addEventListener(
 document.addEventListener(
   "cut",
   e=>{
+
     if(
       isBetNumber(e.target) ||
       currentPressing ||
@@ -2881,6 +3089,7 @@ document.addEventListener(
     ){
       e.preventDefault();
     }
+
   }
 );
 
@@ -2890,9 +3099,11 @@ document.addEventListener(
 document.addEventListener(
   "contextmenu",
   e=>{
+
     if(isBetNumber(e.target)){
       e.preventDefault();
     }
+
   }
 );
 
@@ -2902,9 +3113,11 @@ document.addEventListener(
 document.addEventListener(
   "dragstart",
   e=>{
+
     if(isBetNumber(e.target)){
       e.preventDefault();
     }
+
   }
 );
 
@@ -2914,9 +3127,11 @@ document.addEventListener(
 document.addEventListener(
   "touchstart",
   e=>{
+
     if(isBetNumber(e.target)){
       e.target.style.webkitTouchCallout="none";
     }
+
   },
   {passive:true}
 );
@@ -2962,6 +3177,7 @@ document.addEventListener(
       if(z11Pressing){
         z11StopBet(z11PressBtn);
       }
+
     }
 
   }
@@ -2969,21 +3185,33 @@ document.addEventListener(
 
 
 /* INITIAL */
+
 Object.keys(bets).forEach(number=>{
   updateBetCount(Number(number));
 });
+
 updateBalance();
 renderLastWins();
 syncZ11Balance();
 renderZ11Last();
-const savedScreen=localStorage.getItem("zynoCurrentScreen");
+
+const savedScreen=
+  localStorage.getItem(
+    "zynoCurrentScreen"
+  );
 
 if(savedScreen){
   openGame(savedScreen);
 }
 </script>
+
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
 
 import {
   getAuth,
@@ -2993,945 +3221,763 @@ import {
   signOut
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
+
 import {
-getFirestore,
-doc,
-getDoc,
-getDocs,
-collection,
-setDoc,
-updateDoc,
-addDoc,
-deleteDoc,
-runTransaction
+  getFirestore,
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  setDoc,
+  updateDoc,
+  addDoc,
+  deleteDoc,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
+/* =========================
+   FIREBASE
+========================= */
+
 const firebaseConfig = {
-  apiKey: "AIzaSyDpQHse79QRukas1LD_GTLf-CmDWtArA_c",
-  authDomain: "zyno-dc777.firebaseapp.com",
-  projectId: "zyno-dc777",
-  storageBucket: "zyno-dc777.firebasestorage.app",
-  messagingSenderId: "59378366235",
-  appId: "1:59378366235:web:72021899a3de7bf3a705be"
+
+  apiKey:
+    "AIzaSyDpQHse79QRukas1LD_GTLf-CmDWtArA_c",
+
+  authDomain:
+    "zyno-dc777.firebaseapp.com",
+
+  projectId:
+    "zyno-dc777",
+
+  storageBucket:
+    "zyno-dc777.firebasestorage.app",
+
+  messagingSenderId:
+    "59378366235",
+
+  appId:
+    "1:59378366235:web:72021899a3de7bf3a705be"
 };
 
 
-const app = initializeApp(firebaseConfig);
+const app=
+  initializeApp(firebaseConfig);
 
-const auth = getAuth(app);
-window.zynoCurrentUserUID = null;
-const db = getFirestore(app);
+const auth=
+  getAuth(app);
+
+const db=
+  getFirestore(app);
+
+window.zynoCurrentUserUID=null;
+
+
+/* =========================
+   SHARED ROULETTE WINNER
+========================= */
+
 async function getSharedRouletteWinner(){
 
-  const roundId = Math.floor(Date.now()/60000);
-const roundRef = doc(db,"rouletteRounds",String(roundId));
+  const roundId=
+    Math.floor(
+      Date.now()/60000
+    );
 
-  const winner = await runTransaction(db,async(transaction)=>{
+  const roundRef=
+    doc(
+      db,
+      "rouletteRounds",
+      String(roundId)
+    );
 
-    const snap = await transaction.get(roundRef);
+  const winner=
+    await runTransaction(
+      db,
+      async(transaction)=>{
 
-    if(snap.exists() && snap.data().winner !== undefined){
-      return Number(snap.data().winner);
-    }
+        const snap=
+          await transaction.get(
+            roundRef
+          );
 
-    const winner=
+        if(
+          snap.exists() &&
+          snap.data().winner !== undefined
+        ){
 
-    Math.floor(Math.random()*37);
+          return Number(
+            snap.data().winner
+          );
+        }
 
-    transaction.set(roundRef,{
-      winner:newWinner,
-      createdAt:Date.now()
-    });
+        const newWinner=
+          Math.floor(
+            Math.random()*37
+          );
 
-    return newWinner;
-  });
+        transaction.set(
+          roundRef,
+          {
+            winner:newWinner,
+            createdAt:Date.now()
+          }
+        );
+
+        return newWinner;
+      }
+    );
 
   return winner;
 }
+
+
 /* =========================
    ZYNO BALANCE SAVE
 ========================= */
 
-window.saveUserBalance = async function(){
+window.saveUserBalance=
+  async function(){
 
-  const user = auth.currentUser;
+    const user=
+      auth.currentUser;
 
-  if(!user){
-    return;
-  }
-
-  try{
-
-    await updateDoc(
-      doc(db,"users",user.uid),
-      {
-        points: Math.floor(balance)
-      }
-    );
-
-    console.log(
-      "BALANCE SAVED:",
-      Math.floor(balance)
-    );
-
-  }catch(error){
-
-    console.error(
-      "BALANCE SAVE ERROR:",
-      error
-    );
-
-  }
-};
-window.savePointsHistory = async function(number, points){
-window.clearPointsHistory = async function(){
-
-  const user = auth.currentUser;
-
-  if(!user){
-    return;
-  }
-
-  try{
-
-    const historyRef =
-      collection(db, "users", user.uid, "pointsHistory");
-
-    const historySnap =
-      await getDocs(historyRef);
-
-    for(const historyDoc of historySnap.docs){
-
-      await deleteDoc(historyDoc.ref);
-
+    if(!user){
+      return;
     }
 
-    console.log("OLD POINTS HISTORY CLEARED");
+    try{
 
-  }catch(error){
+      await updateDoc(
+        doc(
+          db,
+          "users",
+          user.uid
+        ),
+        {
+          points:
+            Math.floor(balance)
+        }
+      );
 
-    console.error(
-      "CLEAR POINTS HISTORY ERROR:",
-      error
-    );
+      console.log(
+        "BALANCE SAVED:",
+        Math.floor(balance)
+      );
 
-  }
-};
-  const user = auth.currentUser;
+    }catch(error){
 
-  if(!user){
-    return;
-  }
+      console.error(
+        "BALANCE SAVE ERROR:",
+        error
+      );
+    }
+  };
 
-  try{
 
-    await addDoc(
-      collection(db, "users", user.uid, "pointsHistory"),
-      {
-        uid: user.uid,
-        username: user.displayName || "",
-        email: user.email || "",
-        role: "user",
-        points: Math.floor(points),
-        number: Number(number),
-        dateTime: new Date().toISOString(),
-        approved: true
+/* =========================
+   POINTS HISTORY SAVE
+========================= */
+
+window.savePointsHistory=
+  async function(
+    number,
+    points
+  ){
+
+    const user=
+      auth.currentUser;
+
+    if(!user){
+      return;
+    }
+
+    try{
+
+      await addDoc(
+        collection(
+          db,
+          "users",
+          user.uid,
+          "pointsHistory"
+        ),
+        {
+          uid:user.uid,
+
+          username:
+            user.displayName || "",
+
+          email:
+            user.email || "",
+
+          role:"user",
+
+          points:
+            Math.floor(points),
+
+          number:
+            Number(number),
+
+          dateTime:
+            new Date().toISOString(),
+
+          approved:true
+        }
+      );
+
+      console.log(
+        "POINTS HISTORY SAVED:",
+        number,
+        Math.floor(points)
+      );
+
+    }catch(error){
+
+      console.error(
+        "POINTS HISTORY ERROR:",
+        error
+      );
+    }
+  };
+
+
+/* =========================
+   CLEAR POINTS HISTORY
+========================= */
+
+window.clearPointsHistory=
+  async function(){
+
+    const user=
+      auth.currentUser;
+
+    if(!user){
+      return;
+    }
+
+    try{
+
+      const historyRef=
+        collection(
+          db,
+          "users",
+          user.uid,
+          "pointsHistory"
+        );
+
+      const historySnap=
+        await getDocs(
+          historyRef
+        );
+
+      for(
+        const historyDoc
+        of historySnap.docs
+      ){
+
+        await deleteDoc(
+          historyDoc.ref
+        );
       }
-    );
 
-    console.log(
-      "POINTS HISTORY SAVED:",
-      number,
-      Math.floor(points)
-    );
+      console.log(
+        "OLD POINTS HISTORY CLEARED"
+      );
 
-  }catch(error){
+    }catch(error){
 
-    console.error(
-      "POINTS HISTORY ERROR:",
-      error
-    );
+      console.error(
+        "CLEAR POINTS HISTORY ERROR:",
+        error
+      );
+    }
+  };
 
-  }
-};
+
 /* =========================
    USER LOGIN
 ========================= */
 
-window.openUserLogin = function(){
+window.openUserLogin=
+  function(){
 
-  document.querySelectorAll(".view").forEach(v=>{
-    v.classList.remove("active");
-  });
-
-  document.getElementById("userLogin").classList.add("active");
-
-  window.scrollTo(0,0);
-};
-
-
-window.openUserRegister = function(){
-
-  document.querySelectorAll(".view").forEach(v=>{
-    v.classList.remove("active");
-  });
-
-  document.getElementById("userRegister").classList.add("active");
-
-  window.scrollTo(0,0);
-};
-
-
-window.zynoUserLogin = async function(){
-
-  const email =
-    document.getElementById("userLoginEmail").value.trim();
-
-  const password =
-    document.getElementById("userLoginPassword").value;
-
-  const message =
-    document.getElementById("userLoginMessage");
-
-  if(!email || !password){
-
-    message.textContent =
-      "Email aur Password bharo";
-
-    return;
-  }
-
-  message.textContent =
-    "LOGIN CHECKING...";
-
-  try{
-
-    const result =
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-    const uid =
-      result.user.uid;
-window.zynoCurrentUserUID = uid;
-bets = {};
-
-const savedUserBets =
-  localStorage.getItem(
-    "zynoRouletteBets_" + uid
-  );
-
-if(savedUserBets){
-  bets = JSON.parse(savedUserBets);
-}
-    const userRef =
-      doc(db,"users",uid);
-
-    const userSnap =
-      await getDoc(userRef);
-
-    if(!userSnap.exists()){
-
-      await signOut(auth);
-
-      message.textContent =
-        "User profile nahi mila";
-
-      return;
-    }
-
-    const userData =
-      userSnap.data();
-
-    if(userData.role !== "user"){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Ye normal user account nahi hai";
-
-      return;
-    }
-
-    if(userData.approved !== true){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin approval pending hai";
-
-      return;
-    }
-
-    balance =
-      Number(userData.points) || 0;
-window.zynoCurrentUserUID = uid;
-    updateBalance();
-    Object.keys(bets).forEach(number=>{
-  updateBetCount(Number(number));
-});
-
-updateSelected();
-
-    message.textContent =
-      "LOGIN SUCCESS";
+    document
+      .querySelectorAll(".view")
+      .forEach(v=>{
+        v.classList.remove("active");
+      });
 
     document
       .getElementById("userLogin")
-      .classList.remove("active");
-
-    document
-      .getElementById("home")
       .classList.add("active");
 
     window.scrollTo(0,0);
+  };
 
-  }catch(error){
 
-    console.error(
-      "ZYNO USER LOGIN ERROR:",
-      error
-    );
+window.openUserRegister=
+  function(){
 
-    if(error.code === "auth/invalid-credential"){
+    document
+      .querySelectorAll(".view")
+      .forEach(v=>{
+        v.classList.remove("active");
+      });
 
-      message.textContent =
-        "Email ya Password galat hai";
+    document
+      .getElementById("userRegister")
+      .classList.add("active");
 
-    }else if(error.code === "auth/user-not-found"){
+    window.scrollTo(0,0);
+  };
 
-      message.textContent =
-        "User account nahi mila";
 
-    }else if(error.code === "auth/wrong-password"){
+window.zynoUserLogin=
+  async function(){
 
-      message.textContent =
-        "Password galat hai";
+    const email=
+      document
+        .getElementById(
+          "userLoginEmail"
+        )
+        .value
+        .trim();
 
-    }else{
+    const password=
+      document
+        .getElementById(
+          "userLoginPassword"
+        )
+        .value;
 
-      message.textContent =
-        "Login error: "+error.code;
+    const message=
+      document
+        .getElementById(
+          "userLoginMessage"
+        );
+
+    if(!email || !password){
+
+      message.textContent=
+        "Email aur Password bharo";
+
+      return;
     }
-  }
-};
+
+    message.textContent=
+      "LOGIN CHECKING...";
+
+    try{
+
+      const result=
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
+
+      const uid=
+        result.user.uid;
+
+      window.zynoCurrentUserUID=
+        uid;
+
+      bets={};
+
+      const savedUserBets=
+        localStorage.getItem(
+          "zynoRouletteBets_"+uid
+        );
+
+      if(savedUserBets){
+
+        try{
+
+          bets=
+            JSON.parse(
+              savedUserBets
+            );
+
+        }catch(error){
+
+          bets={};
+        }
+      }
+
+      const userRef=
+        doc(
+          db,
+          "users",
+          uid
+        );
+
+      const userSnap=
+        await getDoc(
+          userRef
+        );
+
+      if(!userSnap.exists()){
+
+        await signOut(auth);
+
+        message.textContent=
+          "User profile nahi mila";
+
+        return;
+      }
+
+      const userData=
+        userSnap.data();
+
+      if(userData.role!=="user"){
+
+        await signOut(auth);
+
+        message.textContent=
+          "Ye normal user account nahi hai";
+
+        return;
+      }
+
+      if(userData.approved!==true){
+
+        await signOut(auth);
+
+        message.textContent=
+          "Admin approval pending hai";
+
+        return;
+      }
+
+      balance=
+        Number(userData.points)||0;
+
+      updateBalance();
+
+      Object.keys(bets).forEach(
+        number=>{
+          updateBetCount(
+            Number(number)
+          );
+        }
+      );
+
+      updateSelected();
+
+      message.textContent=
+        "LOGIN SUCCESS";
+
+      document
+        .getElementById("userLogin")
+        .classList.remove("active");
+
+      document
+        .getElementById("home")
+        .classList.add("active");
+
+      window.scrollTo(0,0);
+
+    }catch(error){
+
+      console.error(
+        "ZYNO USER LOGIN ERROR:",
+        error
+      );
+
+      if(
+        error.code===
+        "auth/invalid-credential"
+      ){
+
+        message.textContent=
+          "Email ya Password galat hai";
+
+      }else if(
+        error.code===
+        "auth/user-not-found"
+      ){
+
+        message.textContent=
+          "User account nahi mila";
+
+      }else if(
+        error.code===
+        "auth/wrong-password"
+      ){
+
+        message.textContent=
+          "Password galat hai";
+
+      }else{
+
+        message.textContent=
+          "Login error: "+
+          error.code;
+      }
+    }
+  };
+
+
 /* =========================
    USER REGISTER
 ========================= */
 
-window.zynoUserRegister = async function(){
+window.zynoUserRegister=
+  async function(){
 
-  const username =
-    document.getElementById("registerUsername").value.trim();
+    const username=
+      document
+        .getElementById(
+          "registerUsername"
+        )
+        .value
+        .trim();
 
-  const email =
-    document.getElementById("registerEmail").value.trim();
+    const email=
+      document
+        .getElementById(
+          "registerEmail"
+        )
+        .value
+        .trim();
 
-  const password =
-    document.getElementById("registerPassword").value;
+    const password=
+      document
+        .getElementById(
+          "registerPassword"
+        )
+        .value;
 
-  const message =
-    document.getElementById("registerMessage");
+    const message=
+      document
+        .getElementById(
+          "registerMessage"
+        );
 
+    if(
+      !username ||
+      !email ||
+      !password
+    ){
 
-  if(!username || !email || !password){
+      message.textContent=
+        "Username, Email aur Password bharo";
 
-    message.textContent =
-      "Username, Email aur Password bharo";
+      return;
+    }
 
-    return;
-  }
+    if(password.length<6){
 
+      message.textContent=
+        "Password kam se kam 6 characters ka hona chahiye";
 
-  if(password.length < 6){
+      return;
+    }
 
-    message.textContent =
-      "Password kam se kam 6 characters ka hona chahiye";
+    message.textContent=
+      "ACCOUNT CREATING...";
 
-    return;
-  }
+    try{
 
+      const result=
+        await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
 
-  message.textContent =
-    "ACCOUNT CREATING...";
+      const uid=
+        result.user.uid;
 
+      await setDoc(
+        doc(
+          db,
+          "users",
+          uid
+        ),
+        {
+          uid:uid,
 
-  try{
+          username:username,
 
-    const result =
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
+          email:email,
+
+          role:"user",
+
+          approved:false,
+
+          points:0
+        }
       );
 
+      message.textContent=
+        "ACCOUNT CREATED • ADMIN APPROVAL PENDING";
 
-    const uid =
-      result.user.uid;
+    }catch(error){
 
+      console.error(
+        "ZYNO USER REGISTER ERROR:",
+        error
+      );
 
-    await setDoc(
-      doc(db,"users",uid),
-      {
-        uid: uid,
-        username: username,
-        email: email,
-        role: "user",
-        approved: false,
-        points: 0
+      if(
+        error.code===
+        "auth/email-already-in-use"
+      ){
+
+        message.textContent=
+          "Ye Email pehle se registered hai";
+
+      }else if(
+        error.code===
+        "auth/invalid-email"
+      ){
+
+        message.textContent=
+          "Email galat hai";
+
+      }else if(
+        error.code===
+        "auth/weak-password"
+      ){
+
+        message.textContent=
+          "Password weak hai";
+
+      }else{
+
+        message.textContent=
+          "Register error: "+
+          error.code;
       }
-    );
-
-
-    message.textContent =
-      "ACCOUNT CREATED • ADMIN APPROVAL PENDING";
-
-
-  }catch(error){
-
-    console.error(
-      "ZYNO USER REGISTER ERROR:",
-      error
-    );
-
-
-    if(error.code === "auth/email-already-in-use"){
-
-      message.textContent =
-        "Ye Email pehle se registered hai";
-
-    }else if(error.code === "auth/invalid-email"){
-
-      message.textContent =
-        "Email galat hai";
-
-    }else if(error.code === "auth/weak-password"){
-
-      message.textContent =
-        "Password weak hai";
-
-    }else{
-
-      message.textContent =
-        "Register error: "+error.code;
     }
-  }
-};
+  };
+
 
 /* =========================
    ADMIN LOGIN
 ========================= */
 
-window.zynoAdminLogin = async function(){
+window.zynoAdminLogin=
+  async function(){
 
-  const email =
-    document.getElementById("adminEmail").value.trim();
-
-  const password =
-    document.getElementById("adminPassword").value;
-
-  const message =
-    document.getElementById("adminMessage");
-
-
-  if(!email || !password){
-
-    message.textContent =
-      "Email aur Password bharo";
-
-    return;
-  }
-
-
-  message.textContent =
-    "LOGIN CHECKING...";
-
-
-  try{
-
-    const result =
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-
-
-    const uid =
-      result.user.uid;
-
-
-    const adminRef =
-      doc(db,"users","admin");
-
-
-    const adminSnap =
-      await getDoc(adminRef);
-
-
-    if(!adminSnap.exists()){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin document nahi mila";
-
-      return;
-    }
-
-
-    const adminData =
-      adminSnap.data();
-
-
-    const uidOK =
-      adminData.uid === uid;
-
-    const roleOK =
-      adminData.role === "admin";
-
-    const approvedOK =
-      adminData.approved === true;
-
-
-    if(!uidOK){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin UID match nahi hua";
-
-      return;
-    }
-
-
-    if(!roleOK){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin role galat hai";
-
-      return;
-    }
-
-
-    if(!approvedOK){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin approval false hai";
-
-      return;
-    }
-balance = Number(adminData.points) || 0;
-updateBalance();
-
-    message.textContent =
-      "ADMIN LOGIN SUCCESS";
-
-
-    document
-      .getElementById("adminLogin")
-      .classList.remove("active");
-
-    document
-      .getElementById("adminPanel")
-      .classList.add("active");
-
-    window.scrollTo(0,0);
-
-
-  }catch(error){
-
-    console.error("ZYNO ADMIN LOGIN ERROR:",error);
-
-    if(error.code === "auth/invalid-credential"){
-
-      message.textContent =
-        "Email ya Password galat hai";
-
-    }else if(error.code === "auth/user-not-found"){
-
-      message.textContent =
-        "Admin user nahi mila";
-
-    }else if(error.code === "auth/wrong-password"){
-
-      message.textContent =
-        "Password galat hai";
-
-    }else{
-
-      message.textContent =
-        "Login error: "+error.code;
-    }
-  }
-};
-
-
-/* =========================
-   ADMIN LOGOUT
-========================= */
-
-window.zynoAdminLogout = async function(){
-
-  try{
-
-    await signOut(auth);
-
-    document
-      .getElementById("adminPanel")
-      .classList.remove("active");
-
-    document
-      .getElementById("adminLogin")
-      .classList.add("active");
-
-    document
-      .getElementById("adminMessage")
-      .textContent = "";
-
-    document
-      .getElementById("adminEmail")
-      .value = "";
-
-    document
-      .getElementById("adminPassword")
-      .value = "";
-
-    window.scrollTo(0,0);
-
-  }catch(error){
-
-    console.error("LOGOUT ERROR:",error);
-  }
-};
-
-
-/* =========================
-   CHECK EXISTING LOGIN
-========================= */
-
-onAuthStateChanged(auth,async(user)=>{
-  
-window.zynoCurrentUserUID = user ? user.uid : null;
-
-if(!user){
-
-    document
-      .getElementById("adminPanel")
-      .classList.remove("active");
+    const email=
       document
-  .getElementById("home")
-  .classList.add("active");
+        .getElementById(
+          "adminEmail"
+        )
+        .value
+        .trim();
 
-    return;
-  }
+    const password=
+      document
+        .getElementById(
+          "adminPassword"
+        )
+        .value;
 
+    const message=
+      document
+        .getElementById(
+          "adminMessage"
+        );
 
-  try{
+    if(!email || !password){
 
-    const adminRef =
-      doc(db,"users","admin");
-
-
-    const snap =
-      await getDoc(adminRef);
-
-
-    if(!snap.exists()){
-
-      await signOut(auth);
+      message.textContent=
+        "Email aur Password bharo";
 
       return;
     }
 
+    message.textContent=
+      "LOGIN CHECKING...";
 
-    const data =
-      snap.data();
+    try{
 
+      const result=
+        await signInWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
 
-    if(
-      data.uid === user.uid &&
-      data.role === "admin" &&
-      data.approved === true
-    ){
-balance = Number(data.points) || 0;
+      const uid=
+        result.user.uid;
 
-updateBalance();
-const usersSnapshot = await getDocs(
-  collection(db, "users")
-);
+      const adminRef=
+        doc(
+          db,
+          "users",
+          "admin"
+        );
 
-const usersList =
-  document.getElementById("adminUsersList");
+      const adminSnap=
+        await getDoc(
+          adminRef
+        );
 
-const usersMessage =
-  document.getElementById("adminUsersMessage");
+      if(!adminSnap.exists()){
 
-usersList.innerHTML = "";
+        await signOut(auth);
 
-let userCount = 0;
+        message.textContent=
+          "Admin document nahi mila";
 
-usersSnapshot.forEach((userDoc) => {
-
-  if(userDoc.id === "admin") return;
-
-  const userData = userDoc.data();
-
-  userCount++;
-
-  const userBox =
-    document.createElement("div");
-    const viewBetsBtn = document.createElement("button");
-
-viewBetsBtn.textContent = "VIEW ROULETTE BETS";
-
-viewBetsBtn.style.cssText = `
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:9px;
-  border:1px solid rgba(0,229,255,.25);
-  background:#071a30;
-  color:#00e5ff;
-  font-size:9px;
-  font-weight:1000;
-`;
-
-viewBetsBtn.onclick = () => {
-
-  const savedUserBets =
-    localStorage.getItem(
-      "zynoRouletteBets_" + userDoc.id
-    );
-
-  if(!savedUserBets){
-
-    alert("Is user ke Roulette bets nahi hain");
-
-    return;
-  }
-
-  const userBets =
-    JSON.parse(savedUserBets);
-
-  const betNumbers =
-    Object.keys(userBets)
-    .filter(number => Number(userBets[number]) > 0);
-
-  if(betNumbers.length === 0){
-
-    alert("Is user ke Roulette bets nahi hain");
-
-    return;
-  }
-
-  let text =
-    "ROULETTE BETS\\n\\n";
-
-  betNumbers.forEach(number => {
-
-    text +=
-      "Number " + number +
-      " = " + userBets[number] +
-      " points\\n";
-
-  });
-
-  alert(text);
-};
-
-  userBox.style.cssText = `
-    padding:12px;
-    margin-top:10px;
-    border:1px solid rgba(0,229,255,.18);
-    border-radius:12px;
-    background:#061322;
-  `;
-
-  userBox.innerHTML = `
-    <div style="
-      color:#00e5ff;
-      font-weight:1000;
-    ">
-      ${userData.username || "No Username"}
-    </div>
-
-    <div style="
-      margin-top:5px;
-      color:#8faac2;
-      font-size:9px;
-    ">
-      ${userData.email || "No Email"}
-    </div>
-
-    <div style="
-  margin-top:8px;
-  color:#fff;
-  font-size:10px;
-">
-  POINTS: <span class="user-points">${Number(userData.points) || 0}</span>
-</div>
-
-    <div style="
-      margin-top:5px;
-      color:#ffd34e;
-      font-size:9px;
-    ">
-      ${
-        userData.approved === true
-        ? "APPROVED"
-        : "APPROVAL PENDING"
+        return;
       }
-    </div>
-  `;
-    
-const approveBtn = document.createElement("button");
 
-approveBtn.textContent =
-  userData.approved === true
-  ? "APPROVED"
-  : "APPROVE USER";
+      const adminData=
+        adminSnap.data();
 
-approveBtn.style.cssText = `
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:9px;
-  border:1px solid rgba(0,229,255,.25);
-  background:#071a30;
-  color:#00e5ff;
-  font-size:9px;
-  font-weight:1000;
-`;
+      const uidOK=
+        adminData.uid===uid;
 
-approveBtn.disabled =
-  userData.approved === true;
+      const roleOK=
+        adminData.role==="admin";
 
-approveBtn.onclick = async () => {
+      const approvedOK=
+        adminData.approved===true;
 
-  approveBtn.textContent =
-    "APPROVING...";
+      if(!uidOK){
 
-  try {
+        await signOut(auth);
 
-    await updateDoc(
-      doc(db, "users", userDoc.id),
-      {
-        approved: true
+        message.textContent=
+          "Admin UID match nahi hua";
+
+        return;
       }
-    );
 
-    approveBtn.textContent =
-      "APPROVED";
+      if(!roleOK){
 
-    approveBtn.disabled = true;
+        await signOut(auth);
 
-    const status =
-      userBox.querySelector(".user-status");
+        message.textContent=
+          "Admin role galat hai";
 
-    if(status){
-      status.textContent =
-        "APPROVED";
-    }
-
-  } catch(error) {
-
-    console.error(
-      "APPROVE USER ERROR:",
-      error
-    );
-
-    approveBtn.textContent =
-      "APPROVE USER";
-  }
-};
-const addPointsBtn = document.createElement("button");
-
-addPointsBtn.textContent = "ADD POINTS";
-
-addPointsBtn.style.cssText = `
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:9px;
-  border:1px solid rgba(255,211,78,.25);
-  background:#071a30;
-  color:#ffd34e;
-  font-size:9px;
-  font-weight:1000;
-`;
-
-addPointsBtn.onclick = async () => {
-
-  const amount = prompt("Kitne points add karne hain?");
-
-  if(amount === null) return;
-
-  const pointsToAdd = Number(amount);
-
-  if(!Number.isFinite(pointsToAdd) || pointsToAdd <= 0){
-    alert("Valid points enter karo");
-    return;
-  }
-
-  addPointsBtn.textContent = "ADDING...";
-
-  try {
-
-    const currentPoints =
-      Number(userData.points) || 0;
-
-    const newPoints =
-      currentPoints + pointsToAdd;
-
-    await updateDoc(
-      doc(db, "users", userDoc.id),
-      {
-        points: newPoints
+        return;
       }
-    );
 
-    userData.points = newPoints;
+      if(!approvedOK){
 
-    const pointsElement =
-      userBox.querySelector(".user-points");
+        await signOut(auth);
 
-    if(pointsElement){
-      pointsElement.textContent = newPoints;
-    }
+        message.textContent=
+          "Admin approval false hai";
 
-    addPointsBtn.textContent = "ADD POINTS";
+        return;
+      }
 
-  } catch(error) {
+      balance=
+        Number(adminData.points)||0;
 
-    console.error(
-      "ADD POINTS ERROR:",
-      error
-    );
+      updateBalance();
 
-    addPointsBtn.textContent = "ADD POINTS";
+      message.textContent=
+        "ADMIN LOGIN SUCCESS";
 
-    alert("Points add nahi ho paye");
-  }
-};
-
-userBox.appendChild(addPointsBtn);
-userBox.appendChild(approveBtn);
-userBox.appendChild(viewBetsBtn);
-  usersList.appendChild(userBox);
-});
-
-usersMessage.textContent =
-  userCount === 0
-    ? "NO USERS FOUND"
-    : userCount + " USER(S) FOUND";
       document
         .getElementById("adminLogin")
         .classList.remove("active");
@@ -3940,21 +3986,664 @@ usersMessage.textContent =
         .getElementById("adminPanel")
         .classList.add("active");
 
-    }else{
+      window.scrollTo(0,0);
+
+    }catch(error){
+
+      console.error(
+        "ZYNO ADMIN LOGIN ERROR:",
+        error
+      );
+
+      if(
+        error.code===
+        "auth/invalid-credential"
+      ){
+
+        message.textContent=
+          "Email ya Password galat hai";
+
+      }else if(
+        error.code===
+        "auth/user-not-found"
+      ){
+
+        message.textContent=
+          "Admin user nahi mila";
+
+      }else if(
+        error.code===
+        "auth/wrong-password"
+      ){
+
+        message.textContent=
+          "Password galat hai";
+
+      }else{
+
+        message.textContent=
+          "Login error: "+
+          error.code;
+      }
+    }
+  };
+
+
+/* =========================
+   ADMIN LOGOUT
+========================= */
+
+window.zynoAdminLogout=
+  async function(){
+
+    try{
 
       await signOut(auth);
+
+      document
+        .getElementById("adminPanel")
+        .classList.remove("active");
+
+      document
+        .getElementById("adminLogin")
+        .classList.add("active");
+
+      document
+        .getElementById("adminMessage")
+        .textContent="";
+
+      document
+        .getElementById("adminEmail")
+        .value="";
+
+      document
+        .getElementById("adminPassword")
+        .value="";
+
+      window.scrollTo(0,0);
+
+    }catch(error){
+
+      console.error(
+        "LOGOUT ERROR:",
+        error
+      );
+    }
+  };
+
+
+/* =========================
+   CHECK EXISTING LOGIN
+========================= */
+
+onAuthStateChanged(
+  auth,
+  async(user)=>{
+
+    window.zynoCurrentUserUID=
+      user ? user.uid : null;
+
+    if(!user){
+
+      document
+        .getElementById("adminPanel")
+        .classList.remove("active");
+
+      document
+        .getElementById("home")
+        .classList.add("active");
+
+      return;
     }
 
+    try{
 
-  }catch(error){
+      const adminRef=
+        doc(
+          db,
+          "users",
+          "admin"
+        );
 
-    console.error(
-      "ADMIN CHECK ERROR:",
-      error
-    );
+      const snap=
+        await getDoc(
+          adminRef
+        );
+
+      if(!snap.exists()){
+
+        await signOut(auth);
+
+        return;
+      }
+
+      const data=
+        snap.data();
+
+      if(
+        data.uid===user.uid &&
+        data.role==="admin" &&
+        data.approved===true
+      ){
+
+        balance=
+          Number(data.points)||0;
+
+        updateBalance();
+
+        const usersSnapshot=
+          await getDocs(
+            collection(
+              db,
+              "users"
+            )
+          );
+
+        const usersList=
+          document.getElementById(
+            "adminUsersList"
+          );
+
+        const usersMessage=
+          document.getElementById(
+            "adminUsersMessage"
+          );
+
+        usersList.innerHTML="";
+
+        let userCount=0;
+
+        usersSnapshot.forEach(
+          (userDoc)=>{
+
+            if(userDoc.id==="admin"){
+              return;
+            }
+
+            const userData=
+              userDoc.data();
+
+            userCount++;
+
+            const userBox=
+              document.createElement(
+                "div"
+              );
+
+            const viewBetsBtn=
+              document.createElement(
+                "button"
+              );
+
+            viewBetsBtn.textContent=
+              "VIEW ROULETTE BETS";
+
+            viewBetsBtn.style.cssText=`
+              width:100%;
+              margin-top:10px;
+              padding:10px;
+              border-radius:9px;
+              border:1px solid rgba(0,229,255,.25);
+              background:#071a30;
+              color:#00e5ff;
+              font-size:9px;
+              font-weight:1000;
+            `;
+
+            viewBetsBtn.onclick=()=>{
+
+              const savedUserBets=
+                localStorage.getItem(
+                  "zynoRouletteBets_"+
+                  userDoc.id
+                );
+
+              if(!savedUserBets){
+
+                alert(
+                  "Is user ke Roulette bets nahi hain"
+                );
+
+                return;
+              }
+
+              let userBets={};
+
+              try{
+
+                userBets=
+                  JSON.parse(
+                    savedUserBets
+                  );
+
+              }catch(error){
+
+                alert(
+                  "Bets data read nahi ho paya"
+                );
+
+                return;
+              }
+
+              const betNumbers=
+                Object.keys(userBets)
+                .filter(
+                  number=>
+                    Number(
+                      userBets[number]
+                    )>0
+                );
+
+              if(
+                betNumbers.length===0
+              ){
+
+                alert(
+                  "Is user ke Roulette bets nahi hain"
+                );
+
+                return;
+              }
+
+              let text=
+                "ROULETTE BETS\n\n";
+
+              betNumbers.forEach(
+                number=>{
+
+                  text+=
+                    "Number "+
+                    number+
+                    " = "+
+                    userBets[number]+
+                    " points\n";
+                }
+              );
+
+              alert(text);
+            };
+
+
+            userBox.style.cssText=`
+              padding:12px;
+              margin-top:10px;
+              border:1px solid rgba(0,229,255,.18);
+              border-radius:12px;
+              background:#061322;
+            `;
+
+
+            userBox.innerHTML=`
+
+              <div style="
+                color:#00e5ff;
+                font-weight:1000;
+              ">
+                ${
+                  userData.username ||
+                  "No Username"
+                }
+              </div>
+
+              <div style="
+                margin-top:5px;
+                color:#8faac2;
+                font-size:9px;
+              ">
+                ${
+                  userData.email ||
+                  "No Email"
+                }
+              </div>
+
+              <div style="
+                margin-top:8px;
+                color:#fff;
+                font-size:10px;
+              ">
+                POINTS:
+                <span class="user-points">
+                  ${
+                    Number(
+                      userData.points
+                    )||0
+                  }
+                </span>
+              </div>
+
+              <div class="user-status" style="
+                margin-top:5px;
+                color:#ffd34e;
+                font-size:9px;
+              ">
+                ${
+                  userData.approved===true
+                  ?"APPROVED"
+                  :"APPROVAL PENDING"
+                }
+              </div>
+            `;
+
+
+            const approveBtn=
+              document.createElement(
+                "button"
+              );
+
+            approveBtn.textContent=
+              userData.approved===true
+              ?"APPROVED"
+              :"APPROVE USER";
+
+            approveBtn.style.cssText=`
+              width:100%;
+              margin-top:10px;
+              padding:10px;
+              border-radius:9px;
+              border:1px solid rgba(0,229,255,.25);
+              background:#071a30;
+              color:#00e5ff;
+              font-size:9px;
+              font-weight:1000;
+            `;
+
+            approveBtn.disabled=
+              userData.approved===true;
+
+            approveBtn.onclick=
+              async()=>{
+
+                approveBtn.textContent=
+                  "APPROVING...";
+
+                try{
+
+                  await updateDoc(
+                    doc(
+                      db,
+                      "users",
+                      userDoc.id
+                    ),
+                    {
+                      approved:true
+                    }
+                  );
+
+                  approveBtn.textContent=
+                    "APPROVED";
+
+                  approveBtn.disabled=true;
+
+                  const status=
+                    userBox.querySelector(
+                      ".user-status"
+                    );
+
+                  if(status){
+
+                    status.textContent=
+                      "APPROVED";
+                  }
+
+                }catch(error){
+
+                  console.error(
+                    "APPROVE USER ERROR:",
+                    error
+                  );
+
+                  approveBtn.textContent=
+                    "APPROVE USER";
+                }
+              };
+
+
+            const addPointsBtn=
+              document.createElement(
+                "button"
+              );
+
+            addPointsBtn.textContent=
+              "ADD POINTS";
+
+            addPointsBtn.style.cssText=`
+              width:100%;
+              margin-top:10px;
+              padding:10px;
+              border-radius:9px;
+              border:1px solid rgba(255,211,78,.25);
+              background:#071a30;
+              color:#ffd34e;
+              font-size:9px;
+              font-weight:1000;
+            `;
+
+
+            addPointsBtn.onclick=
+              async()=>{
+
+                const amount=
+                  prompt(
+                    "Kitne points add karne hain?"
+                  );
+
+                if(amount===null){
+                  return;
+                }
+
+                const pointsToAdd=
+                  Number(amount);
+
+                if(
+                  !Number.isFinite(
+                    pointsToAdd
+                  ) ||
+                  pointsToAdd<=0
+                ){
+
+                  alert(
+                    "Valid points enter karo"
+                  );
+
+                  return;
+                }
+
+                addPointsBtn.textContent=
+                  "ADDING...";
+
+                try{
+
+                  const currentPoints=
+                    Number(
+                      userData.points
+                    )||0;
+
+                  const newPoints=
+                    currentPoints+
+                    pointsToAdd;
+
+                  await updateDoc(
+                    doc(
+                      db,
+                      "users",
+                      userDoc.id
+                    ),
+                    {
+                      points:newPoints
+                    }
+                  );
+
+                  userData.points=
+                    newPoints;
+
+                  const pointsElement=
+                    userBox.querySelector(
+                      ".user-points"
+                    );
+
+                  if(pointsElement){
+
+                    pointsElement.textContent=
+                      newPoints;
+                  }
+
+                  addPointsBtn.textContent=
+                    "ADD POINTS";
+
+                }catch(error){
+
+                  console.error(
+                    "ADD POINTS ERROR:",
+                    error
+                  );
+
+                  addPointsBtn.textContent=
+                    "ADD POINTS";
+
+                  alert(
+                    "Points add nahi ho paye"
+                  );
+                }
+              };
+
+
+            userBox.appendChild(
+              addPointsBtn
+            );
+
+            userBox.appendChild(
+              approveBtn
+            );
+
+            userBox.appendChild(
+              viewBetsBtn
+            );
+
+            usersList.appendChild(
+              userBox
+            );
+
+          }
+        );
+
+        usersMessage.textContent=
+          userCount===0
+          ?"NO USERS FOUND"
+          :userCount+
+           " USER(S) FOUND";
+
+
+        document
+          .getElementById(
+            "adminLogin"
+          )
+          .classList.remove(
+            "active"
+          );
+
+        document
+          .getElementById(
+            "adminPanel"
+          )
+          .classList.add(
+            "active"
+          );
+
+      }else{
+
+        /*
+          Normal approved user ko
+          admin check fail hone par
+          signout nahi karna.
+          User login already handle ho chuka hai.
+        */
+
+        const userRef=
+          doc(
+            db,
+            "users",
+            user.uid
+          );
+
+        const userSnap=
+          await getDoc(
+            userRef
+          );
+
+        if(
+          userSnap.exists()
+        ){
+
+          const userData=
+            userSnap.data();
+
+          if(
+            userData.role==="user" &&
+            userData.approved===true
+          ){
+
+            balance=
+              Number(
+                userData.points
+              )||0;
+
+            updateBalance();
+
+            bets={};
+
+            const savedUserBets=
+              localStorage.getItem(
+                "zynoRouletteBets_"+
+                user.uid
+              );
+
+            if(savedUserBets){
+
+              try{
+
+                bets=
+                  JSON.parse(
+                    savedUserBets
+                  );
+
+              }catch(error){
+
+                bets={};
+              }
+            }
+
+            Object.keys(bets).forEach(
+              number=>{
+                updateBetCount(
+                  Number(number)
+                );
+              }
+            );
+
+            updateSelected();
+
+            document
+              .getElementById("home")
+              .classList.add("active");
+          }
+
+        }else{
+
+          await signOut(auth);
+        }
+      }
+
+    }catch(error){
+
+      console.error(
+        "AUTH CHECK ERROR:",
+        error
+      );
+    }
+
   }
+);
 
-});
 </script>
 </body>
 </html>
