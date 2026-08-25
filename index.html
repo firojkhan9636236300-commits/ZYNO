@@ -2371,6 +2371,8 @@ setInterval(()=>{
 /* SPIN */
 
 async function spinWheel(){
+  
+  const roundRef = doc(db,"rouletteRounds","current");
 
   if(spinning)return;
 
