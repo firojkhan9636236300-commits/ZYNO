@@ -2370,6 +2370,7 @@ async function spinWheel(){
   stopAllBetting();
 
   const roundRef = doc(db, "rouletteRounds", "current");
+  const now = Date.now();
 
 const roundSnap = await getDoc(roundRef);
 
