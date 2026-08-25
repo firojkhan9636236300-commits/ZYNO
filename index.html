@@ -2371,7 +2371,8 @@ async function spinWheel(){
 
   const roundRef = doc(db, "rouletteRounds", "current");
   const now = Date.now();
-
+  
+resultEl.textContent="GETTING WINNER...";
 const roundSnap = await getDoc(roundRef);
 
 let winner;
