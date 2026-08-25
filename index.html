@@ -3022,7 +3022,8 @@ window.zynoCurrentUserUID = null;
 const db = getFirestore(app);
 async function getSharedRouletteWinner(){
 
-  const roundRef = doc(db,"rouletteRounds","current");
+  const roundId = Math.floor(Date.now()/60000);
+const roundRef = doc(db,"rouletteRounds",String(roundId));
 
   const winner = await runTransaction(db,async(transaction)=>{
 
