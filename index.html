@@ -3035,22 +3035,9 @@ const roundRef = doc(db,"rouletteRounds",String(roundId));
       return Number(snap.data().winner);
     }
 
-    let winner;
+    const winner=
 
-const roundSnap = await getDoc(roundRef);
-
-if(roundSnap.exists()){
-
-  winner = Number(roundSnap.data().winner);
-
-}else{
-
-  winner = Math.floor(Math.random()*37);
-
-  await setDoc(roundRef,{
-    winner: winner
-  });
-}
+    Math.floor(Math.random()*37);
 
     transaction.set(roundRef,{
       winner:newWinner,
