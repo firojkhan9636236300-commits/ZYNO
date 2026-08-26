@@ -3745,32 +3745,16 @@ usersMessage.textContent =
     await getDoc(userRef);
 
   if(
-    userSnap.exists() &&
-    userSnap.data().role === "user" &&
-    userSnap.data().approved === true
-  ){
+  userSnap.exists() &&
+  userSnap.data().role === "user" &&
+  userSnap.data().approved === true
+){
 
-    const userData =
-      userSnap.data();
-      
-    balance =
-      Number(userData.points) || 0;
+  console.log("USER ALREADY LOGGED IN — STAY ON LOGIN SCREEN");
 
-    updateBalance();
-    
-    document
-      .querySelectorAll(".view")
-      .forEach(v=>{
-        v.classList.remove("active");
-      });
+  return;
 
-    document
-      .getElementById("home")
-      .classList.add("active");
-
-    window.scrollTo(0,0);
-
-  }else{
+}else{
 
     await signOut(auth);
   }
