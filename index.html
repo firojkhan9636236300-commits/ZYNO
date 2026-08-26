@@ -2562,6 +2562,10 @@ function resetGame(){
   stopAllBetting();
 
   bets={};
+  
+  localStorage.removeItem("zynoRouletteBets");
+localStorage.removeItem("zynoRouletteTime");
+localStorage.removeItem("zynoRouletteTimestamp");
 
   selectedNumber=null;
 
