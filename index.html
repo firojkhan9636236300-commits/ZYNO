@@ -3454,7 +3454,9 @@ window.zynoAdminLogout = async function(){
 ========================= */
 
 onAuthStateChanged(auth,async(user)=>{
-
+  
+  console.log("REFRESH AUTH USER:", user ? user.uid : "NO USER");
+  
   if(!user){
 
     document
