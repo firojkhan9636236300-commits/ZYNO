@@ -2315,7 +2315,9 @@ function addBet(number,amount){
   bets[number]=
     (bets[number]||0)+amount;
 
-  updateBalance();
+saveRouletteState();
+
+updateBalance();
 
   updateBetCount(number);
 
