@@ -3477,6 +3477,11 @@ window.zynoAdminLogout = async function(){
 
 onAuthStateChanged(auth,async(user)=>{
   
+  document.querySelectorAll(".view").forEach(v=>{
+  v.classList.remove("active");
+});
+
+document.getElementById("userLogin").classList.add("active");
   console.log("REFRESH AUTH USER:", user ? user.uid : "NO USER");
   
   if(!user){
