@@ -2365,8 +2365,6 @@ function updateSelected(){
 
 setInterval(()=>{
 
-  if(!roulette.classList.contains("active"))return;
-
   if(spinning)return;
 
   if(timeLeft>0){
@@ -2374,6 +2372,8 @@ setInterval(()=>{
     timeLeft--;
 
     timerEl.textContent=timeLeft;
+    
+    saveRouletteState();
   }
 
   if(
