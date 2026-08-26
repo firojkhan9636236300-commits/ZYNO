@@ -3824,8 +3824,11 @@ usersMessage.textContent =
   userSnap.data().role === "user" &&
   userSnap.data().approved === true
 ){
+ 
+balance = Number(userSnap.data().points) || 0;
+updateBalance();
 
-  console.log("USER ALREADY LOGGED IN — STAY ON LOGIN SCREEN");
+console.log("USER ALREADY LOGGED IN — STAY ON LOGIN SCREEN");
 
   return;
 
