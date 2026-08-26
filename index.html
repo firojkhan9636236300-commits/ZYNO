@@ -3117,10 +3117,15 @@ window.zynoUserLogin = async function(){
     }
 
     balance =
-      Number(userData.points) || 0;
+  Number(userData.points);
 
-    updateBalance();
-    syncZ11Balance();
+if(!Number.isFinite(balance)){
+  balance =
+    Number(localStorage.getItem("zynoUserBalance")) || 0;
+}
+
+updateBalance();
+syncZ11Balance();
 
     message.textContent =
       "LOGIN SUCCESS";
