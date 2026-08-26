@@ -3126,6 +3126,12 @@ if(!Number.isFinite(balance)){
 const firestoreBalance =
   Number(userData.points);
 
+const localBalance =
+  Number(localStorage.getItem("zynoUserBalance"));
+
+const firestoreBalance =
+  Number(userData.points);
+
 balance =
   Number.isFinite(localBalance)
   ? localBalance
