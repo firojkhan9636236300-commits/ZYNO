@@ -2015,8 +2015,34 @@ const centerLogo=document.getElementById("centerLogo");
 const centerWin=document.getElementById("centerWin");
 
 let timeLeft=60;
-const savedRouletteTime = localStorage.getItem("zynoRouletteTime");
-if(savedRouletteTime !== null) timeLeft = Number(savedRouletteTime);
+
+const savedRouletteTime =
+  Number(localStorage.getItem("zynoRouletteTime"));
+
+const savedRouletteTimestamp =
+  Number(localStorage.getItem("zynoRouletteTimestamp"));
+
+if(
+  Number.isFinite(savedRouletteTime) &&
+  Number.isFinite(savedRouletteTimestamp)
+){
+
+  const elapsedSeconds =
+    Math.floor(
+      (Date.now()-savedRouletteTimestamp)/1000
+    );
+
+  timeLeft =
+    Math.max(
+      0,
+      savedRouletteTime-elapsedSeconds
+    );
+
+}else if(Number.isFinite(savedRouletteTime)){
+
+  timeLeft =
+    Math.max(0,savedRouletteTime);
+}
 let bettingOpen=true;
 let spinning=false;
 let selectedNumber=null;
