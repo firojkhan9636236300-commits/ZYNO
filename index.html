@@ -2988,15 +2988,23 @@ window.saveUserBalance = async function(){
 
   if(!user)return;
 
+  const savedBalance =
+    Math.floor(balance);
+
+  localStorage.setItem(
+    "zynoUserBalance",
+    String(savedBalance)
+  );
+
   try{
 
     await setDoc(
-  doc(db,"users",user.uid),
-  {
-    points: Math.floor(balance)
-  },
-  { merge: true }
-);
+      doc(db,"users",user.uid),
+      {
+        points: savedBalance
+      },
+      { merge:true }
+    );
 
   }catch(error){
 
