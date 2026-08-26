@@ -3120,9 +3120,20 @@ window.zynoUserLogin = async function(){
   Number(userData.points);
 
 if(!Number.isFinite(balance)){
-  balance =
-    Number(localStorage.getItem("zynoUserBalance")) || 0;
-}
+  const localBalance =
+  Number(localStorage.getItem("zynoUserBalance"));
+
+const firestoreBalance =
+  Number(userData.points);
+
+balance =
+  Number.isFinite(localBalance)
+  ? localBalance
+  : (
+      Number.isFinite(firestoreBalance)
+      ? firestoreBalance
+      : 0
+    );
 
 updateBalance();
 syncZ11Balance();
