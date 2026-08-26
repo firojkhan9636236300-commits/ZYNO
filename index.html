@@ -2423,6 +2423,8 @@ async function spinWheel(){
 
   const winner=
     Math.floor(Math.random()*37);
+    
+    saveRouletteState();
 
   const index=
     wheelNumbers.indexOf(winner);
