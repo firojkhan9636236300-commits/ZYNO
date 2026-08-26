@@ -2079,6 +2079,10 @@ function saveRouletteState(){
     "zynoRouletteTime",
     String(timeLeft)
   );
+  localStorage.setItem(
+  "zynoRouletteTimestamp",
+  String(Date.now())
+);
 }
 let wheelRotation=0;
 
