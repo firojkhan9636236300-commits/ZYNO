@@ -3186,20 +3186,18 @@ window.zynoUserLogin = async function(){
       return;
     }
 
-    const localBalance =
-  Number(localStorage.getItem("zynoUserBalance"));
-
-const firestoreBalance =
+    const firestoreBalance =
   Number(userData.points);
 
 balance =
-  Number.isFinite(localBalance)
-  ? localBalance
-  : (
-      Number.isFinite(firestoreBalance)
-      ? firestoreBalance
-      : 0
-    );
+  Number.isFinite(firestoreBalance)
+  ? firestoreBalance
+  : 0;
+
+localStorage.setItem(
+  "zynoUserBalance",
+  String(balance)
+);
 
 updateBalance();
 syncZ11Balance();
