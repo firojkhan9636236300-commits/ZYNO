@@ -2022,6 +2022,21 @@ let spinning=false;
 let selectedNumber=null;
 let bets={};
 let lastWins=[];
+
+/* SAVE ROULETTE BET + TIMER */
+
+function saveRouletteState(){
+
+  localStorage.setItem(
+    "zynoRouletteBets",
+    JSON.stringify(bets)
+  );
+
+  localStorage.setItem(
+    "zynoRouletteTime",
+    String(timeLeft)
+  );
+}
 let wheelRotation=0;
 
 let currentPress=null;
