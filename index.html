@@ -3732,13 +3732,12 @@ usersMessage.textContent =
 
     const userData =
       userSnap.data();
-
+      
     balance =
       Number(userData.points) || 0;
 
     updateBalance();
     
-
     document
       .querySelectorAll(".view")
       .forEach(v=>{
