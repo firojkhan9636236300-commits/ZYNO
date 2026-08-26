@@ -3111,6 +3111,7 @@ window.zynoUserLogin = async function(){
       Number(userData.points) || 0;
 
     updateBalance();
+    syncZ11Balance();
 
     message.textContent =
       "LOGIN SUCCESS";
