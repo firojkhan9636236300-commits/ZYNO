@@ -2023,6 +2023,23 @@ let selectedNumber=null;
 let bets={};
 let lastWins=[];
 
+const savedRouletteBets =
+  localStorage.getItem("zynoRouletteBets");
+
+if(savedRouletteBets){
+
+  try{
+
+    bets = JSON.parse(savedRouletteBets);
+
+  }catch(error){
+
+    bets = {};
+
+  }
+
+}
+
 /* SAVE ROULETTE BET + TIMER */
 
 function saveRouletteState(){
