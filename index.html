@@ -3737,7 +3737,8 @@ usersMessage.textContent =
 
     updateBalance();
     
-    console.log("REFRESH USER BALANCE:", balance);
+    document.getElementById("homeBalance").textContent =
+  "TEST " + Number(userData.points);
 
     document
       .querySelectorAll(".view")
