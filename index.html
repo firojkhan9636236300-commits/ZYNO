@@ -3095,6 +3095,63 @@ window.saveUserBalance = async function(){
   }
 };
 /* =========================
+   SHARED LAST 4 WIN NUMBERS
+========================= */
+
+window.saveSharedLastWins = async function(list){
+
+  try{
+
+    await setDoc(
+      doc(db,"gameState","roulette"),
+      {
+        lastWins: list.slice(0,4),
+        updatedAt: Date.now()
+      },
+      {merge:true}
+    );
+
+  }catch(error){
+
+    console.error(
+      "SAVE SHARED LAST WINS ERROR:",
+      error
+    );
+
+  }
+};
+
+
+onSnapshot(
+  doc(db,"gameState","roulette"),
+  (snap)=>{
+
+    if(!snap.exists())return;
+
+    const data=snap.data();
+
+    if(!Array.isArray(data.lastWins))return;
+
+    lastWins=data.lastWins.slice(0,4);
+
+    localStorage.setItem(
+      "zynoLastWins",
+      JSON.stringify(lastWins)
+    );
+
+    renderLastWins();
+
+  },
+  (error)=>{
+
+    console.error(
+      "SHARED LAST WINS ERROR:",
+      error
+    );
+
+  }
+);
+/* =========================
    USER LOGIN
 ========================= */
 
