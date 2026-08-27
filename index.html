@@ -2381,22 +2381,38 @@ function playTick(){
         window.webkitAudioContext)();
     }
 
+    if(tickAudioCtx.state==="suspended"){
+      tickAudioCtx.resume();
+    }
+
     const osc=
       tickAudioCtx.createOscillator();
 
     const gain=
       tickAudioCtx.createGain();
 
-    osc.frequency.value=900;
-    gain.gain.value=0.08;
+    osc.type="sine";
+    osc.frequency.setValueAtTime(
+      1200,
+      tickAudioCtx.currentTime
+    );
+
+    gain.gain.setValueAtTime(
+      0.04,
+      tickAudioCtx.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      tickAudioCtx.currentTime+0.045
+    );
 
     osc.connect(gain);
     gain.connect(tickAudioCtx.destination);
 
     osc.start();
-
     osc.stop(
-      tickAudioCtx.currentTime+0.06
+      tickAudioCtx.currentTime+0.045
     );
 
   }catch(e){}
