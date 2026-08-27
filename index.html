@@ -3015,7 +3015,22 @@ document.addEventListener(
 
 
 /* INITIAL */
+const savedLastWins =
+  localStorage.getItem("zynoLastWins");
 
+if(savedLastWins){
+
+  try{
+
+    lastWins = JSON.parse(savedLastWins);
+
+  }catch(error){
+
+    lastWins = [];
+
+  }
+
+}
 updateBalance();
 renderLastWins();
 syncZ11Balance();
