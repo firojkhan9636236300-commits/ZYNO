@@ -3117,13 +3117,48 @@ window.saveSharedLastWins = async function(list){
 
   try{
 
-    await setDoc(
-      doc(db,"gameState","roulette"),
-      {
-        lastWins: list.slice(0,4),
-        updatedAt: Date.now()
-      },
-      {merge:true}
+    await runTransaction(
+      db,
+      async (transaction)=>{
+
+        const ref =
+          doc(db,"gameState","roulette");
+
+        const snap =
+          await transaction.get(ref);
+
+        let sharedWins=[];
+
+        if(snap.exists()){
+
+          const data=snap.data();
+
+          if(Array.isArray(data.lastWins)){
+            sharedWins=data.lastWins.slice(0,4);
+          }
+
+        }
+
+        const newWinner=list[0];
+
+        if(newWinner===undefined)return;
+
+        sharedWins.unshift(newWinner);
+
+        if(sharedWins.length>4){
+          sharedWins.pop();
+        }
+
+        transaction.set(
+          ref,
+          {
+            lastWins:sharedWins,
+            updatedAt:Date.now()
+          },
+          {merge:true}
+        );
+
+      }
     );
 
   }catch(error){
@@ -3135,7 +3170,6 @@ window.saveSharedLastWins = async function(list){
 
   }
 };
-
 
 onSnapshot(
   doc(db,"gameState","roulette"),
