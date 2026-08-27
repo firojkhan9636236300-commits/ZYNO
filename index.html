@@ -2528,11 +2528,17 @@ function addLastWin(number){
   if(lastWins.length>4){
     lastWins.pop();
   }
+
   renderLastWins();
+
   localStorage.setItem(
     "zynoLastWins",
     JSON.stringify(lastWins)
   );
+
+  if(window.saveSharedLastWins){
+    window.saveSharedLastWins(lastWins);
+  }
 }
   
 function renderLastWins(){
