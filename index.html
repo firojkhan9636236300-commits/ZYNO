@@ -2418,6 +2418,77 @@ function playTick(){
   }catch(e){}
 
 }
+/* WHEEL SPIN SOUND */
+
+let spinAudioCtx=null;
+let spinOsc=null;
+let spinGain=null;
+
+function startSpinSound(){
+
+  try{
+
+    if(!spinAudioCtx){
+      spinAudioCtx=
+        new (window.AudioContext||
+        window.webkitAudioContext)();
+    }
+
+    if(spinAudioCtx.state==="suspended"){
+      spinAudioCtx.resume();
+    }
+
+    spinOsc=
+      spinAudioCtx.createOscillator();
+
+    spinGain=
+      spinAudioCtx.createGain();
+
+    spinOsc.type="sawtooth";
+
+    spinOsc.frequency.setValueAtTime(
+      110,
+      spinAudioCtx.currentTime
+    );
+
+    spinGain.gain.setValueAtTime(
+      0.025,
+      spinAudioCtx.currentTime
+    );
+
+    spinOsc.connect(spinGain);
+    spinGain.connect(
+      spinAudioCtx.destination
+    );
+
+    spinOsc.start();
+
+  }catch(e){}
+
+}
+
+function stopSpinSound(){
+
+  try{
+
+    if(spinOsc && spinAudioCtx){
+
+      spinGain.gain.exponentialRampToValueAtTime(
+        0.001,
+        spinAudioCtx.currentTime+0.08
+      );
+
+      spinOsc.stop(
+        spinAudioCtx.currentTime+0.08
+      );
+
+      spinOsc=null;
+
+    }
+
+  }catch(e){}
+
+}
 /* ROULETTE TIMER */
 
 setInterval(()=>{
