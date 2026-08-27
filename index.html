@@ -2585,8 +2585,9 @@ async function spinWheel(){
     "Wheel spinning...";
 
   setTimeout(()=>{
-    showWinner(winner);
-  },5900);
+  stopSpinSound();
+  showWinner(winner);
+},5900);
 }
 
 
