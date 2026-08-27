@@ -2367,7 +2367,41 @@ function updateSelected(){
      "</strong> select kiya hai";
 }
 
+/* TIMER TICK SOUND */
 
+let tickAudioCtx=null;
+
+function playTick(){
+
+  try{
+
+    if(!tickAudioCtx){
+      tickAudioCtx=
+        new (window.AudioContext||
+        window.webkitAudioContext)();
+    }
+
+    const osc=
+      tickAudioCtx.createOscillator();
+
+    const gain=
+      tickAudioCtx.createGain();
+
+    osc.frequency.value=900;
+    gain.gain.value=0.08;
+
+    osc.connect(gain);
+    gain.connect(tickAudioCtx.destination);
+
+    osc.start();
+
+    osc.stop(
+      tickAudioCtx.currentTime+0.06
+    );
+
+  }catch(e){}
+
+}
 /* ROULETTE TIMER */
 
 setInterval(()=>{
