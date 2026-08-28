@@ -2444,25 +2444,29 @@ function startSpinSound(){
     spinGain=
       spinAudioCtx.createGain();
 
-    spinOsc.type="sawtooth";
-
     const now=
       spinAudioCtx.currentTime;
 
+    spinOsc.type="sawtooth";
+
+    /* FAST → SLOW */
+
     spinOsc.frequency.setValueAtTime(
-      120,
+      160,
       now
     );
 
     spinOsc.frequency.exponentialRampToValueAtTime(
-      75,
+      95,
       now+2.5
     );
 
     spinOsc.frequency.exponentialRampToValueAtTime(
-      45,
+      55,
       now+5.8
     );
+
+    /* VOLUME */
 
     spinGain.gain.setValueAtTime(
       0.001,
@@ -2470,12 +2474,12 @@ function startSpinSound(){
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.035,
+      0.025,
       now+0.12
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.012,
+      0.008,
       now+4.5
     );
 
