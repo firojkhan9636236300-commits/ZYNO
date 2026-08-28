@@ -2447,26 +2447,26 @@ function startSpinSound(){
     const now=
       spinAudioCtx.currentTime;
 
-    spinOsc.type="sawtooth";
+    /* MECHANICAL FAST WHEEL */
 
-    /* FAST → SLOW */
+    spinOsc.type="triangle";
 
     spinOsc.frequency.setValueAtTime(
-      160,
+      210,
       now
     );
 
     spinOsc.frequency.exponentialRampToValueAtTime(
-      95,
-      now+2.5
+      135,
+      now+2.0
     );
 
     spinOsc.frequency.exponentialRampToValueAtTime(
-      55,
+      70,
       now+5.8
     );
 
-    /* VOLUME */
+    /* NATURAL ROLLING VOLUME */
 
     spinGain.gain.setValueAtTime(
       0.001,
@@ -2474,13 +2474,18 @@ function startSpinSound(){
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.025,
-      now+0.12
+      0.018,
+      now+0.08
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.008,
-      now+4.5
+      0.010,
+      now+2.0
+    );
+
+    spinGain.gain.exponentialRampToValueAtTime(
+      0.004,
+      now+5.3
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
