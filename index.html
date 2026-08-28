@@ -2429,36 +2429,77 @@ function startSpinSound(){
   try{
 
     if(!spinAudioCtx){
+
       spinAudioCtx=
+
         new (window.AudioContext||
+
         window.webkitAudioContext)();
+
     }
 
     if(spinAudioCtx.state==="suspended"){
+
       spinAudioCtx.resume();
+
     }
 
     spinOsc=
+
       spinAudioCtx.createOscillator();
 
     spinGain=
+
       spinAudioCtx.createGain();
 
-    spinOsc.type="sine";
+    spinOsc.type="sawtooth";
 
     spinOsc.frequency.setValueAtTime(
-      180,
+
+      95,
+
       spinAudioCtx.currentTime
+
+    );
+
+    spinOsc.frequency.exponentialRampToValueAtTime(
+
+      55,
+
+      spinAudioCtx.currentTime+5.8
+
     );
 
     spinGain.gain.setValueAtTime(
-      0.008,
+
+      0.001,
+
       spinAudioCtx.currentTime
+
+    );
+
+    spinGain.gain.exponentialRampToValueAtTime(
+
+      0.025,
+
+      spinAudioCtx.currentTime+0.15
+
+    );
+
+    spinGain.gain.exponentialRampToValueAtTime(
+
+      0.001,
+
+      spinAudioCtx.currentTime+5.8
+
     );
 
     spinOsc.connect(spinGain);
+
     spinGain.connect(
+
       spinAudioCtx.destination
+
     );
 
     spinOsc.start();
