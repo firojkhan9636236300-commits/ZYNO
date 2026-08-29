@@ -2430,7 +2430,7 @@ function playTick(){
 
 }
 /* =========================
-   CYCLE WHEEL SPIN SOUND
+   KARRRRRR CYCLE WHEEL SOUND
 ========================= */
 
 let spinAudioCtx=null;
@@ -2445,26 +2445,37 @@ function startSpinSound(){
   try{
 
     if(!spinAudioCtx){
+
       spinAudioCtx=
         new (window.AudioContext||
         window.webkitAudioContext)();
+
     }
 
     if(spinAudioCtx.state==="suspended"){
       spinAudioCtx.resume();
     }
 
-    /* STOP OLD SOUND */
-    stopSpinSound();
+    /* STOP PREVIOUS */
+    if(spinNoise){
+      try{spinNoise.stop();}catch(e){}
+      spinNoise=null;
+    }
+
+    if(spinLfo){
+      try{spinLfo.stop();}catch(e){}
+      spinLfo=null;
+    }
 
     const ctx=spinAudioCtx;
     const now=ctx.currentTime;
 
     /* =========================
-       CREATE SOFT WHEEL NOISE
+       ROUGH "KARRRR" NOISE
     ========================= */
 
     const bufferSize=ctx.sampleRate*2;
+
     const buffer=ctx.createBuffer(
       1,
       bufferSize,
@@ -2475,17 +2486,21 @@ function startSpinSound(){
 
     for(let i=0;i<bufferSize;i++){
 
-      /* SOFT RANDOM RUBBING NOISE */
-      data[i]=(Math.random()*2-1)*0.55;
+      /* ROUGH MECHANICAL TEXTURE */
+      const noise=
+        Math.random()*2-1;
+
+      data[i]=noise*0.75;
 
     }
 
     spinNoise=ctx.createBufferSource();
+
     spinNoise.buffer=buffer;
     spinNoise.loop=true;
 
     /* =========================
-       MECHANICAL WHEEL FILTER
+       KARRRR FREQUENCY
     ========================= */
 
     spinFilter=ctx.createBiquadFilter();
@@ -2493,14 +2508,14 @@ function startSpinSound(){
     spinFilter.type="bandpass";
 
     spinFilter.frequency.setValueAtTime(
-      650,
+      1100,
       now
     );
 
-    spinFilter.Q.value=0.65;
+    spinFilter.Q.value=0.75;
 
     /* =========================
-       VOLUME
+       LOUDER MECHANICAL SOUND
     ========================= */
 
     spinGain=ctx.createGain();
@@ -2510,50 +2525,68 @@ function startSpinSound(){
       now
     );
 
+    /* START = STRONG KARRR */
+
     spinGain.gain.exponentialRampToValueAtTime(
-      0.055,
+      0.085,
       now+0.08
     );
 
-    /* WHEEL SLOWING DOWN */
+    /* =========================
+       SLOWING WHEEL
+    ========================= */
+
+    spinFilter.frequency.exponentialRampToValueAtTime(
+      900,
+      now+2.0
+    );
+
+    spinFilter.frequency.exponentialRampToValueAtTime(
+      700,
+      now+4.0
+    );
+
+    spinFilter.frequency.exponentialRampToValueAtTime(
+      480,
+      now+5.8
+    );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.038,
+      0.055,
       now+2.0
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.022,
+      0.030,
       now+4.0
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.008,
+      0.010,
       now+5.8
     );
 
     /* =========================
-       SMALL ROTATION PULSATION
-       LIKE CYCLE WHEEL
+       RAPID KARRRR PULSES
     ========================= */
 
     spinLfo=ctx.createOscillator();
 
-    spinLfo.type="sine";
+    spinLfo.type="square";
 
     spinLfo.frequency.setValueAtTime(
-      9,
+      12,
       now
     );
 
     spinLfo.frequency.exponentialRampToValueAtTime(
-      4,
+      5,
       now+5.8
     );
 
     spinLfoGain=ctx.createGain();
 
-    spinLfoGain.gain.value=0.012;
+    spinLfoGain.gain.value=0.018;
 
     spinLfo.connect(spinLfoGain);
     spinLfoGain.connect(spinGain.gain);
@@ -2580,10 +2613,10 @@ function stopSpinSound(){
 
     if(!spinAudioCtx) return;
 
-    const now=
-      spinAudioCtx.currentTime;
+    const ctx=spinAudioCtx;
+    const now=ctx.currentTime;
 
-    /* SMOOTH STOP */
+    /* QUICK FADE */
 
     if(spinGain){
 
@@ -2599,27 +2632,24 @@ function stopSpinSound(){
 
       spinGain.gain.exponentialRampToValueAtTime(
         0.001,
-        now+0.12
+        now+0.10
       );
-    }
 
-    /* STOP NOISE */
+    }
 
     if(spinNoise){
 
       try{
-        spinNoise.stop(now+0.12);
+        spinNoise.stop(now+0.10);
       }catch(e){}
 
       spinNoise=null;
     }
 
-    /* STOP LFO */
-
     if(spinLfo){
 
       try{
-        spinLfo.stop(now+0.12);
+        spinLfo.stop(now+0.10);
       }catch(e){}
 
       spinLfo=null;
