@@ -2429,12 +2429,16 @@ function playTick(){
   }catch(e){}
 
 }
-/* WHEEL SPIN SOUND */
+/* =========================
+   CYCLE WHEEL SPIN SOUND
+========================= */
 
 let spinAudioCtx=null;
-let spinOsc=null;
+let spinNoise=null;
 let spinGain=null;
 let spinFilter=null;
+let spinLfo=null;
+let spinLfoGain=null;
 
 function startSpinSound(){
 
@@ -2450,104 +2454,138 @@ function startSpinSound(){
       spinAudioCtx.resume();
     }
 
-    /* STOP OLD SOUND IF ANY */
-    if(spinOsc){
-      try{
-        spinOsc.stop();
-      }catch(e){}
-      spinOsc=null;
+    /* STOP OLD SOUND */
+    stopSpinSound();
+
+    const ctx=spinAudioCtx;
+    const now=ctx.currentTime;
+
+    /* =========================
+       CREATE SOFT WHEEL NOISE
+    ========================= */
+
+    const bufferSize=ctx.sampleRate*2;
+    const buffer=ctx.createBuffer(
+      1,
+      bufferSize,
+      ctx.sampleRate
+    );
+
+    const data=buffer.getChannelData(0);
+
+    for(let i=0;i<bufferSize;i++){
+
+      /* SOFT RANDOM RUBBING NOISE */
+      data[i]=(Math.random()*2-1)*0.55;
+
     }
 
-    spinOsc=
-      spinAudioCtx.createOscillator();
+    spinNoise=ctx.createBufferSource();
+    spinNoise.buffer=buffer;
+    spinNoise.loop=true;
 
-    spinGain=
-      spinAudioCtx.createGain();
+    /* =========================
+       MECHANICAL WHEEL FILTER
+    ========================= */
 
-    spinFilter=
-      spinAudioCtx.createBiquadFilter();
+    spinFilter=ctx.createBiquadFilter();
 
-    /* NATURAL MECHANICAL WHEEL FEEL */
-    spinOsc.type="triangle";
+    spinFilter.type="bandpass";
 
-    spinFilter.type="lowpass";
     spinFilter.frequency.setValueAtTime(
-      900,
-      spinAudioCtx.currentTime
-    );
-    spinFilter.Q.value=1.2;
-
-    const now=
-      spinAudioCtx.currentTime;
-
-    /* START FAST */
-    spinOsc.frequency.setValueAtTime(
-      210,
+      650,
       now
     );
 
-    /* GRADUAL SLOWDOWN */
-    spinOsc.frequency.exponentialRampToValueAtTime(
-      145,
-      now+2.2
-    );
+    spinFilter.Q.value=0.65;
 
-    spinOsc.frequency.exponentialRampToValueAtTime(
-      105,
-      now+4.2
-    );
+    /* =========================
+       VOLUME
+    ========================= */
 
-    spinOsc.frequency.exponentialRampToValueAtTime(
-      68,
-      now+5.8
-    );
+    spinGain=ctx.createGain();
 
-    /* SMOOTH VOLUME */
     spinGain.gain.setValueAtTime(
       0.001,
       now
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.035,
-      now+0.10
+      0.055,
+      now+0.08
+    );
+
+    /* WHEEL SLOWING DOWN */
+
+    spinGain.gain.exponentialRampToValueAtTime(
+      0.038,
+      now+2.0
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.018,
-      now+2.5
+      0.022,
+      now+4.0
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
       0.008,
-      now+5.2
-    );
-
-    spinGain.gain.exponentialRampToValueAtTime(
-      0.001,
       now+5.8
     );
 
-    spinOsc.connect(spinFilter);
-    spinFilter.connect(spinGain);
-    spinGain.connect(
-      spinAudioCtx.destination
+    /* =========================
+       SMALL ROTATION PULSATION
+       LIKE CYCLE WHEEL
+    ========================= */
+
+    spinLfo=ctx.createOscillator();
+
+    spinLfo.type="sine";
+
+    spinLfo.frequency.setValueAtTime(
+      9,
+      now
     );
 
-    spinOsc.start();
+    spinLfo.frequency.exponentialRampToValueAtTime(
+      4,
+      now+5.8
+    );
+
+    spinLfoGain=ctx.createGain();
+
+    spinLfoGain.gain.value=0.012;
+
+    spinLfo.connect(spinLfoGain);
+    spinLfoGain.connect(spinGain.gain);
+
+    /* =========================
+       CONNECT
+    ========================= */
+
+    spinNoise.connect(spinFilter);
+    spinFilter.connect(spinGain);
+    spinGain.connect(ctx.destination);
+
+    spinNoise.start();
+    spinLfo.start();
 
   }catch(e){}
 
 }
 
+
 function stopSpinSound(){
 
   try{
 
-    if(spinOsc && spinAudioCtx){
+    if(!spinAudioCtx) return;
 
-      const now=
-        spinAudioCtx.currentTime;
+    const now=
+      spinAudioCtx.currentTime;
+
+    /* SMOOTH STOP */
+
+    if(spinGain){
 
       spinGain.gain.cancelScheduledValues(now);
 
@@ -2563,11 +2601,28 @@ function stopSpinSound(){
         0.001,
         now+0.12
       );
+    }
 
-      spinOsc.stop(now+0.12);
+    /* STOP NOISE */
 
-      spinOsc=null;
+    if(spinNoise){
 
+      try{
+        spinNoise.stop(now+0.12);
+      }catch(e){}
+
+      spinNoise=null;
+    }
+
+    /* STOP LFO */
+
+    if(spinLfo){
+
+      try{
+        spinLfo.stop(now+0.12);
+      }catch(e){}
+
+      spinLfo=null;
     }
 
   }catch(e){}
