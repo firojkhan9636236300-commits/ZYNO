@@ -1888,19 +1888,15 @@ function renderZ11Last(){
 
     // ROULETTE LAST 4 WIN COLORS
 
-    if(num===0){
+    const n = Number(num);
 
-      el.classList.add("zero");
-
-    }else if([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(Number(num))){
-
-      el.classList.add("red");
-
-    }else if(num!=="-"){
-
-      el.classList.add("black");
-
-    }
+if(n === 0){
+  el.classList.add("zero");
+}else if([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(n)){
+  el.classList.add("red");
+}else if(num !== "-"){
+  el.classList.add("black");
+}
 
     lastWinsEl.appendChild(el);
 
