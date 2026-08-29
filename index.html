@@ -2434,6 +2434,7 @@ function playTick(){
 let spinAudioCtx=null;
 let spinOsc=null;
 let spinGain=null;
+let spinFilter=null;
 
 function startSpinSound(){
 
@@ -2449,45 +2450,77 @@ function startSpinSound(){
       spinAudioCtx.resume();
     }
 
+    /* STOP OLD SOUND IF ANY */
+    if(spinOsc){
+      try{
+        spinOsc.stop();
+      }catch(e){}
+      spinOsc=null;
+    }
+
     spinOsc=
       spinAudioCtx.createOscillator();
 
     spinGain=
       spinAudioCtx.createGain();
 
-    spinOsc.type="sawtooth";
+    spinFilter=
+      spinAudioCtx.createBiquadFilter();
+
+    /* NATURAL MECHANICAL WHEEL FEEL */
+    spinOsc.type="triangle";
+
+    spinFilter.type="lowpass";
+    spinFilter.frequency.setValueAtTime(
+      900,
+      spinAudioCtx.currentTime
+    );
+    spinFilter.Q.value=1.2;
 
     const now=
       spinAudioCtx.currentTime;
 
+    /* START FAST */
     spinOsc.frequency.setValueAtTime(
-      160,
+      210,
       now
     );
 
+    /* GRADUAL SLOWDOWN */
     spinOsc.frequency.exponentialRampToValueAtTime(
-      95,
-      now+2.5
+      145,
+      now+2.2
     );
 
     spinOsc.frequency.exponentialRampToValueAtTime(
-      55,
+      105,
+      now+4.2
+    );
+
+    spinOsc.frequency.exponentialRampToValueAtTime(
+      68,
       now+5.8
     );
 
+    /* SMOOTH VOLUME */
     spinGain.gain.setValueAtTime(
       0.001,
       now
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
-      0.025,
-      now+0.12
+      0.035,
+      now+0.10
+    );
+
+    spinGain.gain.exponentialRampToValueAtTime(
+      0.018,
+      now+2.5
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
       0.008,
-      now+4.5
+      now+5.2
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
@@ -2495,8 +2528,8 @@ function startSpinSound(){
       now+5.8
     );
 
-    spinOsc.connect(spinGain);
-
+    spinOsc.connect(spinFilter);
+    spinFilter.connect(spinGain);
     spinGain.connect(
       spinAudioCtx.destination
     );
@@ -2513,14 +2546,25 @@ function stopSpinSound(){
 
     if(spinOsc && spinAudioCtx){
 
-      spinGain.gain.exponentialRampToValueAtTime(
-        0.001,
-        spinAudioCtx.currentTime+0.1
+      const now=
+        spinAudioCtx.currentTime;
+
+      spinGain.gain.cancelScheduledValues(now);
+
+      spinGain.gain.setValueAtTime(
+        Math.max(
+          spinGain.gain.value,
+          0.001
+        ),
+        now
       );
 
-      spinOsc.stop(
-        spinAudioCtx.currentTime+0.1
+      spinGain.gain.exponentialRampToValueAtTime(
+        0.001,
+        now+0.12
       );
+
+      spinOsc.stop(now+0.12);
 
       spinOsc=null;
 
