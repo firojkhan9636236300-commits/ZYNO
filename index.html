@@ -1581,6 +1581,12 @@ function openGame(game){
 
   document.getElementById(game).classList.add("active");
 
+  /* SAVE CURRENT GAME FOR REFRESH */
+  localStorage.setItem(
+    "zynoLastView",
+    game
+  );
+
   if(game==="zero11"){
     syncZ11Balance();
   }
