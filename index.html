@@ -4017,7 +4017,26 @@ window.zynoAdminLogout = async function(){
 /* =========================
    CHECK EXISTING LOGIN
 ========================= */
+/* =========================
+   SAVE CURRENT VIEW
+   FOR REFRESH
+========================= */
 
+window.addEventListener("beforeunload",()=>{
+
+  const activeView =
+    document.querySelector(".view.active");
+
+  if(activeView && activeView.id){
+
+    localStorage.setItem(
+      "zynoLastView",
+      activeView.id
+    );
+
+  }
+
+});
 onAuthStateChanged(auth,async(user)=>{
 
   console.log(
@@ -4419,30 +4438,37 @@ onAuthStateChanged(auth,async(user)=>{
 
 
       /* =========================
-         IMPORTANT:
-         REFRESH → HOME
-      ========================= */
+   RESTORE LAST VIEW
+   AFTER REFRESH
+========================= */
 
-      document
-        .querySelectorAll(".view")
-        .forEach(v=>{
-          v.classList.remove("active");
-        });
+const lastView =
+  localStorage.getItem("zynoLastView");
 
-
-      document
-        .getElementById("home")
-        .classList.add("active");
+document
+  .querySelectorAll(".view")
+  .forEach(v=>{
+    v.classList.remove("active");
+  });
 
 
-      window.scrollTo(0,0);
+const restoreView =
+  lastView &&
+  document.getElementById(lastView)
+    ? document.getElementById(lastView)
+    : document.getElementById("home");
 
-      console.log(
-        "USER ALREADY LOGGED IN → HOME"
-      );
 
-      return;
-    }
+restoreView.classList.add("active");
+
+window.scrollTo(0,0);
+
+console.log(
+  "USER LOGIN RESTORED VIEW:",
+  restoreView.id
+);
+
+return;
 
 
     /* =========================
