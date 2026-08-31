@@ -4044,6 +4044,26 @@ window.addEventListener("beforeunload",()=>{
   }
 
 });
+/* =========================
+   SAVE CURRENT VIEW
+   BEFORE REFRESH
+========================= */
+
+window.addEventListener("beforeunload",()=>{
+
+  const activeView =
+    document.querySelector(".view.active");
+
+  if(activeView && activeView.id){
+
+    localStorage.setItem(
+      "zynoLastView",
+      activeView.id
+    );
+
+  }
+
+});
 onAuthStateChanged(auth,async(user)=>{
 
   console.log(
