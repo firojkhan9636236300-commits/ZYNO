@@ -1642,15 +1642,35 @@ const homeBalance=document.getElementById("homeBalance");
 
 function updateBalance(){
 
-  document.getElementById("balance").textContent=Math.floor(balance);
+  const value = Math.floor(Number(balance) || 0);
 
-  homeBalance.textContent=Math.floor(balance);
+  const balanceEl =
+    document.getElementById("balance");
 
-  const z1=document.getElementById("z11Balance");
-  const z2=document.getElementById("z11Balance2");
+  const homeBalanceEl =
+    document.getElementById("homeBalance");
 
-  if(z1)z1.textContent=Math.floor(balance);
-  if(z2)z2.textContent=Math.floor(balance);
+  const z1 =
+    document.getElementById("z11Balance");
+
+  const z2 =
+    document.getElementById("z11Balance2");
+
+  if(balanceEl){
+    balanceEl.textContent = value;
+  }
+
+  if(homeBalanceEl){
+    homeBalanceEl.textContent = value;
+  }
+
+  if(z1){
+    z1.textContent = value;
+  }
+
+  if(z2){
+    z2.textContent = value;
+  }
 }
 
 
