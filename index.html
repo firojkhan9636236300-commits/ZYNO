@@ -4478,16 +4478,21 @@ onAuthStateChanged(auth,async(user)=>{
 
       /* USER BALANCE */
 
-      balance =
-        Number(userSnap.data().points)||0;
+      const firestoreBalance =
+  Number(userSnap.data().points);
 
-      localStorage.setItem(
-        "zynoUserBalance",
-        String(balance)
-      );
+balance =
+  Number.isFinite(firestoreBalance)
+  ? firestoreBalance
+  : 0;
 
-      updateBalance();
-      syncZ11Balance();
+localStorage.setItem(
+  "zynoUserBalance",
+  String(balance)
+);
+
+updateBalance();
+syncZ11Balance();
 
 
       /* =========================
