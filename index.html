@@ -3431,7 +3431,38 @@ updateBalance();
 renderLastWins();
 syncZ11Balance();
 renderZ11Last();
+window.openUserLogin = function(){
 
+  document.querySelectorAll(".view").forEach(v=>{
+    v.classList.remove("active");
+  });
+
+  const login =
+    document.getElementById("userLogin");
+
+  if(login){
+    login.classList.add("active");
+  }
+
+  window.scrollTo(0,0);
+};
+
+
+window.openUserRegister = function(){
+
+  document.querySelectorAll(".view").forEach(v=>{
+    v.classList.remove("active");
+  });
+
+  const register =
+    document.getElementById("userRegister");
+
+  if(register){
+    register.classList.add("active");
+  }
+
+  window.scrollTo(0,0);
+};
 </script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
