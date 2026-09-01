@@ -3700,18 +3700,21 @@ window.zynoUserLogin = async function(){
     const firestoreBalance =
   Number(userData.points);
 
-balance =
-  Number.isFinite(firestoreBalance)
-  ? firestoreBalance
-  : 0;
+  const firestoreBalance =
+    Number(userSnap.data().points);
 
-localStorage.setItem(
-  "zynoUserBalance",
-  String(balance)
-);
+  balance =
+    Number.isFinite(firestoreBalance)
+    ? firestoreBalance
+    : 0;
 
-updateBalance();
-syncZ11Balance();
+  updateBalance();
+  syncZ11Balance();
+
+  localStorage.setItem(
+    "zynoUserBalance",
+    String(balance)
+  );
 
     message.textContent =
       "LOGIN SUCCESS";
