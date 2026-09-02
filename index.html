@@ -3871,6 +3871,15 @@ window.zynoUserRegister = async function(){
     
     message.textContent =
     "ACCOUNT CREATED • LOGIN NOW"
+    document.querySelectorAll(".view").forEach(v=>{
+  v.classList.remove("active");
+});
+
+document
+  .getElementById("home")
+  .classList.add("active");
+
+window.scrollTo(0,0);
 
   }catch(error){
 
