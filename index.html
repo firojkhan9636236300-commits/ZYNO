@@ -1718,7 +1718,21 @@ const betAmounts = [
   60,80,100,120,130,150,170,200,230,270,
   300,350,380,400,450,500
 ];
+function changeBetAmount(direction){
 
+  betAmountIndex += direction;
+
+  if(betAmountIndex < 0){
+    betAmountIndex = 0;
+  }
+
+  if(betAmountIndex >= betAmounts.length){
+    betAmountIndex = betAmounts.length - 1;
+  }
+
+  document.getElementById("betAmount").textContent =
+    betAmounts[betAmountIndex];
+}
 let betAmountIndex = 0;
 const homeBalance=document.getElementById("homeBalance");
 
