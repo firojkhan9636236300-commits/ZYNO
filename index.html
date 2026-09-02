@@ -2516,8 +2516,8 @@ function addBet(number,amount){
     amount<=0
   )return;
 
-  amount=
-    Math.min(amount,Math.floor(balance));
+  amount = betAmounts[betAmountIndex];
+amount = Math.min(amount,Math.floor(balance));
 
   balance-=amount;
 
