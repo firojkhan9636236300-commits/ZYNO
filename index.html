@@ -390,7 +390,45 @@ button{
   color:#ffd34e;
   margin:0 3px;
 }
+.bet-amount-control{
+  width:100%;
+  display:grid;
+  grid-template-columns:52px 1fr 52px;
+  gap:6px;
+  margin:7px 0 8px;
+}
 
+.bet-amount-control button{
+  min-height:44px;
+  border-radius:10px;
+  border:1px solid rgba(0,229,255,.25);
+  background:#071a30;
+  color:#00e5ff;
+  font-size:24px;
+  font-weight:1000;
+}
+
+.bet-amount-value{
+  min-height:44px;
+  border-radius:10px;
+  border:1px solid rgba(255,211,78,.3);
+  background:#071a30;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.bet-amount-value small{
+  color:#7896b5;
+  font-size:7px;
+  letter-spacing:1px;
+}
+
+.bet-amount-value strong{
+  color:#ffd34e;
+  font-size:17px;
+}
 /* 0-11 */
 .z11-stage{
   display:flex;
