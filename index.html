@@ -4495,8 +4495,7 @@ onAuthStateChanged(auth,async(user)=>{
 
     if(
       userSnap.exists() &&
-      userSnap.data().role==="user" &&
-      userSnap.data().approved===true
+      userSnap.data().role==="user"
     ){
 
       /* USER BALANCE */
