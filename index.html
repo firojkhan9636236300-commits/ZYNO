@@ -3720,16 +3720,6 @@ window.zynoUserLogin = async function(){
       return;
     }
 
-    if(userData.approved !== true){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin approval pending hai";
-
-      return;
-    }
-
     const firestoreBalance =
   Number(userData.points);
 
