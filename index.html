@@ -2985,6 +2985,7 @@ function showWinner(winner){
       winningBet*35;
 
     balance+=totalPayout;
+    window.saveUserBalance();
 
     resultEl.textContent=
       "WIN "+winner+
