@@ -1633,7 +1633,32 @@ window.openAdminLogin = function(){
 
   window.scrollTo(0,0);
 }
+function openUserLogin(){
 
+  document.querySelectorAll(".view").forEach(v=>{
+    v.classList.remove("active");
+  });
+
+  document
+    .getElementById("userLogin")
+    .classList.add("active");
+
+  window.scrollTo(0,0);
+}
+
+
+function openUserRegister(){
+
+  document.querySelectorAll(".view").forEach(v=>{
+    v.classList.remove("active");
+  });
+
+  document
+    .getElementById("userRegister")
+    .classList.add("active");
+
+  window.scrollTo(0,0);
+}
 /* =========================
    GLOBAL BALANCE
 ========================= */
