@@ -3850,15 +3850,12 @@ window.zynoUserRegister = async function(){
         username: username,
         email: email,
         role: "user",
-        approved: false,
         points: 0
       }
     );
-
-
+    
     message.textContent =
-      "ACCOUNT CREATED • ADMIN APPROVAL PENDING";
-
+    "ACCOUNT CREATED • LOGIN NOW"
 
   }catch(error){
 
