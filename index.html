@@ -2485,28 +2485,47 @@ function stopAllBetting(){
 }
 
 
-function addBet(number,amount){
+function addBet(number, amount){
 
-  if(
-    !bettingOpen ||
-    spinning ||
-    amount<=0
-  )return;
+  if(!bettingOpen || spinning || amount <= 0){
+    return;
+  }
 
-  
-amount = Math.min(amount,Math.floor(balance));
+  const existingBet =
+    Number(bets[number]) || 0;
 
-  balance-=amount;
+  const MAX_BET_PER_NUMBER = 5500;
 
-  bets[number]=
-    (bets[number]||0)+amount;
+  const remaining =
+    MAX_BET_PER_NUMBER - existingBet;
 
-saveRouletteState();
+  if(remaining <= 0){
+    resultEl.textContent =
+      "Is number par maximum 5500 points bet ho chuke hain";
+    stopBet(currentPress);
+    return;
+  }
 
-updateBalance();
+  const safeAmount =
+    Math.min(
+      Number(amount),
+      remaining,
+      Math.floor(balance)
+    );
 
+  if(safeAmount <= 0){
+    return;
+  }
+
+  balance -= safeAmount;
+
+  bets[number] =
+    existingBet + safeAmount;
+
+  saveRouletteState();
+
+  updateBalance();
   updateBetCount(number);
-
   updateSelected();
 }
 
