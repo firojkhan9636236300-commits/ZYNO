@@ -3635,11 +3635,12 @@ window.saveUserBalance = async function(){
 
   const user = auth.currentUser;
 
-  if(!user)return;
+  if(!user) return;
 
   const savedBalance =
-    Math.floor(balance);
+    Math.max(0, Math.floor(Number(balance) || 0));
 
+  // Local backup
   localStorage.setItem(
     "zynoUserBalance",
     String(savedBalance)
@@ -3654,6 +3655,11 @@ window.saveUserBalance = async function(){
       },
       { merge:true }
     );
+
+    // Firebase save successful
+    balance = savedBalance;
+
+    updateBalance();
 
   }catch(error){
 
