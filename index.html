@@ -4249,7 +4249,7 @@ window.addEventListener("beforeunload",()=>{
 
 });
 onAuthStateChanged(auth,async(user)=>{
-
+window.zynoUserLoggedIn = !!user;
   console.log(
     "REFRESH AUTH USER:",
     user ? user.uid : "NO USER"
