@@ -3923,9 +3923,8 @@ window.zynoUserLogin = async function(){
   }else{
 
     message.textContent =
-      errorCode
-      ? "Login error: "+errorCode
-      : "Login error: "+(errorMessage || "Unknown error");
+  "Login error: " +
+  String(error?.code || error?.message || error || "Unknown error");
   }
 }
 /* =========================
