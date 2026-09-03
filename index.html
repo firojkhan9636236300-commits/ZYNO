@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+
+<title>ZYNO</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  width:100%;
+  min-height:100%;
+  background:#020817;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+  overflow-x:hidden;
+}
+
+button{
+  font-family:inherit;
+}
+
+.app{
+  width:100%;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(0,229,255,.10),transparent 35%),
+    linear-gradient(180deg,#020817,#041225);
+}
+
+.view{
+  display:none;
+  width:100%;
+  min-height:100vh;
+}
+
+.view.active{
+  display:block;
+}
+
+/* =========================
+   HOME
+========================= */
+
+#home{
+  padding:20px 15px 30px;
+}
+
+.home-top{
+  text-align:center;
+  padding:18px 0 20px;
+}
+
+.zyno-logo{
+  font-size:42px;
+  font-weight:900;
+  letter-spacing:7px;
+  color:#00e5ff;
+  text-shadow:
+    0 0 5px #00e5ff,
+    0 0 15px rgba(0,229,255,.8),
+    0 0 30px rgba(0,229,255,.45);
+}
+
+.home-sub{
+  margin-top:5px;
+  color:#7f9caf;
+  font-size:12px;
+  letter-spacing:3px;
+}
+
+.balance-card{
+  width:100%;
+  max-width:500px;
+  margin:0 auto 20px;
+  padding:18px;
+  border:1px solid rgba(0,229,255,.35);
+  border-radius:18px;
+  background:rgba(5,20,38,.85);
+  box-shadow:0 0 20px rgba(0,229,255,.08);
+  text-align:center;
+}
+
+.balance-label{
+  color:#8298aa;
+  font-size:11px;
+  letter-spacing:2px;
+}
+
+.balance-value{
+  margin-top:7px;
+  color:#fff;
+  font-size:28px;
+  font-weight:800;
+  text-shadow:0 0 10px rgba(0,229,255,.35);
+}
+
+.games-title{
+  max-width:500px;
+  margin:0 auto 12px;
+  color:#8ca4b6;
+  font-size:12px;
+  letter-spacing:2px;
+}
+
+.games{
+  width:100%;
+  max-width:500px;
+  margin:auto;
+  display:grid;
+  gap:12px;
+}
+
+.game-card{
+  position:relative;
+  width:100%;
+  min-height:92px;
+  border:1px solid rgba(0,229,255,.25);
+  border-radius:18px;
+  background:
+    linear-gradient(135deg,rgba(0,229,255,.08),rgba(4,18,35,.95));
+  color:#fff;
+  text-align:left;
+  padding:17px 18px;
+  overflow:hidden;
+  box-shadow:0 8px 25px rgba(0,0,0,.25);
+}
+
+.game-card:active{
+  transform:scale(.98);
+}
+
+.game-icon{
+  position:absolute;
+  right:18px;
+  top:15px;
+  font-size:34px;
+  filter:drop-shadow(0 0 8px rgba(0,229,255,.5));
+}
+
+.game-name{
+  font-size:18px;
+  font-weight:800;
+  color:#00e5ff;
+}
+
+.game-sub{
+  margin-top:5px;
+  color:#8ca2b2;
+  font-size:11px;
+}
+
+.play{
+  display:inline-block;
+  margin-top:10px;
+  padding:5px 12px;
+  border-radius:20px;
+  border:1px solid #00e5ff;
+  color:#00e5ff;
+  font-size:10px;
+  font-weight:bold;
+}
+
+.zyno-footer{
+  text-align:center;
+  padding:25px 0 10px;
+  color:#526878;
+  font-size:10px;
+  letter-spacing:2px;
+}
+
+/* =========================
+   COMMON TOPBAR
+========================= */
+
+.topbar{
+  height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 15px;
+  border-bottom:1px solid rgba(0,229,255,.15);
+  background:rgba(2,8,23,.94);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+
+.back-btn{
+  width:42px;
+  height:42px;
+  border:1px solid rgba(0,229,255,.3);
+  border-radius:12px;
+  background:#07182a;
+  color:#00e5ff;
+  font-size:20px;
+}
+
+.rlogo{
+  color:#00e5ff;
+  font-weight:900;
+  letter-spacing:4px;
+  font-size:20px;
+}
+
+.top-balance{
+  color:#ffd34e;
+  font-size:13px;
+  font-weight:bold;
+}
+
+/* =========================
+   COMMON GAME
+========================= */
+
+.game-page{
+  width:100%;
+  max-width:600px;
+  margin:auto;
+  padding-bottom:30px;
+}
+
+.result{
+  min-height:70px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:12px 15px;
+  border:1px solid rgba(0,229,255,.25);
+  border-radius:18px;
+  background:rgba(4,18,35,.8);
+  font-size:30px;
+  font-weight:900;
+  color:#fff;
+}
+
+.timer{
+  text-align:center;
+  color:#ffd34e;
+  font-size:25px;
+  font-weight:900;
+  text-shadow:0 0 10px rgba(255,211,78,.4);
+}
+
+.last-wins{
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  margin:12px 15px;
+}
+
+.last-number{
+  width:38px;
+  height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:#101e2e;
+  border:1px solid #344b5e;
+  font-weight:bold;
+}
+
+.last-number.red{
+  color:#ff3b55;
+}
+
+.last-number.black{
+  color:#fff;
+}
+
+.last-number.zero{
+  color:#00e5ff;
+}
+
+/* =========================
+   BET CONTROL
+========================= */
+
+.bet-control{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  margin:12px 15px;
+}
+
+.bet-minus,
+.bet-plus{
+  width:45px;
+  height:42px;
+  border:1px solid rgba(0,229,255,.4);
+  border-radius:12px;
+  background:#071a2d;
+  color:#00e5ff;
+  font-size:24px;
+}
+
+.bet-value{
+  min-width:100px;
+  text-align:center;
+  color:#fff;
+  font-size:20px;
+  font-weight:bold;
+}
+
+.selected{
+  text-align:center;
+  min-height:22px;
+  color:#8ba4b7;
+  font-size:12px;
+}
+
+/* =========================
+   ROULETTE
+========================= */
+
+.wheel-wrap{
+  position:relative;
+  width:min(68vw,230px);
+  aspect-ratio:1;
+  margin:-15px auto 8px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#071a2b;
+  border:4px solid #00e5ff;
+  box-shadow:
+    0 0 10px #00e5ff,
+    0 0 35px rgba(0,229,255,.25);
+  overflow:hidden;
+}
+
+#wheel{
+  position:relative;
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  transition:transform 5.8s cubic-bezier(.12,.72,.12,1);
+}
+
+.number{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:30px;
+  height:30px;
+  margin:-15px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:50%;
+  font-size:11px;
+  font-weight:bold;
+  transform-origin:50% 50%;
+}
+
+.number.red{
+  color:#ff334f;
+}
+
+.number.black{
+  color:#fff;
+}
+
+.number.zero{
+  color:#00e5ff;
+}
+
+.center-logo{
+  position:absolute;
+  z-index:5;
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:#020817;
+  border:2px solid #00e5ff;
+  color:#00e5ff;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:2px;
+  box-shadow:0 0 18px rgba(0,229,255,.5);
+}
+
+.pointer{
+  position:absolute;
+  top:-2px;
+  left:50%;
+  transform:translateX(-50%);
+  z-index:10;
+  width:0;
+  height:0;
+  border-left:8px solid transparent;
+  border-right:8px solid transparent;
+  border-top:18px solid #ffd34e;
+  filter:drop-shadow(0 0 5px #ffd34e);
+}
+
+.number-grid{
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:6px;
+  padding:8px 12px;
+}
+
+.bet-number{
+  min-height:43px;
+  border:1px solid #263d51;
+  border-radius:10px;
+  background:#081a2b;
+  color:#fff;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  user-select:none;
+}
+
+.bet-number.red{
+  color:#ff3b55;
+}
+
+.bet-number.black{
+  color:#fff;
+}
+
+.bet-number.zero{
+  color:#00e5ff;
+}
+
+.bet-number.active{
+  border-color:#ffd34e;
+  box-shadow:0 0 12px rgba(255,211,78,.45);
+}
+
+.bet-count{
+  color:#ff9f1c;
+  font-size:11px;
+  font-weight:bold;
+  margin-top:2px;
+}
+
+/* =========================
+   ZYNO 0-11
+========================= */
+
+.z11-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:8px;
+  padding:12px 15px;
+}
+
+.z11-number{
+  min-height:55px;
+  border:1px solid #244057;
+  border-radius:13px;
+  background:#071a2d;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:18px;
+  font-weight:bold;
+}
+
+/* =========================
+   LOGIN / REGISTER
+========================= */
+
+.auth-box{
+  width:calc(100% - 30px);
+  max-width:420px;
+  margin:40px auto;
+  padding:25px;
+  border:1px solid rgba(0,229,255,.25);
+  border-radius:20px;
+  background:#061526;
+}
+
+.auth-title{
+  text-align:center;
+  color:#00e5ff;
+  font-size:25px;
+  font-weight:900;
+  margin-bottom:20px;
+}
+
+.input{
+  width:100%;
+  height:48px;
+  margin-bottom:12px;
+  padding:0 14px;
+  border:1px solid #29445a;
+  border-radius:12px;
+  background:#03101e;
+  color:#fff;
+  outline:none;
+}
+
+.primary-btn{
+  width:100%;
+  height:48px;
+  border:0;
+  border-radius:12px;
+  background:#00e5ff;
+  color:#001018;
+  font-weight:900;
+}
+
+.auth-link{
+  text-align:center;
+  margin-top:15px;
+  color:#00e5ff;
+  font-size:13px;
+}
+
+/* =========================
+   ADMIN
+========================= */
+
+.admin-box{
+  padding:15px;
+}
+
+.admin-user{
+  margin-bottom:10px;
+  padding:14px;
+  border:1px solid #254055;
+  border-radius:14px;
+  background:#071a2b;
+}
+
+.admin-message{
+  text-align:center;
+  margin:15px;
+  color:#ffd34e;
+}
+
+/* =========================
+   LUDO / TEEN PATTI / CLASH
+========================= */
+
+.placeholder-game{
+  margin:25px 15px;
+  min-height:300px;
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#708798;
+  background:#061526;
+}
+
+/* =========================================================
+   ZYNO CORE
+   Original ZYNO game
+========================================================= */
+
+.core-game{
+  min-height:calc(100vh - 64px);
+  padding:15px 15px 30px;
+  background:
+    radial-gradient(circle at 50% 35%,rgba(0,229,255,.12),transparent 30%),
+    linear-gradient(180deg,#020817,#031324);
+  overflow:hidden;
+}
+
+.core-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.core-logo{
+  color:#00e5ff;
+  font-size:23px;
+  font-weight:900;
+  letter-spacing:4px;
+  text-shadow:0 0 15px rgba(0,229,255,.7);
+}
+
+.core-balance{
+  padding:8px 12px;
+  border:1px solid rgba(255,211,78,.3);
+  border-radius:12px;
+  color:#ffd34e;
+  background:rgba(255,211,78,.05);
+  font-size:13px;
+  font-weight:bold;
+}
+
+.core-timer{
+  width:62px;
+  height:62px;
+  margin:18px auto 10px;
+  border-radius:50%;
+  border:2px solid #ffd34e;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#ffd34e;
+  font-size:22px;
+  font-weight:900;
+  box-shadow:
+    0 0 12px rgba(255,211,78,.4),
+    inset 0 0 12px rgba(255,211,78,.08);
+}
+
+.core-arena{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:10px 0 20px;
+}
+
+.core-orb{
+  position:relative;
+  width:min(68vw,280px);
+  aspect-ratio:1;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(circle at 35% 30%,#123d57,#041321 55%,#020817);
+  border:2px solid #00e5ff;
+  box-shadow:
+    0 0 18px rgba(0,229,255,.6),
+    0 0 55px rgba(0,229,255,.22),
+    inset 0 0 35px rgba(0,229,255,.12);
+}
+
+.core-orb::before,
+.core-orb::after{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:50%;
+  border:1px solid rgba(0,229,255,.25);
+}
+
+.core-orb::after{
+  inset:25px;
+  border-color:rgba(255,211,78,.18);
+}
+
+.core-orb.spinning{
+  animation:coreOrbSpin 1.2s linear infinite;
+}
+
+@keyframes coreOrbSpin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+.core-orb-content{
+  position:relative;
+  z-index:2;
+  text-align:center;
+}
+
+.core-orb-title{
+  color:#00e5ff;
+  font-size:17px;
+  font-weight:900;
+  letter-spacing:3px;
+}
+
+.core-result{
+  margin:5px 0;
+  color:#fff;
+  font-size:68px;
+  line-height:1;
+  font-weight:900;
+  text-shadow:
+    0 0 8px #00e5ff,
+    0 0 25px rgba(0,229,255,.6);
+}
+
+.core-status{
+  min-height:18px;
+  color:#829aaa;
+  font-size:10px;
+  letter-spacing:1px;
+}
+
+.core-bet-panel{
+  max-width:430px;
+  margin:0 auto;
+  padding:15px;
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:18px;
+  background:rgba(4,18,35,.85);
+}
+
+.core-bet-title{
+  text-align:center;
+  color:#718b9c;
+  font-size:10px;
+  letter-spacing:2px;
+  margin-bottom:10px;
+}
+
+.core-bet-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.core-bet-btn{
+  width:48px;
+  height:46px;
+  border:1px solid rgba(0,229,255,.4);
+  border-radius:12px;
+  background:#071a2d;
+  color:#00e5ff;
+  font-size:24px;
+  font-weight:bold;
+}
+
+.core-bet-value{
+  flex:1;
+  text-align:center;
+  color:#fff;
+  font-size:22px;
+  font-weight:900;
+}
+
+.core-play{
+  width:100%;
+  height:50px;
+  margin-top:12px;
+  border:0;
+  border-radius:13px;
+  background:linear-gradient(90deg,#00e5ff,#31f5ff);
+  color:#001018;
+  font-size:15px;
+  font-weight:900;
+  box-shadow:0 0 18px rgba(0,229,255,.3);
+}
+
+.core-play:disabled,
+.core-bet-btn:disabled{
+  opacity:.4;
+}
+
+.core-history{
+  max-width:430px;
+  margin:16px auto 0;
+}
+
+.core-history-label{
+  color:#718b9c;
+  font-size:10px;
+  letter-spacing:2px;
+  text-align:center;
+  margin-bottom:8px;
+}
+
+.core-wins{
+  display:flex;
+  justify-content:center;
+  gap:9px;
+}
+
+.core-win{
+  width:42px;
+  height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  border:1px solid #28475b;
+  background:#071a2d;
+  color:#00e5ff;
+  font-weight:900;
+}
+
+.core-footer{
+  text-align:center;
+  margin-top:20px;
+  color:#425b6b;
+  font-size:9px;
+  letter-spacing:2px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:380px){
+  .zyno-logo{
+    font-size:36px;
+  }
+
+  .number-grid{
+    gap:4px;
+    padding-left:8px;
+    padding-right:8px;
+  }
+
+  .bet-number{
+    min-height:40px;
+  }
+
+  .core-result{
+    font-size:60px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- =====================================================
+     HOME
+===================================================== -->
+
+<section id="home" class="view active">
+
+  <div class="home-top">
+    <div class="zyno-logo">ZYNO</div>
+    <div class="home-sub">PLAY • WIN • EXPERIENCE</div>
+  </div>
+
+  <div class="balance-card">
+    <div class="balance-label">BALANCE</div>
+    <div id="homeBalance" class="balance-value">0</div>
+  </div>
+
+  <div class="games-title">6 GAMES</div>
+
+  <div class="games">
+
+    <button class="game-card" onclick="openGame('roulette')">
+      <div class="game-icon">🎡</div>
+      <div class="game-name">ROULETTE 0–36</div>
+      <div class="game-sub">Classic ZYNO Roulette</div>
+      <span class="play">OPEN</span>
+    </button>
+
+    <button class="game-card" onclick="openGame('z11')">
+      <div class="game-icon">🔢</div>
+      <div class="game-name">ZYNO 0–11</div>
+      <div class="game-sub">Fast number game</div>
+      <span class="play">OPEN</span>
+    </button>
+
+    <button class="game-card" onclick="openGame('ludo')">
+      <div class="game-icon">🎲</div>
+      <div class="game-name">ZYNO LUDO</div>
+      <div class="game-sub">Ludo game</div>
+      <span class="play">OPEN</span>
+    </button>
+
+    <button class="game-card" onclick="openGame('teenpatti')">
+      <div class="game-icon">🃏</div>
+      <div class="game-name">TEEN PATTI</div>
+      <div class="game-sub">Card game</div>
+      <span class="play">OPEN</span>
+    </button>
+
+    <button class="game-card" onclick="openGame('clash')">
+      <div class="game-icon">⚔️</div>
+      <div class="game-name">ZYNO CLASH</div>
+      <div class="game-sub">Battle game</div>
+      <span class="play">OPEN</span>
+    </button>
+
+    <button class="game-card" onclick="openGame('core')">
+      <div class="game-icon">⚡</div>
+      <div class="game-name">ZYNO CORE</div>
+      <div class="game-sub">Original ZYNO number game</div>
+      <span class="play">OPEN</span>
+    </button>
+
+  </div>
+
+  <div class="zyno-footer">
+    ZYNO ORIGINAL
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     ROULETTE 0–36
+===================================================== -->
+
+<section id="roulette" class="view">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="rlogo">ZYNO</div>
+    <div id="balance" class="top-balance">0</div>
+  </div>
+
+  <div class="game-page">
+
+    <div id="timer" class="timer">60</div>
+
+    <div class="wheel-wrap">
+
+      <div class="pointer"></div>
+
+      <div id="wheel"></div>
+
+      <div id="centerLogo" class="center-logo">
+        ZYNO
+      </div>
+
+    </div>
+
+    <div id="result" class="result">BET NOW</div>
+
+    <div id="selected" class="selected">
+      Select number and hold to bet
+    </div>
+
+    <div class="bet-control">
+
+      <button class="bet-minus" onclick="changeBetAmount(-1)">
+        −
+      </button>
+
+      <div id="betAmount" class="bet-value">
+        1
+      </div>
+
+      <button class="bet-plus" onclick="changeBetAmount(1)">
+        +
+      </button>
+
+    </div>
+
+    <div id="lastWins" class="last-wins"></div>
+
+    <div id="grid" class="number-grid"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     ZYNO 0–11
+===================================================== -->
+
+<section id="z11" class="view">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="rlogo">ZYNO</div>
+    <div id="z11Balance" class="top-balance">0</div>
+  </div>
+
+  <div class="game-page">
+
+    <div id="z11Timer" class="timer">60</div>
+
+    <div id="z11Result" class="result">
+      BET NOW
+    </div>
+
+    <div id="z11Selected" class="selected">
+      Select a number
+    </div>
+
+    <div class="z11-grid" id="z11Grid"></div>
+
+    <div id="z11Last" class="last-wins"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     LUDO
+===================================================== -->
+
+<section id="ludo" class="view">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="rlogo">ZYNO</div>
+    <div class="top-balance">LUDO</div>
+  </div>
+
+  <div class="placeholder-game">
+    ZYNO LUDO<br><br>
+    Game area
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     TEEN PATTI
+===================================================== -->
+
+<section id="teenpatti" class="view">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="rlogo">ZYNO</div>
+    <div class="top-balance">TEEN PATTI</div>
+  </div>
+
+  <div class="placeholder-game">
+    ZYNO TEEN PATTI<br><br>
+    Game area
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     CLASH
+===================================================== -->
+
+<section id="clash" class="view">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+    <div class="rlogo">ZYNO</div>
+    <div class="top-balance">CLASH</div>
+  </div>
+
+  <div class="placeholder-game">
+    ZYNO CLASH<br><br>
+    Game area
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     ZYNO CORE
+===================================================== -->
+
+<section id="core" class="view">
+
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">‹</button>
+
+    <div class="rlogo">ZYNO</div>
+
+    <div id="coreBalance" class="top-balance">
+      0
+    </div>
+  </div>
+
+  <div class="core-game">
+
+    <div class="core-header">
+      <div class="core-logo">CORE</div>
+
+      <div id="coreBalance" class="core-balance">
+        0
+      </div>
+    </div>
+
+    <div id="coreTimer" class="core-timer">
+      10
+    </div>
+
+    <div class="core-arena">
+
+      <div id="coreOrb" class="core-orb">
+
+        <div class="core-orb-content">
+
+          <div class="core-orb-title">
+            ZYNO CORE
+          </div>
+
+          <div id="coreResult" class="core-result">
+            ?
+          </div>
+
+          <div id="coreStatus" class="core-status">
+            READY
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="core-bet-panel">
+
+      <div class="core-bet-title">
+        BET AMOUNT
+      </div>
+
+      <div class="core-bet-row">
+
+        <button
+          id="coreMinus"
+          class="core-bet-btn"
+          onclick="coreChangeBet(-1)">
+          −
+        </button>
+
+        <div id="coreBetAmount" class="core-bet-value">
+          1
+        </div>
+
+        <button
+          id="corePlus"
+          class="core-bet-btn"
+          onclick="coreChangeBet(1)">
+          +
+        </button>
+
+      </div>
+
+      <button
+        id="corePlay"
+        class="core-play"
+        onclick="startCoreGame()">
+        PLACE BET
+      </button>
+
+    </div>
+
+    <div class="core-history">
+
+      <div class="core-history-label">
+        LAST 4 RESULTS
+      </div>
+
+      <div id="coreWins" class="core-wins"></div>
+
+    </div>
+
+    <div class="core-footer">
+      ZYNO CORE • ORIGINAL ZYNO GAME
+    </div>
+
+  </div>
+
+</section>
+
+<script>
+
+/* =========================================================
+   ZYNO NAVIGATION
+========================================================= */
+
+function openGame(game){
+
+  document.querySelectorAll(".view").forEach(function(v){
+    v.classList.remove("active");
+  });
+
+  const target=document.getElementById(game);
+
+  if(target){
+    target.classList.add("active");
+  }
+
+  if(game==="core"){
+    updateCoreBalance();
+    renderCoreHistory();
+  }
+
+  if(game==="roulette"){
+    updateBalance();
+  }
+
+  if(game==="z11"){
+    syncZ11Balance();
+  }
+
+  window.scrollTo(0,0);
+}
+
+
+function goHome(){
+
+  document.querySelectorAll(".view").forEach(function(v){
+    v.classList.remove("active");
+  });
+
+  document.getElementById("home").classList.add("active");
+
+  updateBalance();
+  updateCoreBalance();
+  syncZ11Balance();
+
+  window.scrollTo(0,0);
+}
+
+
+/* =========================================================
+   GLOBAL BALANCE
+========================================================= */
+
+let balance=0;
+
+const betAmounts=[
+  1,2,3,5,7,10,15,20,25,30,
+  35,40,50,60,80,100,120,130,
+  150,170,200,230,270,300,350,
+  380,400,450,500
+];
+
+let betAmountIndex=0;
+
+
+function updateBalance(){
+
+  const value=Math.floor(Number(balance)||0);
+
+  const home=document.getElementById("homeBalance");
+  const main=document.getElementById("balance");
+
+  if(home){
+    home.textContent=value.toLocaleString("en-IN");
+  }
+
+  if(main){
+    main.textContent=value.toLocaleString("en-IN");
+  }
+
+  updateCoreBalance();
+  syncZ11Balance();
+}
+
+
+function changeBetAmount(dir){
+
+  betAmountIndex+=dir;
+
+  if(betAmountIndex<0){
+    betAmountIndex=0;
+  }
+
+  if(betAmountIndex>=betAmounts.length){
+    betAmountIndex=betAmounts.length-1;
+  }
+
+  const el=document.getElementById("betAmount");
+
+  if(el){
+    el.textContent=betAmounts[betAmountIndex];
+  }
+}
+
+
+/* =========================================================
+   ZYNO CORE VARIABLES
+========================================================= */
+
+let coreBet=1;
+let coreTimer=10;
+let corePlaying=false;
+let coreHistory=[];
+let coreInterval=null;
+
+
+function updateCoreBalance(){
+
+  const value=Math.floor(Number(balance)||0);
+
+  document.querySelectorAll("#coreBalance").forEach(function(el){
+    el.textContent=value.toLocaleString("en-IN");
+  });
+}
+
+
+function coreChangeBet(direction){
+
+  if(corePlaying) return;
+
+  coreBet+=direction;
+
+  if(coreBet<1){
+    coreBet=1;
+  }
+
+  const maxBalance=Math.floor(Number(balance)||0);
+
+  if(coreBet>maxBalance){
+    coreBet=maxBalance;
+  }
+
+  const el=document.getElementById("coreBetAmount");
+
+  if(el){
+    el.textContent=coreBet.toLocaleString("en-IN");
+  }
+}
+
+
+function renderCoreHistory(){
+
+  const box=document.getElementById("coreWins");
+
+  if(!box) return;
+
+  box.innerHTML="";
+
+  coreHistory.slice(0,4).forEach(function(num){
+
+    const item=document.createElement("div");
+
+    item.className="core-win";
+    item.textContent=num;
+
+    box.appendChild(item);
+
+  });
+
+  while(box.children.length<4){
+
+    const item=document.createElement("div");
+
+    item.className="core-win";
+    item.textContent="–";
+
+    box.appendChild(item);
+
+  }
+}
+
+
+function updateCoreControls(){
+
+  const minus=document.getElementById("coreMinus");
+  const plus=document.getElementById("corePlus");
+  const play=document.getElementById("corePlay");
+
+  if(minus){
+    minus.disabled=corePlaying || coreBet<=1;
+  }
+
+  if(plus){
+    plus.disabled=corePlaying ||
+      coreBet>=Math.floor(Number(balance)||0);
+  }
+
+  if(play){
+    play.disabled=corePlaying;
+    play.textContent=corePlaying ? "CORE RUNNING..." : "PLACE BET";
+  }
+}
+
+
+function startCoreGame(){
+
+  if(corePlaying) return;
+
+  const amount=Math.floor(Number(coreBet)||0);
+  const currentBalance=Math.floor(Number(balance)||0);
+
+  if(amount<1){
+    const status=document.getElementById("coreStatus");
+    if(status) status.textContent="MINIMUM BET IS 1";
+    return;
+  }
+
+  if(currentBalance<amount){
+
+    const status=document.getElementById("coreStatus");
+
+    if(status){
+      status.textContent="INSUFFICIENT BALANCE";
+    }
+
+    return;
+  }
+
+  corePlaying=true;
+
+  balance-=amount;
+
+  updateBalance();
+  updateCoreBalance();
+  updateCoreControls();
+
+  const result=document.getElementById("coreResult");
+  const status=document.getElementById("coreStatus");
+  const timer=document.getElementById("coreTimer");
+  const orb=document.getElementById("coreOrb");
+
+  if(result) result.textContent="?";
+
+  if(status){
+    status.textContent="ZYNO CORE ACTIVATING...";
+  }
+
+  if(orb){
+    orb.classList.add("spinning");
+  }
+
+  coreTimer=10;
+
+  if(timer){
+    timer.textContent=coreTimer;
+  }
+
+  if(coreInterval){
+    clearInterval(coreInterval);
+  }
+
+  coreInterval=setInterval(function(){
+
+    coreTimer--;
+
+    if(timer){
+      timer.textContent=coreTimer;
+    }
+
+    if(coreTimer<=0){
+
+      clearInterval(coreInterval);
+      coreInterval=null;
+
+      finishCoreGame(amount);
+
+    }
+
+  },1000);
+
+  if(window.saveUserBalance){
+    window.saveUserBalance();
+  }
+}
+
+
+function finishCoreGame(amount){
+
+  const result=document.getElementById("coreResult");
+  const status=document.getElementById("coreStatus");
+  const orb=document.getElementById("coreOrb");
+
+  const winningNumber=
+    Math.floor(Math.random()*9)+1;
+
+  if(result){
+    result.textContent=winningNumber;
+  }
+
+  if(orb){
+    orb.classList.remove("spinning");
+  }
+
+  coreHistory.unshift(winningNumber);
+
+  if(coreHistory.length>4){
+    coreHistory.length=4;
+  }
+
+  renderCoreHistory();
+
+  if(winningNumber===9){
+
+    const win=amount*9;
+
+    balance+=win;
+
+    if(status){
+      status.textContent="YOU WIN +" + win.toLocaleString("en-IN");
+    }
+
+  }else{
+
+    if(status){
+      status.textContent="RESULT " + winningNumber;
+    }
+
+  }
+
+  updateBalance();
+  updateCoreBalance();
+
+  if(window.saveUserBalance){
+    window.saveUserBalance();
+  }
+
+  setTimeout(function(){
+
+    corePlaying=false;
+
+    coreTimer=10;
+
+    if(document.getElementById("coreTimer")){
+      document.getElementById("coreTimer").textContent="10";
+    }
+
+    if(document.getElementById("coreStatus")){
+      document.getElementById("coreStatus").textContent="READY";
+    }
+
+    updateCoreControls();
+
+  },1500);
+}
+
+
+updateCoreControls();
+renderCoreHistory();
+
+</script>
+<script>
+
+/* =========================================================
+   ZYNO 0–11
+========================================================= */
+
+const z11Numbers = Array.from({length:12},(_,i)=>i);
+
+let z11TimeLeft = 60;
+let z11BettingOpen = true;
+let z11Spinning = false;
+let z11SelectedNumber = null;
+let z11Bets = {};
+let z11LastWins = [];
+
+const Z11_POINT_TIME = 40;
+let z11Pressing = false;
+let z11PressTimer = null;
+let z11PressNumber = null;
+let z11PressStart = 0;
+
+
+function syncZ11Balance(){
+
+  const el=document.getElementById("z11Balance");
+
+  if(el){
+    el.textContent=
+      Math.floor(Number(balance)||0).toLocaleString("en-IN");
+  }
+}
+
+
+function buildZ11Grid(){
+
+  const grid=document.getElementById("z11Grid");
+
+  if(!grid) return;
+
+  grid.innerHTML="";
+
+  z11Numbers.forEach(function(number){
+
+    const btn=document.createElement("button");
+
+    btn.className="z11-number";
+    btn.dataset.number=number;
+    btn.textContent=number;
+
+    btn.addEventListener("pointerdown",function(e){
+      e.preventDefault();
+      startZ11Bet(btn,number);
+    });
+
+    btn.addEventListener("pointerup",function(e){
+      e.preventDefault();
+      stopZ11Bet(btn);
+    });
+
+    btn.addEventListener("pointercancel",function(){
+      stopZ11Bet(btn);
+    });
+
+    btn.addEventListener("pointerleave",function(){
+      if(z11Pressing){
+        stopZ11Bet(btn);
+      }
+    });
+
+    grid.appendChild(btn);
+
+  });
+
+}
+
+
+function startZ11Bet(btn,number){
+
+  if(!z11BettingOpen || z11Spinning) return;
+
+  z11Pressing=true;
+  z11PressNumber=number;
+  z11PressStart=Date.now();
+
+  btn.classList.add("active");
+
+  addZ11Bet(number);
+
+  z11PressTimer=setInterval(function(){
+
+    if(!z11Pressing) return;
+
+    const elapsed=Date.now()-z11PressStart;
+
+    if(elapsed>=Z11_POINT_TIME){
+
+      addZ11Bet(number);
+
+      z11PressStart=Date.now();
+
+    }
+
+  },Z11_POINT_TIME);
+
+}
+
+
+function stopZ11Bet(btn){
+
+  z11Pressing=false;
+
+  if(z11PressTimer!==null){
+
+    clearInterval(z11PressTimer);
+    z11PressTimer=null;
+
+  }
+
+  if(btn){
+    btn.classList.remove("active");
+  }
+
+  z11PressNumber=null;
+  z11PressStart=0;
+
+}
+
+
+function addZ11Bet(number){
+
+  if(!z11BettingOpen || z11Spinning) return;
+
+  const amount=10;
+
+  if(balance<amount){
+
+    const result=document.getElementById("z11Result");
+
+    if(result){
+      result.textContent="LOW BALANCE";
+    }
+
+    return;
+  }
+
+  balance-=amount;
+
+  z11Bets[number]=(z11Bets[number]||0)+amount;
+
+  updateBalance();
+  syncZ11Balance();
+  updateZ11BetCounts();
+
+}
+
+
+function updateZ11BetCounts(){
+
+  document.querySelectorAll(".z11-number").forEach(function(btn){
+
+    const number=Number(btn.dataset.number);
+
+    const old=btn.querySelector(".bet-count");
+
+    if(old){
+      old.remove();
+    }
+
+    if(z11Bets[number]){
+
+      const count=document.createElement("div");
+
+      count.className="bet-count";
+      count.textContent=z11Bets[number];
+
+      btn.appendChild(count);
+
+    }
+
+  });
+
+}
+
+
+function renderZ11Last(){
+
+  const box=document.getElementById("z11Last");
+
+  if(!box) return;
+
+  box.innerHTML="";
+
+  z11LastWins.slice(0,4).forEach(function(number){
+
+    const item=document.createElement("div");
+
+    item.className="last-number";
+
+    if(number===0){
+      item.classList.add("zero");
+    }else if([1,3,5,7,9,11].includes(number)){
+      item.classList.add("red");
+    }else{
+      item.classList.add("black");
+    }
+
+    item.textContent=number;
+
+    box.appendChild(item);
+
+  });
+
+}
+
+
+function finishZ11(){
+
+  if(z11Spinning) return;
+
+  z11Spinning=true;
+  z11BettingOpen=false;
+
+  stopZ11AllBetting();
+
+  const result=Math.floor(Math.random()*12);
+
+  const resultEl=document.getElementById("z11Result");
+
+  if(resultEl){
+    resultEl.textContent=result;
+  }
+
+  const winningBet=z11Bets[result]||0;
+
+  if(winningBet>0){
+
+    const win=winningBet*10;
+
+    balance+=win;
+
+    if(resultEl){
+      resultEl.textContent=
+        result+"  +" + win.toLocaleString("en-IN");
+    }
+
+  }
+
+  z11LastWins.unshift(result);
+
+  if(z11LastWins.length>4){
+    z11LastWins.length=4;
+  }
+
+  renderZ11Last();
+
+  updateBalance();
+  syncZ11Balance();
+
+  if(window.saveUserBalance){
+    window.saveUserBalance();
+  }
+
+  setTimeout(function(){
+
+    z11Bets={};
+    z11SelectedNumber=null;
+    z11Spinning=false;
+    z11BettingOpen=true;
+    z11TimeLeft=60;
+
+    const timer=document.getElementById("z11Timer");
+
+    if(timer){
+      timer.textContent="60";
+    }
+
+    if(resultEl){
+      resultEl.textContent="BET NOW";
+    }
+
+    updateZ11BetCounts();
+
+  },2500);
+
+}
+
+
+function stopZ11AllBetting(){
+
+  z11Pressing=false;
+
+  if(z11PressTimer!==null){
+
+    clearInterval(z11PressTimer);
+    z11PressTimer=null;
+
+  }
+
+  document.querySelectorAll(".z11-number").forEach(function(btn){
+    btn.classList.remove("active");
+  });
+
+}
+
+
+const z11TimerInterval=setInterval(function(){
+
+  const view=document.getElementById("z11");
+
+  if(!view || !view.classList.contains("active")) return;
+
+  if(!z11BettingOpen || z11Spinning) return;
+
+  z11TimeLeft--;
+
+  const timer=document.getElementById("z11Timer");
+
+  if(timer){
+    timer.textContent=z11TimeLeft;
+  }
+
+  if(z11TimeLeft<=0){
+
+    z11TimeLeft=60;
+
+    finishZ11();
+
+  }
+
+},1000);
+
+
+/* =========================================================
+   ROULETTE 0–36
+========================================================= */
+
+const wheel=document.getElementById("wheel");
+const grid=document.getElementById("grid");
+const timerEl=document.getElementById("timer");
+const balanceEl=document.getElementById("balance");
+const resultEl=document.getElementById("result");
+const selectedEl=document.getElementById("selected");
+const lastWinsEl=document.getElementById("lastWins");
+const centerLogo=document.getElementById("centerLogo");
+
+let timeLeft=60;
+let bettingOpen=true;
+let spinning=false;
+let selectedNumber=null;
+
+let bets={};
+let lastWins=[];
+
+let currentPressing=false;
+let currentPressTimer=null;
+let currentPress=null;
+let currentPressNumber=null;
+let currentPressStart=0;
+let currentPressPoints=0;
+
+const POINT_TIME=40;
+
+
+/* Roulette wheel order */
+
+const wheelNumbers=[
+  0,32,15,19,4,21,2,25,17,34,
+  6,27,13,36,11,30,8,23,10,5,
+  24,16,33,1,20,14,31,9,22,18,
+  29,7,28,12,35,3,26
+];
+
+
+/* Red numbers */
+
+const rouletteRedNumbers=[
+  1,3,5,7,9,12,14,16,18,
+  19,21,23,25,27,30,32,34,36
+];
+
+
+function isRouletteRed(number){
+  return rouletteRedNumbers.includes(number);
+}
+
+
+function buildRouletteWheel(){
+
+  if(!wheel) return;
+
+  wheel.innerHTML="";
+
+  const total=wheelNumbers.length;
+
+  wheelNumbers.forEach(function(number,index){
+
+    const el=document.createElement("div");
+
+    el.className="number";
+
+    if(number===0){
+      el.classList.add("zero");
+    }else if(isRouletteRed(number)){
+      el.classList.add("red");
+    
