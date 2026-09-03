@@ -43,8 +43,16 @@ button{
   cursor:pointer;
 }
 
-.view{display:none}
-.view.active{display:block}
+.view{
+  display:none;
+}
+
+.view.active{
+  display:block;
+  position:relative;
+  z-index:100;
+  pointer-events:auto;
+}
 
 /* NO COPY / NO SELECT ON BETTING NUMBERS */
 .bet-number,
