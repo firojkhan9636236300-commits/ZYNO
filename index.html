@@ -3882,35 +3882,52 @@ window.zynoUserLogin = async function(){
 
     window.scrollTo(0,0);
 
-  }catch(error){
+  } catch(error){
 
-    console.error(
-      "ZYNO USER LOGIN ERROR:",
-      error
-    );
+  console.error(
+    "ZYNO USER LOGIN ERROR:",
+    error
+  );
 
-    if(error.code === "auth/invalid-credential"){
+  const errorCode =
+    error?.code || "";
 
-      message.textContent =
-        "Email ya Password galat hai";
+  const errorMessage =
+    error?.message || "";
 
-    }else if(error.code === "auth/user-not-found"){
+  if(errorCode === "auth/invalid-credential"){
 
-      message.textContent =
-        "User account nahi mila";
+    message.textContent =
+      "Email ya Password galat hai";
 
-    }else if(error.code === "auth/wrong-password"){
+  }else if(errorCode === "auth/user-not-found"){
 
-      message.textContent =
-        "Password galat hai";
+    message.textContent =
+      "User account nahi mila";
 
-    }else{
+  }else if(errorCode === "auth/wrong-password"){
 
-      message.textContent =
-        "Login error: "+error.code;
-    }
+    message.textContent =
+      "Password galat hai";
+
+  }else if(errorCode === "auth/invalid-email"){
+
+    message.textContent =
+      "Email format galat hai";
+
+  }else if(errorCode === "auth/too-many-requests"){
+
+    message.textContent =
+      "Bahut baar login try hua hai, thodi der baad try karo";
+
+  }else{
+
+    message.textContent =
+      errorCode
+      ? "Login error: "+errorCode
+      : "Login error: "+(errorMessage || "Unknown error");
   }
-};
+}
 /* =========================
    USER REGISTER
 ========================= */
