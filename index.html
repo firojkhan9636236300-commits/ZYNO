@@ -2895,12 +2895,10 @@ setInterval(()=>{
     timeLeft--;
 
     timerEl.textContent=timeLeft;
-    
+  if(window.zynoUserLoggedIn){
     playTick();
-    
-    saveRouletteState();
   }
-
+  
   if(
     timeLeft<=4 &&
     timeLeft>0 &&
