@@ -2423,12 +2423,48 @@ function startBet(number,btn){
         Math.floor(balance)
       );
 
-    if(newPoints>0){
+    if(newPoints > 0){
 
-      addBet(number,newPoints);
+  const beforeBet =
+    Number(bets[number]) || 0;
 
-      currentPressPoints+=newPoints;
-    }
+  const MAX_BET_PER_NUMBER = 5500;
+
+  const remaining =
+    MAX_BET_PER_NUMBER - beforeBet;
+
+  if(remaining <= 0){
+    resultEl.textContent =
+      "Is number par maximum 5500 points bet ho chuke hain";
+
+    stopBet(btn);
+    return;
+  }
+
+  const actualPoints =
+    Math.min(
+      newPoints,
+      remaining,
+      Math.floor(balance)
+    );
+
+  if(actualPoints > 0){
+
+    addBet(number, actualPoints);
+
+    currentPressPoints += actualPoints;
+  }
+
+  if(
+    (Number(bets[number]) || 0) >=
+    MAX_BET_PER_NUMBER
+  ){
+    resultEl.textContent =
+      "Is number par maximum 5500 points bet ho chuke hain";
+
+    stopBet(btn);
+  }
+}
 
   },5);
 }
