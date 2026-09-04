@@ -755,6 +755,31 @@ button{
     font-size:14px;
   }
 }
+/* ZYNO BUTTON TOUCH FIX */
+
+#userRegister,
+#userLogin,
+#adminLogin{
+  position:relative;
+  z-index:1000;
+}
+
+#userRegister button,
+#userLogin button,
+#adminLogin button{
+  position:relative;
+  z-index:1001;
+  pointer-events:auto !important;
+  touch-action:manipulation;
+}
+
+#userRegister input,
+#userLogin input,
+#adminLogin input{
+  position:relative;
+  z-index:1001;
+  pointer-events:auto !important;
+}
 </style>
 </head>
 
