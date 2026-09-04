@@ -2513,8 +2513,13 @@ function stopBet(btn){
   currentPressPoints=0;
   
   window.updateBalance();
-  
+
+if(typeof window.saveUserBalance === "function"){
+
   window.saveUserBalance();
+
+}
+
 }
 
 
