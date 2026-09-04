@@ -3877,51 +3877,59 @@ window.zynoUserLogin = async function(){
 
     window.scrollTo(0,0);
 
-  } catch(error){
+    }catch(error){
 
-  console.error(
-    "ZYNO USER LOGIN ERROR:",
-    error
-  );
+    console.error(
+      "ZYNO USER LOGIN ERROR:",
+      error
+    );
 
-  const errorCode =
-    error?.code || "";
+    const errorCode =
+      error?.code || "";
 
-  const errorMessage =
-    error?.message || "";
+    const errorMessage =
+      error?.message || "";
 
-  if(errorCode === "auth/invalid-credential"){
+    if(errorCode === "auth/invalid-credential"){
 
-    message.textContent =
-      "Email ya Password galat hai";
+      message.textContent =
+        "Email ya Password galat hai";
 
-  }else if(errorCode === "auth/user-not-found"){
+    }else if(errorCode === "auth/user-not-found"){
 
-    message.textContent =
-      "User account nahi mila";
+      message.textContent =
+        "User account nahi mila";
 
-  }else if(errorCode === "auth/wrong-password"){
+    }else if(errorCode === "auth/wrong-password"){
 
-    message.textContent =
-      "Password galat hai";
+      message.textContent =
+        "Password galat hai";
 
-  }else if(errorCode === "auth/invalid-email"){
+    }else if(errorCode === "auth/invalid-email"){
 
-    message.textContent =
-      "Email format galat hai";
+      message.textContent =
+        "Email format galat hai";
 
-  }else if(errorCode === "auth/too-many-requests"){
+    }else if(errorCode === "auth/too-many-requests"){
 
-    message.textContent =
-      "Bahut baar login try hua hai, thodi der baad try karo";
+      message.textContent =
+        "Bahut baar login try hua hai, thodi der baad try karo";
 
-  }else{
+    }else{
 
-    message.textContent =
-  "Login error: " +
-  String(error?.code || error?.message || error || "Unknown error");
+      message.textContent =
+        "Login error: " +
+        String(
+          error?.code ||
+          error?.message ||
+          error ||
+          "Unknown error"
+        );
+    }
+
   }
-}
+
+};
 /* =========================
    USER REGISTER
 ========================= */
