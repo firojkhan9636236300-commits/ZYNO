@@ -1761,7 +1761,7 @@ function changeBetAmount(direction){
 let betAmountIndex = 0;
 const homeBalance=document.getElementById("homeBalance");
 
-function updateBalance(){
+window.updateBalance = function(){
 
   const value = Math.floor(Number(balance) || 0);
 
