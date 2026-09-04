@@ -1691,8 +1691,13 @@ function goHome(){
 
   home.classList.add("active");
 
-  syncZ11Balance();
-  updateBalance();
+  if(typeof window.updateBalance === "function"){
+  window.updateBalance();
+}
+
+if(typeof window.syncZ11Balance === "function"){
+  window.syncZ11Balance();
+}
 
   window.scrollTo(0,0);
 }
