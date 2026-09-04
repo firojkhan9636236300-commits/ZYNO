@@ -2901,47 +2901,70 @@ function stopSpinSound(){
   }catch(e){}
 
 }
-/* ROULETTE TIMER */
+/* =========================
+
+   ROULETTE TIMER
+
+========================= */
 
 setInterval(()=>{
 
-  if(spinning)return;
+  if(spinning){
 
-  if(timeLeft>0){
+    return;
+
+  }
+
+  if(timeLeft > 0){
 
     timeLeft--;
 
-    timerEl.textContent=timeLeft;
-  if(window.zynoUserLoggedIn){
-    playTick();
-  }
-  
-  if(
-    timeLeft<=4 &&
-    timeLeft>0 &&
-    bettingOpen
-  ){
+    timerEl.textContent = timeLeft;
 
-    bettingOpen=false;
+    if(window.zynoUserLoggedIn){
 
-    timerEl.classList.add("closed");
+      playTick();
 
-    stopAllBetting();
+    }
 
-    resultEl.textContent=
-      "Betting closed";
-  }
+    if(
 
-  if(
-    timeLeft<=0 &&
-    !spinning
-  ){
+      timeLeft <= 4 &&
 
-    timeLeft=0;
+      timeLeft > 0 &&
 
-    timerEl.textContent="0";
+      bettingOpen
 
-    spinWheel();
+    ){
+
+      bettingOpen = false;
+
+      timerEl.classList.add("closed");
+
+      stopAllBetting();
+
+      resultEl.textContent =
+
+        "Betting closed";
+
+    }
+
+    if(
+
+      timeLeft <= 0 &&
+
+      !spinning
+
+    ){
+
+      timeLeft = 0;
+
+      timerEl.textContent = "0";
+
+      spinWheel();
+
+    }
+
   }
 
 },1000);
