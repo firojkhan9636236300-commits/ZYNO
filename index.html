@@ -1766,38 +1766,55 @@ function changeBetAmount(direction){
 let betAmountIndex = 0;
 const homeBalance=document.getElementById("homeBalance");
 
-window.updateBalance = function(){
+function updateBalance(){
 
   const value = Math.floor(Number(balance) || 0);
 
   const balanceEl =
+
     document.getElementById("balance");
 
   const homeBalanceEl =
+
     document.getElementById("homeBalance");
 
   const z1 =
+
     document.getElementById("z11Balance");
 
   const z2 =
+
     document.getElementById("z11Balance2");
 
   if(balanceEl){
+
     balanceEl.textContent = value;
+
   }
 
   if(homeBalanceEl){
+
     homeBalanceEl.textContent = value;
+
   }
 
   if(z1){
+
     z1.textContent = value;
+
   }
 
   if(z2){
+
     z2.textContent = value;
+
   }
+
 }
+
+/* Safari / global access */
+
+window.updateBalance = updateBalance;
 
 /* =========================
    ZYNO 0–11
