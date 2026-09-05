@@ -4485,11 +4485,6 @@ if (
 
 }
 
-/* =========================
-
-   END PART 2 A
-
-========================= */
 <!-- =========================
 
      PART 2 B
@@ -4554,15 +4549,25 @@ const firebaseConfig = {
 
   apiKey: "YOUR_API_KEY",
 
-  authDomain: "zyno-dc777.firebaseapp.com",
+  authDomain:
 
-  projectId: "zyno-dc777",
+    "zyno-dc777.firebaseapp.com",
 
-  storageBucket: "zyno-dc777.firebasestorage.app",
+  projectId:
 
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    "zyno-dc777",
 
-  appId: "YOUR_APP_ID"
+  storageBucket:
+
+    "zyno-dc777.firebasestorage.app",
+
+  messagingSenderId:
+
+    "YOUR_MESSAGING_SENDER_ID",
+
+  appId:
+
+    "YOUR_APP_ID"
 
 };
 
@@ -4572,11 +4577,145 @@ const firebaseConfig = {
 
 ========================= */
 
-const app = initializeApp(firebaseConfig);
+const app =
 
-const auth = getAuth(app);
+  initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
+const auth =
+
+  getAuth(app);
+
+const db =
+
+  getFirestore(app);
+
+/* =========================
+
+   PAGE NAVIGATION
+
+========================= */
+
+window.openHome = function(){
+
+  document
+
+    .querySelectorAll(".view")
+
+    .forEach(v =>
+
+      v.classList.remove("active")
+
+    );
+
+  const home =
+
+    document.getElementById("home");
+
+  if(home){
+
+    home.classList.add("active");
+
+  }
+
+  if(typeof window.updateBalance === "function"){
+
+    window.updateBalance();
+
+  }
+
+  if(typeof window.syncZ11Balance === "function"){
+
+    window.syncZ11Balance();
+
+  }
+
+  window.scrollTo(0,0);
+
+};
+
+window.openUserLogin = function(){
+
+  document
+
+    .querySelectorAll(".view")
+
+    .forEach(v =>
+
+      v.classList.remove("active")
+
+    );
+
+  const login =
+
+    document.getElementById("userLogin");
+
+  if(login){
+
+    login.classList.add("active");
+
+  }
+
+  window.scrollTo(0,0);
+
+};
+
+window.openUserRegister = function(){
+
+  document
+
+    .querySelectorAll(".view")
+
+    .forEach(v =>
+
+      v.classList.remove("active")
+
+    );
+
+  const register =
+
+    document.getElementById("userRegister");
+
+  if(register){
+
+    register.classList.add("active");
+
+  }
+
+  window.scrollTo(0,0);
+
+};
+
+window.openAdminPanel = function(){
+
+  document
+
+    .querySelectorAll(".view")
+
+    .forEach(v =>
+
+      v.classList.remove("active")
+
+    );
+
+  const panel =
+
+    document.getElementById("adminPanel");
+
+  if(panel){
+
+    panel.classList.add("active");
+
+  }
+
+  if(typeof window.loadAdminUsers === "function"){
+
+    window.loadAdminUsers();
+
+  }
+
+  window.scrollTo(0,0);
+
+};
 
 /* =========================
 
@@ -4586,17 +4725,15 @@ const db = getFirestore(app);
 
 function safeUpdateBalance(){
 
-  if(typeof window.updateBalance === "function"){
+  if(
+
+    typeof window.updateBalance ===
+
+    "function"
+
+  ){
 
     window.updateBalance();
-
-    return;
-
-  }
-
-  if(typeof updateBalance === "function"){
-
-    updateBalance();
 
     return;
 
@@ -4610,7 +4747,9 @@ function safeUpdateBalance(){
 
     balanceEl.textContent =
 
-      Number(balance || 0).toLocaleString();
+      Number(window.balance || 0)
+
+        .toLocaleString();
 
   }
 
@@ -4622,15 +4761,29 @@ function safeUpdateBalance(){
 
 ========================= */
 
-window.saveUserBalance = async function(){
+window.saveUserBalance =
+
+async function(){
 
   try{
 
-    const user = auth.currentUser;
+    const user =
+
+      auth.currentUser;
 
     const savedBalance =
 
-      Math.max(0, Math.floor(Number(balance || 0)));
+      Math.max(
+
+        0,
+
+        Math.floor(
+
+          Number(window.balance || 0)
+
+        )
+
+      );
 
     localStorage.setItem(
 
@@ -4650,11 +4803,21 @@ window.saveUserBalance = async function(){
 
     await setDoc(
 
-      doc(db, "users", user.uid),
+      doc(
+
+        db,
+
+        "users",
+
+        user.uid
+
+      ),
 
       {
 
-        points: savedBalance
+        points:
+
+          savedBalance
 
       },
 
@@ -4666,7 +4829,9 @@ window.saveUserBalance = async function(){
 
     );
 
-    balance = savedBalance;
+    window.balance =
+
+      savedBalance;
 
     safeUpdateBalance();
 
@@ -4698,7 +4863,13 @@ async function(list){
 
   try{
 
-    if(!Array.isArray(list) || !list.length){
+    if(
+
+      !Array.isArray(list) ||
+
+      !list.length
+
+    ){
 
       return;
 
@@ -4706,7 +4877,15 @@ async function(list){
 
     const gameRef =
 
-      doc(db, "gameState", "roulette");
+      doc(
+
+        db,
+
+        "gameState",
+
+        "roulette"
+
+      );
 
     const newWinner =
 
@@ -4720,27 +4899,45 @@ async function(list){
 
         const snap =
 
-          await transaction.get(gameRef);
+          await transaction.get(
+
+            gameRef
+
+          );
 
         let shared = [];
 
         if(snap.exists()){
 
-          const data = snap.data();
+          const data =
 
-          if(Array.isArray(data.lastWins)){
+            snap.data();
+
+          if(
+
+            Array.isArray(
+
+              data.lastWins
+
+            )
+
+          ){
 
             shared =
 
               data.lastWins
 
-              .map(Number)
+                .map(Number)
 
-              .filter(
+                .filter(
 
-                n => n >= 0 && n <= 36
+                  n =>
 
-              );
+                    n >= 0 &&
+
+                    n <= 36
+
+                );
 
           }
 
@@ -4750,11 +4947,17 @@ async function(list){
 
           shared.filter(
 
-            n => n !== newWinner
+            n =>
+
+              n !== newWinner
 
           );
 
-        shared.unshift(newWinner);
+        shared.unshift(
+
+          newWinner
+
+        );
 
         shared =
 
@@ -4766,9 +4969,13 @@ async function(list){
 
           {
 
-            lastWins: shared,
+            lastWins:
 
-            updatedAt: Date.now()
+              shared,
+
+            updatedAt:
+
+              Date.now()
 
           },
 
@@ -4810,7 +5017,15 @@ try{
 
   const gameRef =
 
-    doc(db, "gameState", "roulette");
+    doc(
+
+      db,
+
+      "gameState",
+
+      "roulette"
+
+    );
 
   onSnapshot(
 
@@ -4830,39 +5045,61 @@ try{
 
       if(
 
-        Array.isArray(data.lastWins)
-
-      ){
-
-        lastWins =
+        Array.isArray(
 
           data.lastWins
 
-          .map(Number)
+        )
 
-          .filter(
+      ){
 
-            n => n >= 0 && n <= 36
+        /*
 
-          )
+          IMPORTANT:
 
-          .slice(0,4);
+          Part 2 A ka lastWins
+
+          module ke andar directly
+
+          access nahi karenge.
+
+        */
 
         localStorage.setItem(
 
           "zynoLastWins",
 
-          JSON.stringify(lastWins)
+          JSON.stringify(
+
+            data.lastWins
+
+              .map(Number)
+
+              .filter(
+
+                n =>
+
+                  n >= 0 &&
+
+                  n <= 36
+
+              )
+
+              .slice(0,4)
+
+          )
 
         );
 
         if(
 
-          typeof renderLastWins === "function"
+          typeof window.renderLastWins ===
+
+          "function"
 
         ){
 
-          renderLastWins();
+          window.renderLastWins();
 
         }
 
@@ -4910,29 +5147,61 @@ async function(){
 
   try{
 
+    /*
+
+      FIX:
+
+      HTML IDs are:
+
+      userLoginEmail
+
+      userLoginPassword
+
+    */
+
     const email =
 
       document
 
-      .getElementById("loginEmail")
+        .getElementById(
 
-      ?.value
+          "userLoginEmail"
 
-      .trim();
+        )
+
+        ?.value
+
+        .trim();
 
     const password =
 
       document
 
-      .getElementById("loginPassword")
+        .getElementById(
 
-      ?.value;
+          "userLoginPassword"
 
-    if(!email || !password){
+        )
+
+        ?.value;
+
+    if(!email){
 
       alert(
 
-        "Email aur password enter karein."
+        "Email enter karein."
+
+      );
+
+      return;
+
+    }
+
+    if(!password){
+
+      alert(
+
+        "Password enter karein."
 
       );
 
@@ -4958,11 +5227,23 @@ async function(){
 
     const userRef =
 
-      doc(db, "users", user.uid);
+      doc(
+
+        db,
+
+        "users",
+
+        user.uid
+
+      );
 
     const userSnap =
 
-      await getDoc(userRef);
+      await getDoc(
+
+        userRef
+
+      );
 
     if(!userSnap.exists()){
 
@@ -4996,13 +5277,17 @@ async function(){
 
     }
 
-    balance =
+    window.balance =
 
       Math.max(
 
         0,
 
-        Number(data.points || 0)
+        Number(
+
+          data.points || 0
+
+        )
 
       );
 
@@ -5010,7 +5295,11 @@ async function(){
 
       "zynoBalance",
 
-      String(balance)
+      String(
+
+        window.balance
+
+      )
 
     );
 
@@ -5018,27 +5307,23 @@ async function(){
 
     if(
 
-      typeof syncZ11Balance ===
+      typeof window.syncZ11Balance ===
 
       "function"
 
     ){
 
-      syncZ11Balance();
+      window.syncZ11Balance();
 
     }
 
-    if(
+    alert(
 
-      typeof window.openHome ===
+      "Login successful."
 
-      "function"
+    );
 
-    ){
-
-      window.openHome();
-
-    }
+    window.openHome();
 
   }
 
@@ -5056,7 +5341,13 @@ async function(){
 
       "Login error: " +
 
-      (error.message || error)
+      (
+
+        error.message ||
+
+        error
+
+      )
 
     );
 
@@ -5080,33 +5371,49 @@ async function(){
 
       document
 
-      .getElementById("registerUsername")
+        .getElementById(
 
-      ?.value
+          "registerUsername"
 
-      .trim();
+        )
+
+        ?.value
+
+        .trim();
 
     const email =
 
       document
 
-      .getElementById("registerEmail")
+        .getElementById(
 
-      ?.value
+          "registerEmail"
 
-      .trim();
+        )
+
+        ?.value
+
+        .trim();
 
     const password =
 
       document
 
-      .getElementById("registerPassword")
+        .getElementById(
 
-      ?.value;
+          "registerPassword"
+
+        )
+
+        ?.value;
 
     if(!username){
 
-      alert("Username enter karein.");
+      alert(
+
+        "Username enter karein."
+
+      );
 
       return;
 
@@ -5114,13 +5421,23 @@ async function(){
 
     if(!email){
 
-      alert("Email enter karein.");
+      alert(
+
+        "Email enter karein."
+
+      );
 
       return;
 
     }
 
-    if(!password || password.length < 6){
+    if(
+
+      !password ||
+
+      password.length < 6
+
+    ){
 
       alert(
 
@@ -5150,29 +5467,53 @@ async function(){
 
     await setDoc(
 
-      doc(db, "users", user.uid),
+      doc(
+
+        db,
+
+        "users",
+
+        user.uid
+
+      ),
 
       {
 
-        uid: user.uid,
+        uid:
 
-        username: username,
+          user.uid,
 
-        email: email,
+        username:
 
-        role: "user",
+          username,
 
-        points: 0,
+        email:
 
-        approved: true,
+          email,
 
-        createdAt: Date.now()
+        role:
+
+          "user",
+
+        points:
+
+          0,
+
+        approved:
+
+          true,
+
+        createdAt:
+
+          Date.now()
 
       }
 
     );
 
-    balance = 0;
+    window.balance =
+
+      0;
 
     localStorage.setItem(
 
@@ -5190,17 +5531,7 @@ async function(){
 
     );
 
-    if(
-
-      typeof window.openHome ===
-
-      "function"
-
-    ){
-
-      window.openHome();
-
-    }
+    window.openHome();
 
   }
 
@@ -5218,7 +5549,13 @@ async function(){
 
       "Register error: " +
 
-      (error.message || error)
+      (
+
+        error.message ||
+
+        error
+
+      )
 
     );
 
@@ -5242,19 +5579,27 @@ async function(){
 
       document
 
-      .getElementById("adminEmail")
+        .getElementById(
 
-      ?.value
+          "adminEmail"
 
-      .trim();
+        )
+
+        ?.value
+
+        .trim();
 
     const password =
 
       document
 
-      .getElementById("adminPassword")
+        .getElementById(
 
-      ?.value;
+          "adminPassword"
+
+        )
+
+        ?.value;
 
     if(!email || !password){
 
@@ -5286,11 +5631,23 @@ async function(){
 
     const adminRef =
 
-      doc(db, "users", "admin");
+      doc(
+
+        db,
+
+        "users",
+
+        "admin"
+
+      );
 
     const adminSnap =
 
-      await getDoc(adminRef);
+      await getDoc(
+
+        adminRef
+
+      );
 
     if(!adminSnap.exists()){
 
@@ -5332,13 +5689,17 @@ async function(){
 
     }
 
-    balance =
+    window.balance =
 
       Math.max(
 
         0,
 
-        Number(admin.points || 0)
+        Number(
+
+          admin.points || 0
+
+        )
 
       );
 
@@ -5346,23 +5707,17 @@ async function(){
 
       "zynoBalance",
 
-      String(balance)
+      String(
+
+        window.balance
+
+      )
 
     );
 
     safeUpdateBalance();
 
-    if(
-
-      typeof window.openAdminPanel ===
-
-      "function"
-
-    ){
-
-      window.openAdminPanel();
-
-    }
+    window.openAdminPanel();
 
   }
 
@@ -5380,7 +5735,13 @@ async function(){
 
       "Admin login error: " +
 
-      (error.message || error)
+      (
+
+        error.message ||
+
+        error
+
+      )
 
     );
 
@@ -5408,17 +5769,7 @@ async function(){
 
     );
 
-    if(
-
-      typeof window.openUserLogin ===
-
-      "function"
-
-    ){
-
-      window.openUserLogin();
-
-    }
+    window.openUserLogin();
 
   }
 
@@ -5433,6 +5784,22 @@ async function(){
     );
 
   }
+
+};
+
+/* =========================
+
+   ADMIN LOGOUT
+
+   HTML mein ye naam hai
+
+========================= */
+
+window.zynoAdminLogout =
+
+async function(){
+
+  await window.zynoLogout();
 
 };
 
@@ -5460,19 +5827,31 @@ onAuthStateChanged(
 
       }
 
-      /* -------------------------
+      /* =====================
 
          CHECK ADMIN
 
-      ------------------------- */
+      ===================== */
 
       const adminRef =
 
-        doc(db, "users", "admin");
+        doc(
+
+          db,
+
+          "users",
+
+          "admin"
+
+        );
 
       const adminSnap =
 
-        await getDoc(adminRef);
+        await getDoc(
+
+          adminRef
+
+        );
 
       if(adminSnap.exists()){
 
@@ -5490,13 +5869,17 @@ onAuthStateChanged(
 
         ){
 
-          balance =
+          window.balance =
 
             Math.max(
 
               0,
 
-              Number(admin.points || 0)
+              Number(
+
+                admin.points || 0
+
+              )
 
             );
 
@@ -5504,7 +5887,11 @@ onAuthStateChanged(
 
             "zynoBalance",
 
-            String(balance)
+            String(
+
+              window.balance
+
+            )
 
           );
 
@@ -5516,19 +5903,31 @@ onAuthStateChanged(
 
       }
 
-      /* -------------------------
+      /* =====================
 
          NORMAL USER
 
-      ------------------------- */
+      ===================== */
 
       const userRef =
 
-        doc(db, "users", user.uid);
+        doc(
+
+          db,
+
+          "users",
+
+          user.uid
+
+        );
 
       const userSnap =
 
-        await getDoc(userRef);
+        await getDoc(
+
+          userRef
+
+        );
 
       if(!userSnap.exists()){
 
@@ -5550,13 +5949,17 @@ onAuthStateChanged(
 
       }
 
-      balance =
+      window.balance =
 
         Math.max(
 
           0,
 
-          Number(data.points || 0)
+          Number(
+
+            data.points || 0
+
+          )
 
         );
 
@@ -5564,7 +5967,11 @@ onAuthStateChanged(
 
         "zynoBalance",
 
-        String(balance)
+        String(
+
+          window.balance
+
+        )
 
       );
 
@@ -5572,13 +5979,13 @@ onAuthStateChanged(
 
       if(
 
-        typeof syncZ11Balance ===
+        typeof window.syncZ11Balance ===
 
         "function"
 
       ){
 
-        syncZ11Balance();
+        window.syncZ11Balance();
 
       }
 
@@ -5616,15 +6023,31 @@ async function(){
 
       await getDocs(
 
-        collection(db,"users")
+        collection(
+
+          db,
+
+          "users"
+
+        )
 
       );
+
+    /*
+
+      FIX:
+
+      HTML mein ID:
+
+      adminUsersList
+
+    */
 
     const container =
 
       document.getElementById(
 
-        "adminUsers"
+        "adminUsersList"
 
       );
 
@@ -5634,7 +6057,9 @@ async function(){
 
     }
 
-    container.innerHTML = "";
+    container.innerHTML =
+
+      "";
 
     usersSnap.forEach(
 
@@ -5656,7 +6081,11 @@ async function(){
 
         const row =
 
-          document.createElement("div");
+          document.createElement(
+
+            "div"
+
+          );
 
         row.className =
 
@@ -5686,7 +6115,11 @@ async function(){
 
               Points:
 
-              ${Number(data.points || 0).toLocaleString()}
+              ${Number(
+
+                data.points || 0
+
+              ).toLocaleString()}
 
             </span>
 
@@ -5704,7 +6137,11 @@ async function(){
 
         `;
 
-        container.appendChild(row);
+        container.appendChild(
+
+          row
+
+        );
 
       }
 
@@ -5780,11 +6217,23 @@ async function(uid){
 
     const userRef =
 
-      doc(db, "users", uid);
+      doc(
+
+        db,
+
+        "users",
+
+        uid
+
+      );
 
     const userSnap =
 
-      await getDoc(userRef);
+      await getDoc(
+
+        userRef
+
+      );
 
     if(!userSnap.exists()){
 
@@ -5856,7 +6305,13 @@ async function(uid){
 
       "Points update error: " +
 
-      (error.message || error)
+      (
+
+        error.message ||
+
+        error
+
+      )
 
     );
 
