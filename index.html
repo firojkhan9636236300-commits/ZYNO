@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#030913">
+<title>ZYNO — Games</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#030913;--panel:#071426;--panel2:#0b1d34;--blue:#00e5ff;--gold:#ffd34e;--red:#e53945;--green:#16c784;--muted:#7890aa}
+html,body{min-height:100%;background:radial-gradient(circle at 50% -10%,#12345a 0,#061120 35%,#02070e 75%);color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{overflow-x:hidden}.app{width:min(100%,560px);min-height:100vh;margin:auto;padding:max(10px,env(safe-area-inset-top)) 10px max(28px,env(safe-area-inset-bottom))}
+button{font:inherit;border:0;cursor:pointer;color:#fff}.hidden{display:none!important}
+.header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.brand{font-weight:1000;letter-spacing:3px;font-size:25px;color:var(--blue);text-shadow:0 0 12px rgba(0,229,255,.65)}
+.balance{padding:8px 11px;border:1px solid rgba(255,211,78,.35);border-radius:12px;background:rgba(5,17,31,.86);text-align:right}.balance small{display:block;color:var(--muted);font-size:7px;letter-spacing:1px}.balance strong{color:var(--gold);font-size:14px}
+.view{display:none}.view.active{display:block}.home-title{text-align:center;padding:8px 0 12px}.home-title h1{font-size:28px;letter-spacing:2px}.home-title p{color:var(--muted);font-size:10px;margin-top:4px}
+.cards{display:grid;gap:10px}.game-card{width:100%;min-height:125px;text-align:left;border-radius:18px;padding:15px;border:1px solid rgba(0,229,255,.25);background:linear-gradient(145deg,#0d2846,#05101e);box-shadow:inset 0 0 22px rgba(0,0,0,.45),0 7px 20px rgba(0,0,0,.25);position:relative;overflow:hidden}.game-card:active{transform:scale(.985)}
+.game-card.gold{border-color:rgba(255,211,78,.4)}.game-card.purple{border-color:rgba(166,104,255,.42)}.game-icon{font-size:36px}.game-card h2{margin-top:5px;font-size:18px}.game-card p{color:var(--muted);font-size:10px;margin-top:3px}.play{position:absolute;right:14px;bottom:13px;padding:8px 13px;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);font-size:10px;font-weight:1000;box-shadow:0 0 12px rgba(0,229,255,.18)}
+.game-head{display:flex;align-items:center;justify-content:space-between;margin:3px 0 7px}.back{padding:8px 11px;border-radius:10px;background:#071525;border:1px solid rgba(0,229,255,.2);font-size:10px}.game-name{font-weight:1000;letter-spacing:1px;color:var(--gold);font-size:15px}.rule{color:var(--muted);font-size:8px;text-align:center;margin-bottom:5px}
+.info{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:5px;margin:6px 0}.ibox{padding:7px;border-radius:10px;background:rgba(5,17,31,.82);border:1px solid rgba(0,229,255,.16)}.ibox small{display:block;color:var(--muted);font-size:7px;letter-spacing:1px}.ibox strong{display:block;margin-top:2px;font-size:14px}.timer{font-size:22px!important;color:var(--gold)}.timer.closed{color:var(--red)}.last{display:flex;gap:3px;margin-top:3px}.last span{width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:1000;border:1px solid rgba(255,255,255,.2)}
+/* premium roulette */
+.wheel-area{display:flex;justify-content:center;position:relative;padding:5px 0 9px}.wheel-wrap{width:min(78vw,300px);height:min(78vw,300px);min-width:235px;min-height:235px;border-radius:50%;padding:9px;background:radial-gradient(circle,#d5ae42 0 5%,#171c22 5.5% 8%,#d8b34c 8.5% 10%,#0b111b 10.5% 100%);border:2px solid #e5c15c;box-shadow:0 0 14px rgba(255,211,78,.3),0 0 38px rgba(0,0,0,.9),inset 0 0 25px #000;position:relative}.wheel{width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;border:5px solid #171c22;background:repeating-conic-gradient(from -4.86deg,#b91e2b 0 4.865deg,#090d13 4.865deg 9.73deg);transition:transform 5.8s cubic-bezier(.12,.72,.12,1);box-shadow:inset 0 0 18px #000}.wheel:before{content:"";position:absolute;inset:7px;border-radius:50%;border:2px solid rgba(255,211,78,.35);box-shadow:inset 0 0 15px #000;z-index:3}.wheel:after{content:"ZYNO";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:34%;height:34%;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#1d5b7d,#071321 66%,#02060c);border:2px solid #dcb64d;box-shadow:0 0 10px #000,inset 0 0 15px #000;color:#ffd34e;font-size:12px;font-weight:1000;letter-spacing:2px;z-index:8}.pointer{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:24px solid #fff;filter:drop-shadow(0 0 5px #ffd34e);z-index:20}.number{position:absolute;left:50%;top:50%;font-size:9px;font-weight:1000;transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-105px) rotate(calc(-1 * var(--angle)));z-index:5;color:#fff;text-shadow:0 1px 2px #000}.number.zero{color:#55f0b4}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding-bottom:10px}.bet-number{min-height:43px;border-radius:8px;background:linear-gradient(145deg,#102945,#071322);border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;font-weight:1000;touch-action:none;user-select:none}.bet-number.red{color:#ff5360}.bet-number.black{color:#fff}.bet-number.zero{color:#55f0b4;border-color:rgba(22,199,132,.4)}.bet-number.active{border-color:var(--blue);box-shadow:0 0 10px rgba(0,229,255,.35);transform:scale(.96)}.bet-count{color:#ff9f1c;font-size:8px;min-height:10px}.bet-number.winner{border-color:var(--gold);box-shadow:0 0 17px rgba(255,211,78,.7)}
+.action{width:100%;min-height:44px;border-radius:12px;background:linear-gradient(145deg,#0c89ae,#00506a);font-weight:1000;letter-spacing:.6px;margin-top:3px}.message{text-align:center;min-height:22px;color:var(--muted);font-size:9px;padding:5px}
+/* 0-11 */
+.z11-wheel{width:220px;height:220px;margin:5px auto 10px;border-radius:50%;border:8px solid #cda73c;background:repeating-conic-gradient(#b71f2c 0 30deg,#0b1118 30deg 60deg);position:relative;box-shadow:0 0 25px rgba(255,211,78,.2),inset 0 0 25px #000}.z11-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:78px;height:78px;border-radius:50%;background:radial-gradient(circle,#164d69,#06101b 70%);border:2px solid #ffd34e;display:flex;align-items:center;justify-content:center;font-weight:1000;color:#ffd34e}.z11n{position:absolute;left:50%;top:50%;font-size:13px;font-weight:1000;transform:translate(-50%,-50%) rotate(var(--a)) translateY(-84px) rotate(calc(-1 * var(--a)))}
+/* Gems Fortune */
+.gems-panel{border-radius:18px;padding:10px;background:linear-gradient(145deg,#071a2c,#030a12);border:1px solid rgba(166,104,255,.35);box-shadow:inset 0 0 25px rgba(0,0,0,.6)}.gems-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.gems-top strong{color:#d9b2ff;font-size:13px}.gems-top span{font-size:10px;color:var(--gold)}.gem-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;min-height:320px}.gem{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(145deg,#15304b,#081321);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 -6px 10px rgba(0,0,0,.35);transition:.18s}.gem.pop{transform:scale(.5);opacity:0}.gem.g1{color:#62e6ff}.gem.g2{color:#ff70a6}.gem.g3{color:#ffd34e}.gem.g4{color:#a984ff}.gem.g5{color:#54e39a}.gem.g6{color:#ff945e}.gem-note{text-align:center;color:var(--muted);font-size:8px;margin:8px 0}.gem-win{text-align:center;min-height:25px;color:#ffd34e;font-weight:1000;font-size:12px}
+@media(max-width:380px){.app{padding-left:8px;padding-right:8px}.wheel-wrap{width:255px;height:255px;min-width:255px;min-height:255px}.number{transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-91px) rotate(calc(-1 * var(--angle)))}.bet-number{min-height:41px;font-size:14px}.gem-grid{min-height:290px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header"><div class="brand">ZYNO</div><div class="balance"><small>BALANCE</small><strong id="topBalance">1,000,000,000</strong></div></header>
+
+<section id="home" class="view active">
+ <div class="home-title"><h1>ZYNO GAMES</h1><p>3 games • clean standalone build</p></div>
+ <div class="cards">
+  <button class="game-card gold" onclick="openGame('r36')"><div class="game-icon">🎰</div><h2>ROULETTE 0–36</h2><p>Premium 3D roulette • 60 sec betting • 35:1</p><span class="play">PLAY</span></button>
+  <button class="game-card" onclick="openGame('r11')"><div class="game-icon">🎯</div><h2>ROULETTE 0–11</h2><p>Fast 0–11 number roulette • 60 sec betting</p><span class="play">PLAY</span></button>
+  <button class="game-card purple" onclick="openGame('gems')"><div class="game-icon">💎</div><h2>GEMS FORTUNE</h2><p>Video-inspired falling gems / cluster game</p><span class="play">PLAY</span></button>
+ </div>
+</section>
+
+<section id="r36" class="view">
+ <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">ROULETTE 0–36</div><div style="width:54px"></div></div>
+ <div class="rule">60 SEC • MAX 5500 PER NUMBER • PAYOUT 35:1</div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r36bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><div class="last" id="r36last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r36timer">60</strong></div></div>
+ <div class="wheel-area"><div class="wheel-wrap"><div class="pointer"></div><div class="wheel" id="wheel36"></div></div></div>
+ <div class="message" id="r36msg">Press and hold a number to bet</div><div class="grid" id="grid36"></div>
+</section>
+
+<section id="r11" class="view">
+ <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">ROULETTE 0–11</div><div style="width:54px"></div></div>
+ <div class="rule">60 SEC • MIN 10 • MAX 5500 PER NUMBER</div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r11bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><div class="last" id="r11last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r11timer">60</strong></div></div>
+ <div class="z11-wheel" id="wheel11"><div class="z11-center">0–11</div></div>
+ <div class="message" id="r11msg">Press and hold a number to bet</div><div class="grid" id="grid11"></div>
+</section>
+
+<section id="gems" class="view">
+ <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">GEMS FORTUNE</div><div style="width:54px"></div></div>
+ <div class="rule">VIDEO-INSPIRED CLUSTER / FALLING-GEMS GAME</div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="gemsBal">1,000,000,000</strong></div><div class="ibox"><small>WIN</small><strong id="gemsWin">0</strong></div><div class="ibox"><small>ROUND</small><strong id="gemsRound">READY</strong></div></div>
+ <div class="gems-panel"><div class="gems-top"><strong>GEMS FORTUNE</strong><span id="gemsBetLabel">BET 10</span></div><div class="gem-grid" id="gemGrid"></div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
+</section>
+</div>
+<script>
+'use strict';
+const START_BALANCE=1000000000,MAX_BET=5500,POINT_TIME=100;
+let balance=START_BALANCE;
+const money=n=>Math.floor(n).toLocaleString('en-IN');
+const topBalance=document.getElementById('topBalance');
+function syncBalance(){topBalance.textContent=money(balance);document.getElementById('r36bal').textContent=money(balance);document.getElementById('r11bal').textContent=money(balance);document.getElementById('gemsBal').textContent=money(balance)}
+function openGame(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='r36')startR36();if(id==='r11')startR11()}
+function goHome(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('home').classList.add('active')}
+/* ---------- ROULETTE 0-36 ---------- */
+const redNums=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const wheelNums=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const wheel36=document.getElementById('wheel36'),grid36=document.getElementById('grid36');let bets36={},r36Open=true,r36Time=60,r36Spin=false,r36Rotation=0,r36Last=[];
+wheelNums.forEach((n,i)=>{const e=document.createElement('div');e.className='number'+(n===0?' zero':'');e.style.setProperty('--angle',(i*360/wheelNums.length)+'deg');e.textContent=n;wheel36.appendChild(e)});
+function colorClass(n){return n===0?'zero':redNums.has(n)?'red':'black'}
+for(let n=0;n<=36;n++){const b=document.createElement('div');b.className='bet-number '+colorClass(n);b.dataset.n=n;b.innerHTML='<span>'+n+'</span><span class="bet-count"></span>';bindHold36(b,n);grid36.appendChild(b)}
+function bindHold36(btn,n){let start=0,timer=null,holding=false;const begin=e=>{if(e.type==='mousedown'&&e.button!==0)return;if(!r36Open||r36Spin)return;holding=true;start=performance.now();btn.classList.add('active');const tick=()=>{if(!holding)return;const amt=Math.min(MAX_BET,(Math.floor((performance.now()-start)/POINT_TIME)+1));const current=bets36[n]||0;if(amt>current){const add=amt-current;if(balance>=add){balance-=add;bets36[n]=amt;syncBalance();updateCount36(btn,amt)}else{holding=false}}timer=requestAnimationFrame(tick)};timer=requestAnimationFrame(tick)};const end=()=>{holding=false;btn.classList.remove('active');if(timer)cancelAnimationFrame(timer)};btn.addEventListener('mousedown',begin);btn.addEventListener('touchstart',begin,{passive:true});btn.addEventListener('mouseup',end);btn.addEventListener('mouseleave',end);btn.addEventListener('touchend',end,{passive:true});btn.addEventListener('touchcancel',end,{passive:true})}
+function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?money(n):''}
+function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
+function startR36(){if(r36Spin)return;if(r36Time<=0){r36Time=60;r36Open=true;document.getElementById('r36timer').textContent=60;document.getElementById('r36timer').classList.remove('closed');clearBets36()} }
+function tickR36(){const v=document.getElementById('r36timer');if(!document.getElementById('r36').classList.contains('active')||r36Spin)return;if(r36Time>0){r36Time--;v.textContent=r36Time}if(r36Time<=4&&r36Time>0){r36Open=false;v.classList.add('closed');document.getElementById('r36msg').textContent='BETTING CLOSED — spinning...'}if(r36Time===0&&!r36Spin)spin36()}
+function spin36(){r36Spin=true;r36Open=false;document.getElementById('r36msg').textContent='Wheel spinning...';playSpinSound();const winner=Math.floor(Math.random()*37),idx=wheelNums.indexOf(winner),target=-(idx*360/wheelNums.length),cur=((r36Rotation%360)+360)%360,diff=((target-cur+540)%360)-180;r36Rotation+=360*8+diff;wheel36.style.transform='rotate('+r36Rotation+'deg)';setTimeout(()=>{stopSpinSound();document.getElementById('r36msg').textContent='WINNING NUMBER: '+winner;grid36.querySelectorAll('.bet-number').forEach(b=>{if(+b.dataset.n===winner)b.classList.add('winner')});let win=0;Object.keys(bets36).forEach(k=>{const n=+k;if(n===winner)win+=bets36[n]*36});balance+=win;r36Last.unshift(winner);r36Last=r36Last.slice(0,4);renderLast('r36last',r36Last);syncBalance();r36Spin=false;setTimeout(()=>{r36Time=60;r36Open=true;document.getElementById('r36timer').textContent=60;document.getElementById('r36timer').classList.remove('closed');clearBets36();document.getElementById('r36msg').textContent='Press and hold a number to bet'},900)},5900)}
+/* ---------- ROULETTE 0-11 ---------- */
+const grid11=document.getElementById('grid11'),wheel11=document.getElementById('wheel11');let bets11={},r11Open=true,r11Time=60,r11Spin=false,r11Last=[];
+for(let i=0;i<12;i++){const e=document.createElement('div');e.className='z11n';e.style.setProperty('--a',(i*30)+'deg');e.textContent=i;wheel11.appendChild(e)}
+for(let n=0;n<=11;n++){const b=document.createElement('div');b.className='bet-number '+colorClass(n);b.dataset.n=n;b.innerHTML='<span>'+n+'</span><span class="bet-count"></span>';bindHold11(b,n);grid11.appendChild(b)}
+function bindHold11(btn,n){let start=0,timer=null,holding=false;const begin=e=>{if(e.type==='mousedown'&&e.button!==0)return;if(!r11Open||r11Spin)return;holding=true;start=performance.now();btn.classList.add('active');const tick=()=>{if(!holding)return;const amt=Math.min(MAX_BET,Math.floor((performance.now()-start)/POINT_TIME)+1);const current=bets11[n]||0;if(amt>current){const add=amt-current;if(balance>=add){balance-=add;bets11[n]=amt;btn.querySelector('.bet-count').textContent=money(amt);syncBalance()}else holding=false}timer=requestAnimationFrame(tick)};timer=requestAnimationFrame(tick)};const end=()=>{holding=false;btn.classList.remove('active');if(timer)cancelAnimationFrame(timer)};btn.addEventListener('mousedown',begin);btn.addEventListener('touchstart',begin,{passive:true});btn.addEventListener('mouseup',end);btn.addEventListener('mouseleave',end);btn.addEventListener('touchend',end,{passive:true});btn.addEventListener('touchcancel',end,{passive:true})}
+function tickR11(){const v=document.getElementById('r11timer');if(!document.getElementById('r11').classList.contains('active')||r11Spin)return;if(r11Time>0){r11Time--;v.textContent=r11Time}if(r11Time<=4&&r11Time>0){r11Open=false;v.classList.add('closed');document.getElementById('r11msg').textContent='BETTING CLOSED — result coming...'}if(r11Time===0&&!r11Spin)spin11()}
+function startR11(){if(r11Time<=0&&!r11Spin){r11Time=60;r11Open=true;document.getElementById('r11timer').textContent=60;document.getElementById('r11timer').classList.remove('closed');clearBets11()}}
+function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
+function spin11(){r11Spin=true;r11Open=false;document.getElementById('r11msg').textContent='Result spinning...';playSpinSound();const winner=Math.floor(Math.random()*12);wheel11.animate([{transform:'rotate(0deg)'},{transform:'rotate(1080deg)'}],{duration:1800,easing:'cubic-bezier(.12,.72,.12,1)'});setTimeout(()=>{stopSpinSound();document.getElementById('r11msg').textContent='WINNING NUMBER: '+winner;grid11.querySelectorAll('.bet-number').forEach(b=>{if(+b.dataset.n===winner)b.classList.add('winner')});let win=(bets11[winner]||0)*10;balance+=win;r11Last.unshift(winner);r11Last=r11Last.slice(0,4);renderLast('r11last',r11Last);syncBalance();r11Spin=false;setTimeout(()=>{r11Time=60;r11Open=true;document.getElementById('r11timer').textContent=60;document.getElementById('r11timer').classList.remove('closed');clearBets11();document.getElementById('r11msg').textContent='Press and hold a number to bet'},700)},1900)}
+function renderLast(id,arr){const el=document.getElementById(id);el.innerHTML='';arr.forEach(n=>{const s=document.createElement('span');s.textContent=n;s.className=colorClass(n);if(n===0)s.style.color='#55f0b4';else if(redNums.has(n))s.style.color='#ff5360';else s.style.color='#fff';el.appendChild(s)})}
+/* ---------- AUDIO ---------- */
+let audioCtx=null,spinOsc=null,spinGain=null,spinFilter=null;
+function ensureAudio(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
+function playTick(){try{ensureAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=740;g.gain.setValueAtTime(.025,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.055);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.06)}catch(e){}}
+function playSpinSound(){try{ensureAudio();spinOsc=audioCtx.createOscillator();spinGain=audioCtx.createGain();spinFilter=audioCtx.createBiquadFilter();spinOsc.type='triangle';spinFilter.type='lowpass';spinFilter.frequency.value=1200;spinFilter.Q.value=1.1;spinGain.gain.setValueAtTime(.001,audioCtx.currentTime);spinGain.gain.linearRampToValueAtTime(.045,audioCtx.currentTime+.18);spinOsc.frequency.setValueAtTime(115,audioCtx.currentTime);spinOsc.frequency.exponentialRampToValueAtTime(62,audioCtx.currentTime+4.8);spinOsc.connect(spinFilter).connect(spinGain).connect(audioCtx.destination);spinOsc.start()}catch(e){}}
+function stopSpinSound(){try{if(!spinOsc)return;spinGain.gain.cancelScheduledValues(audioCtx.currentTime);spinGain.gain.setValueAtTime(spinGain.gain.value,audioCtx.currentTime);spinGain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.22);spinOsc.stop(audioCtx.currentTime+.25);spinOsc=null}catch(e){}}
+setInterval(()=>{tickR36();tickR11();if((document.getElementById('r36').classList.contains('active')||document.getElementById('r11').classList.contains('active'))&&Math.random()<.001)playTick()},1000);
+/* ---------- GEMS FORTUNE ---------- */
+const symbols=['◆','✦','●','⬟','✚','✧'],gemGrid=document.getElementById('gemGrid');let gemsRound=0,gemsBusy=false,gemsBet=10;
+function makeGem(){return Math.floor(Math.random()*symbols.length)}
+function buildGems(){gemGrid.innerHTML='';for(let i=0;i<25;i++){const n=makeGem();const e=document.createElement('div');e.className='gem g'+(n+1);e.dataset.v=n;e.textContent=symbols[n];gemGrid.appendChild(e)}}
+function neighbors(i){const out=[];const r=Math.floor(i/5),c=i%5;[[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{if(rr>=0&&rr<5&&cc>=0&&cc<5)out.push(rr*5+cc)});return out}
+function findClusters(){const els=[...gemGrid.children],seen=new Set(),groups=[];for(let i=0;i<25;i++){if(seen.has(i))continue;const val=+els[i].dataset.v,q=[i],g=[];seen.add(i);while(q.length){const x=q.shift();g.push(x);neighbors(x).forEach(y=>{if(!seen.has(y)&&+els[y].dataset.v===val){seen.add(y);q.push(y)}})}if(g.length>=3)groups.push(g)}return groups}
+function playGems(){if(gemsBusy||balance<gemsBet)return;ensureAudio();balance-=gemsBet;syncBalance();gemsBusy=true;gemsRound++;document.getElementById('gemsRound').textContent=gemsRound;document.getElementById('gemWin').textContent='';buildGems();setTimeout(()=>{const groups=findClusters();let score=0;groups.forEach(g=>{score+=g.length*g.length*2;g.forEach(i=>gemGrid.children[i].classList.add('pop'))});document.getElementById('gemsWin').textContent=score?'+'+score+' POINTS':'NO WIN';document.getElementById('gemWin').textContent=score?'WIN +'+score+' POINTS':'No cluster this round';balance+=score;syncBalance();setTimeout(()=>{buildGems();gemsBusy=false},300)},420)}
+buildGems();syncBalance();
+</script>
+</body>
+</html>
