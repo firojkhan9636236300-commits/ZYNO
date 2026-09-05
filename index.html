@@ -2197,65 +2197,191 @@ function z11Reset(){
 
   syncZ11Balance();
 }
+
+
 /* =========================
-   ROULETTE 0–36
+
+   ROULETTE ELEMENTS
+
 ========================= */
 
-const wheel=document.getElementById("wheel");
-const grid=document.getElementById("grid");
-const timerEl=document.getElementById("timer");
-const balanceEl=document.getElementById("balance");
-const resultEl=document.getElementById("result");
-const selectedEl=document.getElementById("selected");
-const lastWinsEl=document.getElementById("lastWins");
-const centerLogo=document.getElementById("centerLogo");
-const centerWin=document.getElementById("centerWin");
+const wheel = document.getElementById("wheel");
 
-let timeLeft=60;
+const grid = document.getElementById("grid");
+
+const timerEl = document.getElementById("timer");
+
+const balanceEl = document.getElementById("balance");
+
+const resultEl = document.getElementById("result");
+
+const selectedEl = document.getElementById("selected");
+
+const lastWinsEl = document.getElementById("lastWins");
+
+const centerLogo = document.getElementById("centerLogo");
+
+const centerWin = document.getElementById("centerWin");
+
+/* =========================
+
+   ROULETTE VARIABLES
+
+========================= */
+
+let timeLeft = 60;
+
+let bettingOpen = true;
+
+let spinning = false;
+
+let selectedNumber = null;
+
+let bets = {};
+
+let lastWins = [];
+
+let wheelRotation = 0;
+
+/* =========================
+
+   CURRENT PRESS BET
+
+========================= */
+
+let currentPress = null;
+
+let currentPressTimer = null;
+
+let currentPressing = false;
+
+let currentPressNumber = null;
+
+let currentPressStart = 0;
+
+let currentPressPoints = 0;
+
+/* =========================
+
+   BET SPEED
+
+   0.04 SECOND = 1 POINT
+
+========================= */
+
+const POINT_TIME = 40;
+
+/* =========================
+
+   MAX BET PER NUMBER
+
+========================= */
+
+const MAX_BET_PER_NUMBER = 5500;
+
+/* =========================
+
+   ROULETTE NUMBERS
+
+========================= */
+
+const wheelNumbers = [
+
+  0,32,15,19,4,21,2,25,17,34,6,27,13,
+
+  36,11,30,8,23,10,5,24,16,33,1,20,14,
+
+  31,9,22,18,29,7,28,12,35,3,26
+
+];
+
+const slice = 360 / wheelNumbers.length;
+
+/* =========================
+
+   RED NUMBERS
+
+========================= */
+
+const redNumbers = [
+
+  1,3,5,7,9,12,14,16,18,
+
+  19,21,23,25,27,30,32,34,36
+
+];
+
+/* =========================
+
+   LOAD SAVED ROULETTE STATE
+
+========================= */
 
 const savedRouletteTime =
+
   Number(localStorage.getItem("zynoRouletteTime"));
 
 const savedRouletteTimestamp =
+
   Number(localStorage.getItem("zynoRouletteTimestamp"));
 
-if(
+if (
+
   Number.isFinite(savedRouletteTime) &&
+
   Number.isFinite(savedRouletteTimestamp)
-){
+
+) {
 
   const elapsedSeconds =
+
     Math.floor(
-      (Date.now()-savedRouletteTimestamp)/1000
+
+      (Date.now() - savedRouletteTimestamp) / 1000
+
     );
 
   timeLeft =
+
     Math.max(
+
       0,
-      savedRouletteTime-elapsedSeconds
+
+      savedRouletteTime - elapsedSeconds
+
     );
 
-}else if(Number.isFinite(savedRouletteTime)){
+} else if (Number.isFinite(savedRouletteTime)) {
 
   timeLeft =
-    Math.max(0,savedRouletteTime);
+
+    Math.max(
+
+      0,
+
+      savedRouletteTime
+
+    );
+
 }
-let bettingOpen=true;
-let spinning=false;
-let selectedNumber=null;
-let bets={};
-let lastWins=[];
+
+/* =========================
+
+   LOAD SAVED BETS
+
+========================= */
 
 const savedRouletteBets =
+
   localStorage.getItem("zynoRouletteBets");
 
-if(savedRouletteBets){
+if (savedRouletteBets) {
 
-  try{
+  try {
 
     bets = JSON.parse(savedRouletteBets);
 
-  }catch(error){
+  } catch (error) {
 
     bets = {};
 
@@ -2263,647 +2389,1267 @@ if(savedRouletteBets){
 
 }
 
-/* SAVE ROULETTE BET + TIMER */
+/* =========================
 
-function saveRouletteState(){
+   SAVE ROULETTE STATE
+
+========================= */
+
+function saveRouletteState() {
 
   localStorage.setItem(
+
     "zynoRouletteBets",
+
     JSON.stringify(bets)
+
   );
 
   localStorage.setItem(
+
     "zynoRouletteTime",
+
     String(timeLeft)
+
   );
+
   localStorage.setItem(
-  "zynoRouletteTimestamp",
-  String(Date.now())
-);
-}
-let wheelRotation=0;
 
-let currentPress=null;
-let currentPressTimer=null;
-let currentPressing=false;
-let currentPressNumber=null;
-let currentPressStart=0;
-let currentPressPoints=0;
+    "zynoRouletteTimestamp",
 
-/* EXACT:
-   0.04 SECOND = 1 POINT
-*/
-const POINT_TIME=40;
+    String(Date.now())
 
-const wheelNumbers=[
-  0,32,15,19,4,21,2,25,17,34,6,27,13,
-  36,11,30,8,23,10,5,24,16,33,1,20,14,
-  31,9,22,18,29,7,28,12,35,3,26
-];
-
-const slice=360/wheelNumbers.length;
-
-
-/* WHEEL NUMBERS */
-
-wheelNumbers.forEach((num,index)=>{
-
-  const el=document.createElement("div");
-
-  el.className=
-    "number"+(num===0?" zero":"");
-
-  el.style.setProperty(
-    "--angle",
-    index*slice+"deg"
   );
 
-  el.textContent=num;
+}
 
-  wheel.appendChild(el);
-});
+/* =========================
 
+   CREATE WHEEL NUMBERS
 
-/* BET GRID */
+========================= */
 
-for(let i=0;i<=36;i++){
+if (wheel) {
 
-  const btn=document.createElement("div");
+  wheel.innerHTML = "";
 
-  const redNumbers=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
+  wheelNumbers.forEach((num, index) => {
 
-btn.className=
-  "bet-number"+
-  (i===0?" zero":
-  redNumbers.includes(i)?" red":" black");
+    const el =
 
-  btn.dataset.number=i;
+      document.createElement("div");
 
-  btn.innerHTML=
-    "<div>"+i+"</div>"+
-    "<div class='bet-count' id='count-"+i+"'></div>";
+    el.className =
 
-  grid.appendChild(btn);
+      "number" +
 
-  btn.addEventListener("pointerdown",e=>{
+      (num === 0 ? " zero" : "");
 
-    e.preventDefault();
+    el.style.setProperty(
 
-    if(!currentPressing){
-      startBet(i,btn);
+      "--angle",
+
+      index * slice + "deg"
+
+    );
+
+    el.textContent = num;
+
+    wheel.appendChild(el);
+
+  });
+
+}
+
+/* =========================
+
+   CREATE BET GRID
+
+========================= */
+
+if (grid) {
+
+  grid.innerHTML = "";
+
+  for (let i = 0; i <= 36; i++) {
+
+    const btn =
+
+      document.createElement("div");
+
+    btn.className =
+
+      "bet-number" +
+
+      (
+
+        i === 0
+
+        ? " zero"
+
+        : redNumbers.includes(i)
+
+        ? " red"
+
+        : " black"
+
+      );
+
+    btn.dataset.number = i;
+
+    btn.innerHTML =
+
+      "<div>" +
+
+      i +
+
+      "</div>" +
+
+      "<div class='bet-count' id='count-" +
+
+      i +
+
+      "'></div>";
+
+    grid.appendChild(btn);
+
+    /* =========================
+
+       PRESS START
+
+    ========================= */
+
+    btn.addEventListener(
+
+      "pointerdown",
+
+      e => {
+
+        e.preventDefault();
+
+        if (!currentPressing) {
+
+          startBet(i, btn);
+
+        }
+
+      },
+
+      { passive: false }
+
+    );
+
+    /* =========================
+
+       PRESS END
+
+    ========================= */
+
+    btn.addEventListener(
+
+      "pointerup",
+
+      e => {
+
+        e.preventDefault();
+
+        stopBet(btn);
+
+      },
+
+      { passive: false }
+
+    );
+
+    /* =========================
+
+       PRESS CANCEL
+
+    ========================= */
+
+    btn.addEventListener(
+
+      "pointercancel",
+
+      e => {
+
+        e.preventDefault();
+
+        stopBet(btn);
+
+      },
+
+      { passive: false }
+
+    );
+
+  }
+
+}
+
+/* =========================
+
+   START BET
+
+========================= */
+
+function startBet(number, btn) {
+
+  if (currentPressing) {
+
+    return;
+
+  }
+
+  if (!bettingOpen || spinning) {
+
+    if (resultEl) {
+
+      resultEl.textContent =
+
+        "Betting closed";
+
     }
 
-  },{passive:false});
-
-  btn.addEventListener("pointerup",e=>{
-
-    e.preventDefault();
-
-    stopBet(btn);
-
-  },{passive:false});
-
-  btn.addEventListener("pointercancel",e=>{
-
-    e.preventDefault();
-
-    stopBet(btn);
-
-  },{passive:false});
-}
-
-
-/* START ROULETTE BET */
-
-function startBet(number,btn){
-
-  if(currentPressing)return;
-
-  if(!bettingOpen || spinning){
-
-    resultEl.textContent=
-      "Betting closed";
-
     return;
+
   }
 
-  if(balance<=0){
+  if (
 
-    resultEl.textContent=
-      "Balance khatam ho gaya";
+    typeof balance !== "number" ||
+
+    !Number.isFinite(balance)
+
+  ) {
+
+    if (resultEl) {
+
+      resultEl.textContent =
+
+        "Balance load nahi hua";
+
+    }
 
     return;
+
   }
 
-  currentPress=btn;
+  if (balance <= 0) {
 
-  currentPressNumber=number;
+    if (resultEl) {
 
-  currentPressing=true;
+      resultEl.textContent =
 
-  currentPressStart=
+        "Balance khatam ho gaya";
+
+    }
+
+    return;
+
+  }
+
+  const existingBet =
+
+    Number(bets[number]) || 0;
+
+  if (existingBet >= MAX_BET_PER_NUMBER) {
+
+    if (resultEl) {
+
+      resultEl.textContent =
+
+        "Is number par maximum 5500 points bet ho chuke hain";
+
+    }
+
+    return;
+
+  }
+
+  currentPress = btn;
+
+  currentPressNumber = number;
+
+  currentPressing = true;
+
+  currentPressStart =
+
     performance.now();
 
-  currentPressPoints=0;
+  currentPressPoints = 0;
 
-  selectedNumber=number;
+  selectedNumber = number;
 
   btn.classList.add("active");
 
   updateSelected();
 
+  currentPressTimer =
 
-  currentPressTimer=setInterval(()=>{
+    setInterval(() => {
 
-    if(
-      !currentPressing ||
-      !bettingOpen ||
-      spinning
-    )return;
+      if (
 
-    if(balance<=0){
+        !currentPressing ||
 
-      stopBet(btn);
+        !bettingOpen ||
 
-      return;
-    }
+        spinning
 
-    const shouldHave=
-      Math.floor(
-        (performance.now()-
-         currentPressStart)/
-         POINT_TIME
-      );
+      ) {
 
-    let newPoints=
-      Math.min(
-        shouldHave-currentPressPoints,
-        Math.floor(balance)
-      );
+        return;
 
-    if(newPoints > 0){
+      }
 
-  const beforeBet =
-    Number(bets[number]) || 0;
+      if (balance <= 0) {
 
-  const MAX_BET_PER_NUMBER = 5500;
+        stopBet(btn);
 
-  const remaining =
-    MAX_BET_PER_NUMBER - beforeBet;
+        return;
 
-  if(remaining <= 0){
-    resultEl.textContent =
-      "Is number par maximum 5500 points bet ho chuke hain";
+      }
 
-    stopBet(btn);
+      const shouldHave =
+
+        Math.floor(
+
+          (
+
+            performance.now() -
+
+            currentPressStart
+
+          ) /
+
+          POINT_TIME
+
+        );
+
+      const newPoints =
+
+        shouldHave -
+
+        currentPressPoints;
+
+      if (newPoints <= 0) {
+
+        return;
+
+      }
+
+      const beforeBet =
+
+        Number(bets[number]) || 0;
+
+      const remaining =
+
+        MAX_BET_PER_NUMBER -
+
+        beforeBet;
+
+      if (remaining <= 0) {
+
+        if (resultEl) {
+
+          resultEl.textContent =
+
+            "Is number par maximum 5500 points bet ho chuke hain";
+
+        }
+
+        stopBet(btn);
+
+        return;
+
+      }
+
+      const actualPoints =
+
+        Math.min(
+
+          newPoints,
+
+          remaining,
+
+          Math.floor(balance)
+
+        );
+
+      if (actualPoints > 0) {
+
+        addBet(
+
+          number,
+
+          actualPoints
+
+        );
+
+        currentPressPoints +=
+
+          actualPoints;
+
+      }
+
+      if (
+
+        (Number(bets[number]) || 0) >=
+
+        MAX_BET_PER_NUMBER
+
+      ) {
+
+        if (resultEl) {
+
+          resultEl.textContent =
+
+            "Is number par maximum 5500 points bet ho chuke hain";
+
+        }
+
+        stopBet(btn);
+
+      }
+
+    }, 5);
+
+}
+
+/* =========================
+
+   STOP BET
+
+========================= */
+
+function stopBet(btn) {
+
+  if (!currentPressing) {
+
     return;
+
   }
 
-  const actualPoints =
-    Math.min(
-      newPoints,
-      remaining,
-      Math.floor(balance)
+  currentPressing = false;
+
+  if (currentPressTimer !== null) {
+
+    clearInterval(
+
+      currentPressTimer
+
     );
 
-  if(actualPoints > 0){
+    currentPressTimer = null;
 
-    addBet(number, actualPoints);
-
-    currentPressPoints += actualPoints;
   }
 
-  if(
-    (Number(bets[number]) || 0) >=
-    MAX_BET_PER_NUMBER
-  ){
-    resultEl.textContent =
-      "Is number par maximum 5500 points bet ho chuke hain";
+  if (btn) {
 
-    stopBet(btn);
-  }
-}
+    btn.classList.remove(
 
-  },5);
-}
+      "active"
 
+    );
 
-/* STOP ROULETTE BET */
-
-function stopBet(btn){
-
-  if(!currentPressing)return;
-
-  currentPressing=false;
-
-  if(currentPressTimer!==null){
-
-    clearInterval(currentPressTimer);
-
-    currentPressTimer=null;
   }
 
-  if(btn){
-    btn.classList.remove("active");
+  currentPress = null;
+
+  currentPressNumber = null;
+
+  currentPressStart = 0;
+
+  currentPressPoints = 0;
+
+  /*
+
+     SAFE BALANCE UPDATE
+
+  */
+
+  if (
+
+    typeof window.updateBalance ===
+
+    "function"
+
+  ) {
+
+    window.updateBalance();
+
   }
 
-  currentPress=null;
-  currentPressNumber=null;
-  currentPressStart=0;
-  currentPressPoints=0;
-  
-  window.updateBalance();
+  /*
 
-if(typeof window.saveUserBalance === "function"){
+     SAVE BALANCE ONLY
 
-  window.saveUserBalance();
+     IF FUNCTION EXISTS
 
-}
+  */
 
-}
+  if (
 
+    typeof window.saveUserBalance ===
 
-function stopAllBetting(){
+    "function"
 
-  currentPressing=false;
+  ) {
 
-  if(currentPressTimer!==null){
+    window.saveUserBalance();
 
-    clearInterval(currentPressTimer);
-
-    currentPressTimer=null;
   }
 
-  currentPress=null;
-  currentPressNumber=null;
-  currentPressStart=0;
-  currentPressPoints=0;
-
-  document.querySelectorAll(".bet-number")
-    .forEach(el=>el.classList.remove("active"));
 }
 
+/* =========================
 
-function addBet(number, amount){
+   STOP ALL BETTING
 
-  if(!bettingOpen || spinning || amount <= 0){
+========================= */
+
+function stopAllBetting() {
+
+  currentPressing = false;
+
+  if (currentPressTimer !== null) {
+
+    clearInterval(
+
+      currentPressTimer
+
+    );
+
+    currentPressTimer = null;
+
+  }
+
+  currentPress = null;
+
+  currentPressNumber = null;
+
+  currentPressStart = 0;
+
+  currentPressPoints = 0;
+
+  document
+
+    .querySelectorAll(".bet-number")
+
+    .forEach(el => {
+
+      el.classList.remove(
+
+        "active"
+
+      );
+
+    });
+
+}
+
+/* =========================
+
+   ADD BET
+
+========================= */
+
+function addBet(number, amount) {
+
+  if (
+
+    !bettingOpen ||
+
+    spinning ||
+
+    amount <= 0
+
+  ) {
+
     return;
+
   }
 
   const existingBet =
+
     Number(bets[number]) || 0;
 
-  const MAX_BET_PER_NUMBER = 5500;
-
   const remaining =
-    MAX_BET_PER_NUMBER - existingBet;
 
-  if(remaining <= 0){
-    resultEl.textContent =
-      "Is number par maximum 5500 points bet ho chuke hain";
+    MAX_BET_PER_NUMBER -
+
+    existingBet;
+
+  if (remaining <= 0) {
+
+    if (resultEl) {
+
+      resultEl.textContent =
+
+        "Is number par maximum 5500 points bet ho chuke hain";
+
+    }
+
     stopBet(currentPress);
+
     return;
+
   }
 
   const safeAmount =
+
     Math.min(
+
       Number(amount),
+
       remaining,
+
       Math.floor(balance)
+
     );
 
-  if(safeAmount <= 0){
+  if (
+
+    !Number.isFinite(safeAmount) ||
+
+    safeAmount <= 0
+
+  ) {
+
     return;
+
   }
 
   balance -= safeAmount;
 
   bets[number] =
-    existingBet + safeAmount;
+
+    existingBet +
+
+    safeAmount;
 
   saveRouletteState();
 
-  updateBalance();
-  updateBetCount(number);
-  updateSelected();
-}
+  if (
 
+    typeof window.updateBalance ===
 
-function updateBetCount(number){
+    "function"
 
-  const el=
-    document.getElementById("count-"+number);
+  ) {
 
-  if(el){
+    window.updateBalance();
 
-    el.textContent=
-      (bets[number]||0)>0
-      ?bets[number]
-      :"";
   }
+
+  updateBetCount(number);
+
+  updateSelected();
+
 }
 
+/* =========================
 
-function updateSelected(){
+   UPDATE BET COUNT
 
-  if(selectedNumber===null){
+========================= */
 
-    selectedEl.textContent=
+function updateBetCount(number) {
+
+  const el =
+
+    document.getElementById(
+
+      "count-" + number
+
+    );
+
+  if (!el) {
+
+    return;
+
+  }
+
+  const amount =
+
+    Number(bets[number]) || 0;
+
+  el.textContent =
+
+    amount > 0
+
+    ? amount
+
+    : "";
+
+}
+
+/* =========================
+
+   UPDATE SELECTED NUMBER
+
+========================= */
+
+function updateSelected() {
+
+  if (!selectedEl) {
+
+    return;
+
+  }
+
+  if (selectedNumber === null) {
+
+    selectedEl.textContent =
+
       "Koi number select nahi hai";
 
     return;
+
   }
 
-  const total=
-    bets[selectedNumber]||0;
+  const total =
 
-  selectedEl.innerHTML=
-    total>0
-    ?"Number <strong>"+selectedNumber+
-     "</strong> par total <strong>"+total+
-     "</strong> points bet"
-    :"Number <strong>"+selectedNumber+
-     "</strong> select kiya hai";
+    Number(
+
+      bets[selectedNumber]
+
+    ) || 0;
+
+  if (total > 0) {
+
+    selectedEl.innerHTML =
+
+      "Number <strong>" +
+
+      selectedNumber +
+
+      "</strong> par total <strong>" +
+
+      total +
+
+      "</strong> points bet";
+
+  } else {
+
+    selectedEl.innerHTML =
+
+      "Number <strong>" +
+
+      selectedNumber +
+
+      "</strong> select kiya hai";
+
+  }
+
 }
 
-/* TIMER TICK SOUND */
+/* =========================
 
-let tickAudioCtx=null;
+   TIMER TICK SOUND
 
-function playTick(){
+========================= */
 
-  try{
+let tickAudioCtx = null;
 
-    if(!tickAudioCtx){
-      tickAudioCtx=
-        new (window.AudioContext||
-        window.webkitAudioContext)();
+function playTick() {
+
+  try {
+
+    if (!tickAudioCtx) {
+
+      tickAudioCtx =
+
+        new (
+
+          window.AudioContext ||
+
+          window.webkitAudioContext
+
+        )();
+
     }
 
-    if(tickAudioCtx.state==="suspended"){
+    if (
+
+      tickAudioCtx.state ===
+
+      "suspended"
+
+    ) {
+
       tickAudioCtx.resume();
+
     }
 
-    const osc=
+    const osc =
+
       tickAudioCtx.createOscillator();
 
-    const gain=
+    const gain =
+
       tickAudioCtx.createGain();
 
-    osc.type="sine";
+    osc.type = "sine";
+
     osc.frequency.setValueAtTime(
+
       1200,
+
       tickAudioCtx.currentTime
+
     );
 
     gain.gain.setValueAtTime(
+
       0.04,
+
       tickAudioCtx.currentTime
+
     );
 
     gain.gain.exponentialRampToValueAtTime(
+
       0.001,
-      tickAudioCtx.currentTime+0.045
+
+      tickAudioCtx.currentTime + 0.045
+
     );
 
     osc.connect(gain);
-    gain.connect(tickAudioCtx.destination);
+
+    gain.connect(
+
+      tickAudioCtx.destination
+
+    );
 
     osc.start();
+
     osc.stop(
-      tickAudioCtx.currentTime+0.045
+
+      tickAudioCtx.currentTime + 0.045
+
     );
 
-  }catch(e){}
+  } catch (e) {}
 
 }
+
 /* =========================
-   KARRRRRR CYCLE WHEEL SOUND
+
+   ROULETTE SPIN SOUND
+
 ========================= */
 
-let spinAudioCtx=null;
-let spinNoise=null;
-let spinGain=null;
-let spinFilter=null;
-let spinLfo=null;
-let spinLfoGain=null;
+let spinAudioCtx = null;
 
-function startSpinSound(){
+let spinNoise = null;
 
-  try{
+let spinGain = null;
 
-    if(!spinAudioCtx){
+let spinFilter = null;
 
-      spinAudioCtx=
-        new (window.AudioContext||
-        window.webkitAudioContext)();
+let spinLfo = null;
+
+let spinLfoGain = null;
+
+function startSpinSound() {
+
+  try {
+
+    if (!spinAudioCtx) {
+
+      spinAudioCtx =
+
+        new (
+
+          window.AudioContext ||
+
+          window.webkitAudioContext
+
+        )();
 
     }
 
-    if(spinAudioCtx.state==="suspended"){
+    if (
+
+      spinAudioCtx.state ===
+
+      "suspended"
+
+    ) {
+
       spinAudioCtx.resume();
+
     }
 
-    /* STOP PREVIOUS */
-    if(spinNoise){
-      try{spinNoise.stop();}catch(e){}
-      spinNoise=null;
+    if (spinNoise) {
+
+      try {
+
+        spinNoise.stop();
+
+      } catch (e) {}
+
+      spinNoise = null;
+
     }
 
-    if(spinLfo){
-      try{spinLfo.stop();}catch(e){}
-      spinLfo=null;
+    if (spinLfo) {
+
+      try {
+
+        spinLfo.stop();
+
+      } catch (e) {}
+
+      spinLfo = null;
+
     }
 
-    const ctx=spinAudioCtx;
-    const now=ctx.currentTime;
+    const ctx =
+
+      spinAudioCtx;
+
+    const now =
+
+      ctx.currentTime;
 
     /* =========================
-       ROUGH "KARRRR" NOISE
+
+       CREATE NOISE
+
     ========================= */
 
-    const bufferSize=ctx.sampleRate*2;
+    const bufferSize =
 
-    const buffer=ctx.createBuffer(
-      1,
-      bufferSize,
-      ctx.sampleRate
-    );
+      ctx.sampleRate * 2;
 
-    const data=buffer.getChannelData(0);
+    const buffer =
 
-    for(let i=0;i<bufferSize;i++){
+      ctx.createBuffer(
 
-      /* ROUGH MECHANICAL TEXTURE */
-      const noise=
-        Math.random()*2-1;
+        1,
 
-      data[i]=noise*0.75;
+        bufferSize,
+
+        ctx.sampleRate
+
+      );
+
+    const data =
+
+      buffer.getChannelData(0);
+
+    for (
+
+      let i = 0;
+
+      i < bufferSize;
+
+      i++
+
+    ) {
+
+      data[i] =
+
+        (Math.random() * 2 - 1) *
+
+        0.75;
 
     }
 
-    spinNoise=ctx.createBufferSource();
+    spinNoise =
 
-    spinNoise.buffer=buffer;
-    spinNoise.loop=true;
+      ctx.createBufferSource();
+
+    spinNoise.buffer =
+
+      buffer;
+
+    spinNoise.loop =
+
+      true;
 
     /* =========================
-       KARRRR FREQUENCY
+
+       FILTER
+
     ========================= */
 
-    spinFilter=ctx.createBiquadFilter();
+    spinFilter =
 
-    spinFilter.type="bandpass";
+      ctx.createBiquadFilter();
+
+    spinFilter.type =
+
+      "bandpass";
 
     spinFilter.frequency.setValueAtTime(
+
       1100,
+
       now
+
     );
 
-    spinFilter.Q.value=0.75;
+    spinFilter.Q.value =
+
+      0.75;
 
     /* =========================
-       LOUDER MECHANICAL SOUND
+
+       GAIN
+
     ========================= */
 
-    spinGain=ctx.createGain();
+    spinGain =
+
+      ctx.createGain();
 
     spinGain.gain.setValueAtTime(
+
       0.001,
+
       now
+
     );
 
-    /* START = STRONG KARRR */
-
     spinGain.gain.exponentialRampToValueAtTime(
+
       0.085,
-      now+0.08
+
+      now + 0.08
+
     );
 
     /* =========================
-       SLOWING WHEEL
+
+       SLOW DOWN
+
     ========================= */
 
     spinFilter.frequency.exponentialRampToValueAtTime(
+
       900,
-      now+2.0
+
+      now + 2.0
+
     );
 
     spinFilter.frequency.exponentialRampToValueAtTime(
+
       700,
-      now+4.0
+
+      now + 4.0
+
     );
 
     spinFilter.frequency.exponentialRampToValueAtTime(
+
       480,
-      now+5.8
+
+      now + 5.8
+
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
+
       0.055,
-      now+2.0
+
+      now + 2.0
+
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
+
       0.030,
-      now+4.0
+
+      now + 4.0
+
     );
 
     spinGain.gain.exponentialRampToValueAtTime(
+
       0.010,
-      now+5.8
+
+      now + 5.8
+
     );
 
     /* =========================
-       RAPID KARRRR PULSES
+
+       KARRRR PULSES
+
     ========================= */
 
-    spinLfo=ctx.createOscillator();
+    spinLfo =
 
-    spinLfo.type="square";
+      ctx.createOscillator();
+
+    spinLfo.type =
+
+      "square";
 
     spinLfo.frequency.setValueAtTime(
+
       12,
+
       now
+
     );
 
     spinLfo.frequency.exponentialRampToValueAtTime(
+
       5,
-      now+5.8
+
+      now + 5.8
+
     );
 
-    spinLfoGain=ctx.createGain();
+    spinLfoGain =
 
-    spinLfoGain.gain.value=0.018;
+      ctx.createGain();
 
-    spinLfo.connect(spinLfoGain);
-    spinLfoGain.connect(spinGain.gain);
+    spinLfoGain.gain.value =
+
+      0.018;
+
+    spinLfo.connect(
+
+      spinLfoGain
+
+    );
+
+    spinLfoGain.connect(
+
+      spinGain.gain
+
+    );
 
     /* =========================
-       CONNECT
+
+       CONNECT SOUND
+
     ========================= */
 
-    spinNoise.connect(spinFilter);
-    spinFilter.connect(spinGain);
-    spinGain.connect(ctx.destination);
+    spinNoise.connect(
+
+      spinFilter
+
+    );
+
+    spinFilter.connect(
+
+      spinGain
+
+    );
+
+    spinGain.connect(
+
+      ctx.destination
+
+    );
 
     spinNoise.start();
+
     spinLfo.start();
 
-  }catch(e){}
+  } catch (e) {}
 
 }
 
+/* =========================
 
-function stopSpinSound(){
+   STOP SPIN SOUND
 
-  try{
+========================= */
 
-    if(!spinAudioCtx) return;
+function stopSpinSound() {
 
-    const ctx=spinAudioCtx;
-    const now=ctx.currentTime;
+  try {
 
-    /* QUICK FADE */
+    if (!spinAudioCtx) {
 
-    if(spinGain){
+      return;
 
-      spinGain.gain.cancelScheduledValues(now);
+    }
+
+    const ctx =
+
+      spinAudioCtx;
+
+    const now =
+
+      ctx.currentTime;
+
+    if (spinGain) {
+
+      spinGain.gain.cancelScheduledValues(
+
+        now
+
+      );
 
       spinGain.gain.setValueAtTime(
+
         Math.max(
+
           spinGain.gain.value,
+
           0.001
+
         ),
+
         now
+
       );
 
       spinGain.gain.exponentialRampToValueAtTime(
+
         0.001,
-        now+0.10
+
+        now + 0.10
+
       );
 
     }
 
-    if(spinNoise){
+    if (spinNoise) {
 
-      try{
-        spinNoise.stop(now+0.10);
-      }catch(e){}
+      try {
 
-      spinNoise=null;
+        spinNoise.stop(
+
+          now + 0.10
+
+        );
+
+      } catch (e) {}
+
+      spinNoise = null;
+
     }
 
-    if(spinLfo){
+    if (spinLfo) {
 
-      try{
-        spinLfo.stop(now+0.10);
-      }catch(e){}
+      try {
 
-      spinLfo=null;
+        spinLfo.stop(
+
+          now + 0.10
+
+        );
+
+      } catch (e) {}
+
+      spinLfo = null;
+
     }
 
-  }catch(e){}
+  } catch (e) {}
 
 }
 
@@ -2913,765 +3659,918 @@ function stopSpinSound(){
 
 ========================= */
 
-setInterval(()=>{
+const rouletteTimer =
 
-  if(spinning){
+  setInterval(() => {
+
+    if (spinning) {
+
+      return;
+
+    }
+
+    if (timeLeft > 0) {
+
+      timeLeft--;
+
+      if (timerEl) {
+
+        timerEl.textContent =
+
+          timeLeft;
+
+      }
+
+      if (
+
+        window.zynoUserLoggedIn
+
+      ) {
+
+        playTick();
+
+      }
+
+      /* =========================
+
+         CLOSE BETTING AT 4
+
+      ========================= */
+
+      if (
+
+        timeLeft <= 4 &&
+
+        timeLeft > 0 &&
+
+        bettingOpen
+
+      ) {
+
+        bettingOpen = false;
+
+        if (timerEl) {
+
+          timerEl.classList.add(
+
+            "closed"
+
+          );
+
+        }
+
+        stopAllBetting();
+
+        if (resultEl) {
+
+          resultEl.textContent =
+
+            "Betting closed";
+
+        }
+
+      }
+
+      /* =========================
+
+         START SPIN AT 0
+
+      ========================= */
+
+      if (
+
+        timeLeft <= 0 &&
+
+        !spinning
+
+      ) {
+
+        timeLeft = 0;
+
+        if (timerEl) {
+
+          timerEl.textContent =
+
+            "0";
+
+        }
+
+        spinWheel();
+
+      }
+
+    }
+
+  }, 1000);
+
+/* =========================
+
+   SPIN WHEEL
+
+========================= */
+
+async function spinWheel() {
+
+  if (spinning) {
 
     return;
 
   }
 
-  if(timeLeft > 0){
+  spinning = true;
 
-    timeLeft--;
-
-    timerEl.textContent = timeLeft;
-
-    if(window.zynoUserLoggedIn){
-
-      playTick();
-
-    }
-
-    if(
-
-      timeLeft <= 4 &&
-
-      timeLeft > 0 &&
-
-      bettingOpen
-
-    ){
-
-      bettingOpen = false;
-
-      timerEl.classList.add("closed");
-
-      stopAllBetting();
-
-      resultEl.textContent =
-
-        "Betting closed";
-
-    }
-
-    if(
-
-      timeLeft <= 0 &&
-
-      !spinning
-
-    ){
-
-      timeLeft = 0;
-
-      timerEl.textContent = "0";
-
-      spinWheel();
-
-    }
-
-  }
-
-},1000);
-
-
-/* SPIN */
-
-async function spinWheel(){
-
-  if(spinning)return;
-
-  spinning=true;
-  startSpinSound();
-
-  bettingOpen=false;
+  bettingOpen = false;
 
   stopAllBetting();
 
-  const winner=
-    Math.floor(Math.random()*37);
-    
-    saveRouletteState();
+  startSpinSound();
 
-  const index=
-    wheelNumbers.indexOf(winner);
+  /* =========================
 
-  const targetAngle=
-    -(index*slice);
+     RANDOM WINNER 0–36
 
-  const currentNormalized=
-    (wheelRotation%360+360)%360;
+  ========================= */
 
-  const targetNormalized=
-    (targetAngle%360+360)%360;
+  const winner =
 
-  let difference=
-    targetNormalized-
-    currentNormalized;
+    Math.floor(
 
-  if(difference<0){
-    difference+=360;
-  }
+      Math.random() * 37
 
-  wheelRotation+=
-    360*8+difference;
-
-  wheel.style.transform=
-    "rotate("+wheelRotation+"deg)";
-
-  resultEl.textContent=
-    "Wheel spinning...";
-
-  setTimeout(()=>{
-  stopSpinSound();
-  showWinner(winner);
-},5900);
-}
-
-
-/* WINNER */
-
-function showWinner(winner){
-
-  document.querySelectorAll(".bet-number")
-    .forEach(el=>el.classList.remove("winner"));
-
-  const winnerBtn=
-    document.querySelector(
-      '.bet-number[data-number="'+winner+'"]'
     );
 
-  if(winnerBtn){
-    winnerBtn.classList.add("winner");
+  saveRouletteState();
+
+  const index =
+
+    wheelNumbers.indexOf(
+
+      winner
+
+    );
+
+  const targetAngle =
+
+    -(index * slice);
+
+  const currentNormalized =
+
+    (
+
+      wheelRotation % 360 +
+
+      360
+
+    ) % 360;
+
+  const targetNormalized =
+
+    (
+
+      targetAngle % 360 +
+
+      360
+
+    ) % 360;
+
+  let difference =
+
+    targetNormalized -
+
+    currentNormalized;
+
+  if (difference < 0) {
+
+    difference += 360;
+
   }
 
-  centerLogo.style.display="none";
+  wheelRotation +=
 
-  centerWin.textContent=
-    "WIN "+winner;
+    360 * 8 +
 
-  centerWin.style.display="block";
+    difference;
 
-  const winningBet=
-    bets[winner]||0;
+  if (wheel) {
 
-  if(winningBet>0){
+    wheel.style.transform =
 
-    const totalPayout=
-      winningBet*35;
+      "rotate(" +
 
-    balance+=totalPayout;
-    window.saveUserBalance();
+      wheelRotation +
 
-    resultEl.textContent=
-      "WIN "+winner+
-      " — +"+totalPayout+
-      " points";
+      "deg)";
 
-  }else{
-
-    resultEl.textContent=
-      "Winning Number: "+winner;
   }
 
-  updateBalance();
+  if (resultEl) {
+
+    resultEl.textContent =
+
+      "Wheel spinning...";
+
+  }
+
+  /* =========================
+
+     SAME TIME AS SOUND
+
+     5.9 SECOND SPIN
+
+  ========================= */
+
+  setTimeout(() => {
+
+    stopSpinSound();
+
+    showWinner(winner);
+
+  }, 5900);
+
+}
+
+/* =========================
+
+   SHOW WINNER
+
+========================= */
+
+function showWinner(winner) {
+
+  /* =========================
+
+     REMOVE OLD WINNER
+
+  ========================= */
+
+  document
+
+    .querySelectorAll(".bet-number")
+
+    .forEach(el => {
+
+      el.classList.remove(
+
+        "winner"
+
+      );
+
+    });
+
+  /* =========================
+
+     HIGHLIGHT WINNER
+
+  ========================= */
+
+  const winnerBtn =
+
+    document.querySelector(
+
+      '.bet-number[data-number="' +
+
+      winner +
+
+      '"]'
+
+    );
+
+  if (winnerBtn) {
+
+    winnerBtn.classList.add(
+
+      "winner"
+
+    );
+
+  }
+
+  /* =========================
+
+     CENTER WIN
+
+  ========================= */
+
+  if (centerLogo) {
+
+    centerLogo.style.display =
+
+      "none";
+
+  }
+
+  if (centerWin) {
+
+    centerWin.textContent =
+
+      "WIN " + winner;
+
+    centerWin.style.display =
+
+      "block";
+
+  }
+
+  /* =========================
+
+     PAYOUT
+
+     35 : 1
+
+  ========================= */
+
+  const winningBet =
+
+    Number(
+
+      bets[winner]
+
+    ) || 0;
+
+  if (winningBet > 0) {
+
+    const totalPayout =
+
+      winningBet * 35;
+
+    balance +=
+
+      totalPayout;
+
+    if (resultEl) {
+
+      resultEl.textContent =
+
+        "WIN " +
+
+        winner +
+
+        " — +" +
+
+        totalPayout +
+
+        " points";
+
+    }
+
+    if (
+
+      typeof window.saveUserBalance ===
+
+      "function"
+
+    ) {
+
+      window.saveUserBalance();
+
+    }
+
+  } else {
+
+    if (resultEl) {
+
+      resultEl.textContent =
+
+        "Winning Number: " +
+
+        winner;
+
+    }
+
+  }
+
+  /* =========================
+
+     BALANCE UPDATE
+
+  ========================= */
+
+  if (
+
+    typeof window.updateBalance ===
+
+    "function"
+
+  ) {
+
+    window.updateBalance();
+
+  }
+
+  /* =========================
+
+     LAST 4 WINS
+
+  ========================= */
 
   addLastWin(winner);
 
-  setTimeout(()=>{
+  /* =========================
 
-    centerWin.style.display="none";
+     RESET AFTER 4 SEC
 
-    centerLogo.style.display="block";
+  ========================= */
+
+  setTimeout(() => {
+
+    if (centerWin) {
+
+      centerWin.style.display =
+
+        "none";
+
+    }
+
+    if (centerLogo) {
+
+      centerLogo.style.display =
+
+        "block";
+
+    }
 
     resetGame();
 
-  },4000);
+  }, 4000);
+
 }
 
+/* =========================
 
-function addLastWin(number){
+   ADD LAST WIN
 
-  lastWins.unshift(number);
+========================= */
 
-  if(lastWins.length>4){
-    lastWins.pop();
+function addLastWin(number) {
+
+  lastWins.unshift(
+
+    number
+
+  );
+
+  if (lastWins.length > 4) {
+
+    lastWins =
+
+      lastWins.slice(0, 4);
+
   }
 
   renderLastWins();
 
   localStorage.setItem(
+
     "zynoLastWins",
+
     JSON.stringify(lastWins)
+
   );
 
-  if(window.saveSharedLastWins){
-    window.saveSharedLastWins(lastWins);
+  /*
+
+     Firebase shared function
+
+     Part 2 B mein define hogi.
+
+  */
+
+  if (
+
+    typeof window.saveSharedLastWins ===
+
+    "function"
+
+  ) {
+
+    window.saveSharedLastWins(
+
+      lastWins
+
+    );
+
   }
+
 }
-  
-function renderLastWins(){
 
-  lastWinsEl.innerHTML="";
+/* =========================
 
-  const list=[...lastWins];
+   RENDER LAST WINS
 
-  while(list.length<4){
+========================= */
+
+function renderLastWins() {
+
+  if (!lastWinsEl) {
+
+    return;
+
+  }
+
+  lastWinsEl.innerHTML =
+
+    "";
+
+  const list =
+
+    [...lastWins];
+
+  while (
+
+    list.length < 4
+
+  ) {
+
     list.push("-");
+
   }
 
-  list.reverse().forEach(num=>{
+  list
 
-    const el=
-      document.createElement("span");
+    .reverse()
 
-    el.className="last-number";
+    .forEach(num => {
 
-    el.textContent=num;
+      const el =
 
-    lastWinsEl.appendChild(el);
-  });
+        document.createElement(
+
+          "span"
+
+        );
+
+      el.className =
+
+        "last-number";
+
+      if (num === 0) {
+
+        el.classList.add(
+
+          "zero"
+
+        );
+
+      } else if (
+
+        typeof num === "number" &&
+
+        redNumbers.includes(num)
+
+      ) {
+
+        el.classList.add(
+
+          "red"
+
+        );
+
+      } else if (
+
+        typeof num === "number"
+
+      ) {
+
+        el.classList.add(
+
+          "black"
+
+        );
+
+      }
+
+      el.textContent =
+
+        num;
+
+      lastWinsEl.appendChild(
+
+        el
+
+      );
+
+    });
+
 }
 
+/* =========================
 
-function resetGame(){
+   RESET ROULETTE GAME
+
+========================= */
+
+function resetGame() {
 
   stopAllBetting();
 
-  bets={};
-  
-  localStorage.removeItem("zynoRouletteBets");
-localStorage.removeItem("zynoRouletteTime");
-localStorage.removeItem("zynoRouletteTimestamp");
+  bets = {};
 
-  selectedNumber=null;
+  localStorage.removeItem(
 
-  document.querySelectorAll(".bet-count")
-    .forEach(el=>el.textContent="");
+    "zynoRouletteBets"
 
-  document.querySelectorAll(".bet-number")
-    .forEach(el=>{
-      el.classList.remove("winner");
-      el.classList.remove("active");
+  );
+
+  localStorage.removeItem(
+
+    "zynoRouletteTime"
+
+  );
+
+  localStorage.removeItem(
+
+    "zynoRouletteTimestamp"
+
+  );
+
+  selectedNumber =
+
+    null;
+
+  document
+
+    .querySelectorAll(".bet-count")
+
+    .forEach(el => {
+
+      el.textContent =
+
+        "";
+
     });
 
-  selectedEl.textContent=
-    "Koi number select nahi hai";
+  document
 
-  timeLeft=60;
+    .querySelectorAll(".bet-number")
 
-  timerEl.textContent="60";
+    .forEach(el => {
 
-  timerEl.classList.remove("closed");
+      el.classList.remove(
 
-  resultEl.textContent=
-    "Number select karo";
+        "winner"
 
-  bettingOpen=true;
+      );
 
-  spinning=false;
+      el.classList.remove(
 
-  updateBalance();
-  window.saveUserBalance();
-}
+        "active"
 
+      );
 
-/* =========================
-   LUDO
-========================= */
+    });
 
-let ludoPosition=0;
-let ludoRolling=false;
+  if (selectedEl) {
 
-function rollLudoDice(){
+    selectedEl.textContent =
 
-  if(ludoRolling)return;
+      "Koi number select nahi hai";
 
-  ludoRolling=true;
-
-  const diceValue=
-    document.getElementById("diceValue");
-
-  const status=
-    document.getElementById("ludoStatus");
-
-  diceValue.textContent="...";
-
-  status.textContent=
-    "DICE ROLLING...";
-
-  let ticks=0;
-
-  const anim=setInterval(()=>{
-
-    diceValue.textContent=
-      String(1+Math.floor(Math.random()*6));
-
-    ticks++;
-
-    if(ticks>=8){
-
-      clearInterval(anim);
-
-      const n=
-        1+Math.floor(Math.random()*6);
-
-      diceValue.textContent=n;
-
-      ludoPosition=
-        Math.min(20,ludoPosition+n);
-
-      status.textContent=
-        n===6
-        ?"NICE! 6 AAYA"
-        :"YOU MOVED "+n+" STEP"+(n>1?"S":"");
-
-      ludoRolling=false;
-
-      if(ludoPosition>=20){
-
-        status.textContent=
-          "🏆 ZYNO LUDO — YOU WIN!";
-
-        ludoPosition=0;
-      }
-    }
-
-  },80);
-}
-
-
-function resetLudo(){
-
-  ludoPosition=0;
-
-  ludoRolling=false;
-
-  const d=
-    document.getElementById("diceValue");
-
-  const s=
-    document.getElementById("ludoStatus");
-
-  if(d)d.textContent="ROLL";
-
-  if(s)s.textContent="YOUR TURN";
-}
-
-
-/* =========================
-   TEEN PATTI
-========================= */
-
-const tpCards=
-  document.querySelectorAll(".tp-card");
-
-const tpResult=
-  document.getElementById("tpResult");
-
-let tpReady=true;
-
-function dealTeenPatti(){
-
-  if(!tpReady)return;
-
-  tpReady=false;
-
-  tpResult.textContent=
-    "DEALING...";
-
-  tpCards.forEach(c=>{
-    c.textContent="?";
-  });
-
-  let count=0;
-
-  const timer=setInterval(()=>{
-
-    const c=tpCards[count];
-
-    const suits=[
-      "♠","♥","♦","♣"
-    ];
-
-    const ranks=[
-      "A","K","Q","J","10",
-      "9","8","7","6"
-    ];
-
-    c.textContent=
-      ranks[Math.floor(Math.random()*ranks.length)] +
-      suits[Math.floor(Math.random()*4)];
-
-    count++;
-
-    if(count>=3){
-
-      clearInterval(timer);
-
-      tpResult.textContent=
-        "CARDS DEALT";
-
-      tpReady=true;
-    }
-
-  },350);
-}
-
-
-function resetTeenPatti(){
-
-  tpReady=true;
-
-  tpResult.textContent=
-    "DEAL CARDS";
-
-  tpCards.forEach(c=>{
-    c.textContent="?";
-  });
-}
-
-
-/* =========================
-   CLASH
-========================= */
-
-let yourPower=10;
-let cpuPower=10;
-let clashBusy=false;
-
-function clashMove(move){
-
-  if(clashBusy)return;
-
-  clashBusy=true;
-
-  const cpu=
-    ["attack","shield","power"]
-    [Math.floor(Math.random()*3)];
-
-  let yours=
-    move==="attack"
-    ?3
-    :move==="power"
-    ?4
-    :1;
-
-  let cpuHit=
-    cpu==="attack"
-    ?3
-    :cpu==="power"
-    ?4
-    :1;
-
-  let outcome="";
-
-  if(move==="shield"){
-    cpuHit=Math.max(0,cpuHit-2);
   }
 
-  if(cpu==="shield"){
-    yours=Math.max(0,yours-2);
-  }
+  timeLeft =
 
-  if(yours>cpuHit){
+    60;
 
-    cpuPower=
-      Math.max(0,cpuPower-yours);
+  if (timerEl) {
 
-    outcome=
-      "⚡ YOU WIN THIS CLASH";
+    timerEl.textContent =
 
-  }else if(cpuHit>yours){
+      "60";
 
-    yourPower=
-      Math.max(0,yourPower-cpuHit);
+    timerEl.classList.remove(
 
-    outcome=
-      "CPU WINS THIS CLASH";
+      "closed"
 
-  }else{
-
-    outcome="DRAW";
-  }
-
-  document.getElementById("yourPower")
-    .textContent=yourPower;
-
-  document.getElementById("cpuPower")
-    .textContent=cpuPower;
-
-  document.getElementById("clashResult")
-    .textContent=outcome;
-
-  if(
-    yourPower<=0 ||
-    cpuPower<=0
-  ){
-
-    document.getElementById("clashResult")
-      .textContent=
-      cpuPower<=0
-      ?"🏆 YOU WIN ZYNO CLASH"
-      :"CPU WINS";
-
-    setTimeout(resetClash,1600);
-  }
-
-  setTimeout(()=>{
-    clashBusy=false;
-  },450);
-}
-
-
-function resetClash(){
-
-  yourPower=10;
-
-  cpuPower=10;
-
-  clashBusy=false;
-
-  document.getElementById("yourPower")
-    .textContent=10;
-
-  document.getElementById("cpuPower")
-    .textContent=10;
-
-  document.getElementById("clashResult")
-    .textContent=
-    "CHOOSE YOUR MOVE";
-}
-/* =========================
-   ANTI COPY / PASTE
-========================= */
-
-function isBetNumber(target){
-
-  return target &&
-    target.closest &&
-    (
-      target.closest(".bet-number") ||
-      target.closest(".z11-number")
     );
+
+  }
+
+  if (resultEl) {
+
+    resultEl.textContent =
+
+      "Number select karo";
+
+  }
+
+  bettingOpen =
+
+    true;
+
+  spinning =
+
+    false;
+
+  if (
+
+    typeof window.updateBalance ===
+
+    "function"
+
+  ) {
+
+    window.updateBalance();
+
+  }
+
+  if (
+
+    typeof window.saveUserBalance ===
+
+    "function"
+
+  ) {
+
+    window.saveUserBalance();
+
+  }
+
 }
 
+/* =========================
 
-/* Text selection */
+   LOAD LAST WINS
 
-document.addEventListener(
-  "selectstart",
-  e=>{
-    if(isBetNumber(e.target)){
-      e.preventDefault();
-    }
-  }
-);
+========================= */
 
-
-/* Copy */
-
-document.addEventListener(
-  "copy",
-  e=>{
-    if(
-      isBetNumber(e.target) ||
-      currentPressing ||
-      z11Pressing
-    ){
-      e.preventDefault();
-    }
-  }
-);
-
-
-/* Cut */
-
-document.addEventListener(
-  "cut",
-  e=>{
-    if(
-      isBetNumber(e.target) ||
-      currentPressing ||
-      z11Pressing
-    ){
-      e.preventDefault();
-    }
-  }
-);
-
-
-/* Context menu */
-
-document.addEventListener(
-  "contextmenu",
-  e=>{
-    if(isBetNumber(e.target)){
-      e.preventDefault();
-    }
-  }
-);
-
-
-/* Drag */
-
-document.addEventListener(
-  "dragstart",
-  e=>{
-    if(isBetNumber(e.target)){
-      e.preventDefault();
-    }
-  }
-);
-
-
-/* iPhone touch callout */
-
-document.addEventListener(
-  "touchstart",
-  e=>{
-    if(isBetNumber(e.target)){
-      e.target.style.webkitTouchCallout="none";
-    }
-  },
-  {passive:true}
-);
-
-
-/* Prevent scrolling while holding betting number */
-
-document.addEventListener(
-  "touchmove",
-  e=>{
-
-    if(
-      currentPressing &&
-      e.target.closest(".bet-number")
-    ){
-      e.preventDefault();
-    }
-
-    if(
-      z11Pressing &&
-      e.target.closest(".z11-number")
-    ){
-      e.preventDefault();
-    }
-
-  },
-  {passive:false}
-);
-
-
-/* Visibility safety */
-
-document.addEventListener(
-  "visibilitychange",
-  ()=>{
-
-    if(document.hidden){
-
-      if(currentPressing){
-        stopBet(currentPress);
-      }
-
-      if(z11Pressing){
-        z11StopBet(z11PressBtn);
-      }
-    }
-
-  }
-);
-
-
-/* INITIAL */
 const savedLastWins =
-  localStorage.getItem("zynoLastWins");
 
-if(savedLastWins){
+  localStorage.getItem(
 
-  try{
+    "zynoLastWins"
 
-    lastWins = JSON.parse(savedLastWins);
+  );
 
-  }catch(error){
+if (savedLastWins) {
+
+  try {
+
+    const parsed =
+
+      JSON.parse(
+
+        savedLastWins
+
+      );
+
+    if (Array.isArray(parsed)) {
+
+      lastWins =
+
+        parsed.slice(0, 4);
+
+    } else {
+
+      lastWins = [];
+
+    }
+
+  } catch (error) {
 
     lastWins = [];
 
   }
 
 }
-updateBalance();
+
+/* =========================
+
+   INITIAL RENDER
+
+========================= */
+
+if (timerEl) {
+
+  timerEl.textContent =
+
+    timeLeft;
+
+}
+
+if (timeLeft <= 4) {
+
+  bettingOpen = false;
+
+  if (timerEl) {
+
+    timerEl.classList.add(
+
+      "closed"
+
+    );
+
+  }
+
+}
+
+for (let i = 0; i <= 36; i++) {
+
+  updateBetCount(i);
+
+}
+
+updateSelected();
+
 renderLastWins();
-syncZ11Balance();
-renderZ11Last();
-window.openUserLogin = function(){
 
-  document.querySelectorAll(".view").forEach(v=>{
-    v.classList.remove("active");
-  });
+if (
 
-  const login =
-    document.getElementById("userLogin");
+  typeof window.updateBalance ===
 
-  if(login){
-    login.classList.add("active");
-  }
+  "function"
 
-  window.scrollTo(0,0);
-};
+) {
 
+  window.updateBalance();
 
-window.openUserRegister = function(){
+}
 
-  document.querySelectorAll(".view").forEach(v=>{
-    v.classList.remove("active");
-  });
+/* =========================
 
-  const register =
-    document.getElementById("userRegister");
+   END PART 2 A
 
-  if(register){
-    register.classList.add("active");
-  }
+========================= *
+<!-- =========================
 
-  window.scrollTo(0,0);
-};
-</script>
+     PART 2 B
+
+     FIREBASE + LOGIN + USER
+
+========================= -->
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
+import { initializeApp }
+
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
+
   getAuth,
+
   signInWithEmailAndPassword,
+
   createUserWithEmailAndPassword,
+
   onAuthStateChanged,
+
   signOut
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
-getFirestore,
-doc,
-getDoc,
-getDocs,
-collection,
-setDoc,
-updateDoc,
-runTransaction,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
+  getFirestore,
+
+  doc,
+
+  getDoc,
+
+  getDocs,
+
+  collection,
+
+  setDoc,
+
+  updateDoc,
+
+  runTransaction,
+
+  onSnapshot
+
+}
+
+from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+/* =========================
+
+   FIREBASE CONFIG
+
+========================= */
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDpQHse79QRukas1LD_GTLf-CmDWtArA_c",
+
+  apiKey: "YOUR_API_KEY",
+
   authDomain: "zyno-dc777.firebaseapp.com",
+
   projectId: "zyno-dc777",
+
   storageBucket: "zyno-dc777.firebasestorage.app",
-  messagingSenderId: "59378366235",
-  appId: "1:59378366235:web:72021899a3de7bf3a705be"
+
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+
+  appId: "YOUR_APP_ID"
+
 };
 
+/* =========================
+
+   FIREBASE START
+
+========================= */
 
 const app = initializeApp(firebaseConfig);
 
@@ -3679,1041 +4578,1290 @@ const auth = getAuth(app);
 
 const db = getFirestore(app);
 
-window.saveUserBalance = async function(){
+/* =========================
 
-  const user = auth.currentUser;
+   SAFE BALANCE UPDATE
 
-  if(!user) return;
+========================= */
 
-  const savedBalance =
-    Math.max(0, Math.floor(Number(balance) || 0));
+function safeUpdateBalance(){
 
-  // Local backup
-  localStorage.setItem(
-    "zynoUserBalance",
-    String(savedBalance)
-  );
+  if(typeof window.updateBalance === "function"){
 
-  try{
+    window.updateBalance();
 
-    await setDoc(
-      doc(db,"users",user.uid),
-      {
-        points: savedBalance
-      },
-      { merge:true }
-    );
+    return;
 
-    // Firebase save successful
-    balance = savedBalance;
+  }
+
+  if(typeof updateBalance === "function"){
 
     updateBalance();
 
-  }catch(error){
-
-    console.error(
-      "SAVE BALANCE ERROR:",
-      error
-    );
+    return;
 
   }
-};
+
+  const balanceEl =
+
+    document.getElementById("balance");
+
+  if(balanceEl){
+
+    balanceEl.textContent =
+
+      Number(balance || 0).toLocaleString();
+
+  }
+
+}
+
 /* =========================
-   SHARED LAST 4 WIN NUMBERS
+
+   SAVE USER BALANCE
+
 ========================= */
 
-window.saveSharedLastWins = async function(list){
+window.saveUserBalance = async function(){
 
   try{
 
-    await runTransaction(
-      db,
-      async (transaction)=>{
+    const user = auth.currentUser;
 
-        const ref =
-          doc(db,"gameState","roulette");
+    const savedBalance =
+
+      Math.max(0, Math.floor(Number(balance || 0)));
+
+    localStorage.setItem(
+
+      "zynoBalance",
+
+      String(savedBalance)
+
+    );
+
+    if(!user){
+
+      safeUpdateBalance();
+
+      return;
+
+    }
+
+    await setDoc(
+
+      doc(db, "users", user.uid),
+
+      {
+
+        points: savedBalance
+
+      },
+
+      {
+
+        merge:true
+
+      }
+
+    );
+
+    balance = savedBalance;
+
+    safeUpdateBalance();
+
+  }
+
+  catch(error){
+
+    console.error(
+
+      "Balance save error:",
+
+      error
+
+    );
+
+  }
+
+};
+
+/* =========================
+
+   SHARED LAST WINS
+
+========================= */
+
+window.saveSharedLastWins =
+
+async function(list){
+
+  try{
+
+    if(!Array.isArray(list) || !list.length){
+
+      return;
+
+    }
+
+    const gameRef =
+
+      doc(db, "gameState", "roulette");
+
+    const newWinner =
+
+      Number(list[0]);
+
+    await runTransaction(
+
+      db,
+
+      async(transaction)=>{
 
         const snap =
-          await transaction.get(ref);
 
-        let sharedWins=[];
+          await transaction.get(gameRef);
+
+        let shared = [];
 
         if(snap.exists()){
 
-          const data=snap.data();
+          const data = snap.data();
 
           if(Array.isArray(data.lastWins)){
-            sharedWins=data.lastWins.slice(0,4);
+
+            shared =
+
+              data.lastWins
+
+              .map(Number)
+
+              .filter(
+
+                n => n >= 0 && n <= 36
+
+              );
+
           }
 
         }
 
-        const newWinner=list[0];
+        shared =
 
-        if(newWinner===undefined)return;
+          shared.filter(
 
-        sharedWins.unshift(newWinner);
+            n => n !== newWinner
 
-        if(sharedWins.length>4){
-          sharedWins.pop();
-        }
+          );
+
+        shared.unshift(newWinner);
+
+        shared =
+
+          shared.slice(0,4);
 
         transaction.set(
-          ref,
+
+          gameRef,
+
           {
-            lastWins:sharedWins,
-            updatedAt:Date.now()
+
+            lastWins: shared,
+
+            updatedAt: Date.now()
+
           },
-          {merge:true}
+
+          {
+
+            merge:true
+
+          }
+
         );
 
       }
-    );
 
-  }catch(error){
-
-    console.error(
-      "SAVE SHARED LAST WINS ERROR:",
-      error
     );
 
   }
+
+  catch(error){
+
+    console.error(
+
+      "Shared last wins error:",
+
+      error
+
+    );
+
+  }
+
 };
 
-onSnapshot(
-  doc(db,"gameState","roulette"),
-  (snap)=>{
-
-    if(!snap.exists())return;
-
-    const data=snap.data();
-
-    if(!Array.isArray(data.lastWins))return;
-
-    lastWins=data.lastWins.slice(0,4);
-
-    localStorage.setItem(
-      "zynoLastWins",
-      JSON.stringify(lastWins)
-    );
-
-    renderLastWins();
-
-  },
-  (error)=>{
-
-    console.error(
-      "SHARED LAST WINS ERROR:",
-      error
-    );
-
-  }
-);
 /* =========================
-   USER LOGIN
+
+   LISTEN SHARED LAST WINS
+
 ========================= */
 
-window.openUserLogin = function(){
+try{
 
-  document.querySelectorAll(".view").forEach(v=>{
-    v.classList.remove("active");
-  });
+  const gameRef =
 
-  document.getElementById("userLogin").classList.add("active");
+    doc(db, "gameState", "roulette");
 
-  window.scrollTo(0,0);
-};
+  onSnapshot(
 
+    gameRef,
 
-window.openUserRegister = function(){
+    (snap)=>{
 
-  document.querySelectorAll(".view").forEach(v=>{
-    v.classList.remove("active");
-  });
+      if(!snap.exists()){
 
-  document.getElementById("userRegister").classList.add("active");
+        return;
 
-  window.scrollTo(0,0);
-};
+      }
 
+      const data =
 
-window.zynoUserLogin = async function(){
+        snap.data();
 
-  const email =
-    document.getElementById("userLoginEmail").value.trim();
+      if(
 
-  const password =
-    document.getElementById("userLoginPassword").value;
+        Array.isArray(data.lastWins)
 
-  const message =
-    document.getElementById("userLoginMessage");
+      ){
 
-  if(!email || !password){
+        lastWins =
 
-    message.textContent =
-      "Email aur Password bharo";
+          data.lastWins
 
-    return;
-  }
+          .map(Number)
 
-  message.textContent =
-    "LOGIN CHECKING...";
+          .filter(
+
+            n => n >= 0 && n <= 36
+
+          )
+
+          .slice(0,4);
+
+        localStorage.setItem(
+
+          "zynoLastWins",
+
+          JSON.stringify(lastWins)
+
+        );
+
+        if(
+
+          typeof renderLastWins === "function"
+
+        ){
+
+          renderLastWins();
+
+        }
+
+      }
+
+    },
+
+    (error)=>{
+
+      console.error(
+
+        "Last wins listener error:",
+
+        error
+
+      );
+
+    }
+
+  );
+
+}
+
+catch(error){
+
+  console.error(
+
+    "Last wins setup error:",
+
+    error
+
+  );
+
+}
+
+/* =========================
+
+   USER LOGIN
+
+========================= */
+
+window.zynoUserLogin =
+
+async function(){
 
   try{
 
-    const result =
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
+    const email =
+
+      document
+
+      .getElementById("loginEmail")
+
+      ?.value
+
+      .trim();
+
+    const password =
+
+      document
+
+      .getElementById("loginPassword")
+
+      ?.value;
+
+    if(!email || !password){
+
+      alert(
+
+        "Email aur password enter karein."
+
       );
 
-    const uid =
-      result.user.uid;
+      return;
+
+    }
+
+    const result =
+
+      await signInWithEmailAndPassword(
+
+        auth,
+
+        email,
+
+        password
+
+      );
+
+    const user =
+
+      result.user;
 
     const userRef =
-      doc(db,"users",uid);
+
+      doc(db, "users", user.uid);
 
     const userSnap =
+
       await getDoc(userRef);
 
     if(!userSnap.exists()){
 
       await signOut(auth);
 
-      message.textContent =
-        "User profile nahi mila";
+      alert(
+
+        "User account data nahi mila."
+
+      );
 
       return;
+
     }
 
-    const userData =
+    const data =
+
       userSnap.data();
 
-    if(userData.role !== "user"){
+    if(data.role !== "user"){
 
       await signOut(auth);
 
-      message.textContent =
-        "Ye normal user account nahi hai";
+      alert(
+
+        "Ye user account nahi hai."
+
+      );
 
       return;
+
     }
 
-    const firestoreBalance =
-  Number(userData.points);
+    balance =
 
-  balance =
-    Number.isFinite(firestoreBalance)
-    ? firestoreBalance
-    : 0;
+      Math.max(
 
-  updateBalance();
-  syncZ11Balance();
+        0,
 
-  localStorage.setItem(
-    "zynoUserBalance",
-    String(balance)
-  );
+        Number(data.points || 0)
 
-    message.textContent =
-      "LOGIN SUCCESS";
+      );
 
-    document
-      .getElementById("userLogin")
-      .classList.remove("active");
+    localStorage.setItem(
 
-    document
-      .getElementById("home")
-      .classList.add("active");
+      "zynoBalance",
 
-    window.scrollTo(0,0);
+      String(balance)
 
-    }catch(error){
-
-    console.error(
-      "ZYNO USER LOGIN ERROR:",
-      error
     );
 
-    const errorCode =
-      error?.code || "";
+    safeUpdateBalance();
 
-    const errorMessage =
-      error?.message || "";
+    if(
 
-    if(errorCode === "auth/invalid-credential"){
+      typeof syncZ11Balance ===
 
-      message.textContent =
-        "Email ya Password galat hai";
+      "function"
 
-    }else if(errorCode === "auth/user-not-found"){
+    ){
 
-      message.textContent =
-        "User account nahi mila";
+      syncZ11Balance();
 
-    }else if(errorCode === "auth/wrong-password"){
-
-      message.textContent =
-        "Password galat hai";
-
-    }else if(errorCode === "auth/invalid-email"){
-
-      message.textContent =
-        "Email format galat hai";
-
-    }else if(errorCode === "auth/too-many-requests"){
-
-      message.textContent =
-        "Bahut baar login try hua hai, thodi der baad try karo";
-
-    }else{
-
-      message.textContent =
-        "Login error: " +
-        String(
-          error?.code ||
-          error?.message ||
-          error ||
-          "Unknown error"
-        );
     }
+
+    if(
+
+      typeof window.openHome ===
+
+      "function"
+
+    ){
+
+      window.openHome();
+
+    }
+
+  }
+
+  catch(error){
+
+    console.error(
+
+      "Login error:",
+
+      error
+
+    );
+
+    alert(
+
+      "Login error: " +
+
+      (error.message || error)
+
+    );
 
   }
 
 };
+
 /* =========================
+
    USER REGISTER
+
 ========================= */
 
-window.zynoUserRegister = async function(){
+window.zynoUserRegister =
 
-  const username =
-    document.getElementById("registerUsername").value.trim();
-
-  const email =
-    document.getElementById("registerEmail").value.trim();
-
-  const password =
-    document.getElementById("registerPassword").value;
-
-  const message =
-    document.getElementById("registerMessage");
-
-
-  if(!username || !email || !password){
-
-    message.textContent =
-      "Username, Email aur Password bharo";
-
-    return;
-  }
-
-
-  if(password.length < 6){
-
-    message.textContent =
-      "Password kam se kam 6 characters ka hona chahiye";
-
-    return;
-  }
-
-
-  message.textContent =
-    "ACCOUNT CREATING...";
-
+async function(){
 
   try{
 
-    const result =
-      await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
+    const username =
+
+      document
+
+      .getElementById("registerUsername")
+
+      ?.value
+
+      .trim();
+
+    const email =
+
+      document
+
+      .getElementById("registerEmail")
+
+      ?.value
+
+      .trim();
+
+    const password =
+
+      document
+
+      .getElementById("registerPassword")
+
+      ?.value;
+
+    if(!username){
+
+      alert("Username enter karein.");
+
+      return;
+
+    }
+
+    if(!email){
+
+      alert("Email enter karein.");
+
+      return;
+
+    }
+
+    if(!password || password.length < 6){
+
+      alert(
+
+        "Password kam se kam 6 characters ka hona chahiye."
+
       );
 
+      return;
 
-    const uid =
-      result.user.uid;
+    }
 
+    const result =
+
+      await createUserWithEmailAndPassword(
+
+        auth,
+
+        email,
+
+        password
+
+      );
+
+    const user =
+
+      result.user;
 
     await setDoc(
-      doc(db,"users",uid),
+
+      doc(db, "users", user.uid),
+
       {
-        uid: uid,
+
+        uid: user.uid,
+
         username: username,
+
         email: email,
+
         role: "user",
-        points: 0
+
+        points: 0,
+
+        approved: true,
+
+        createdAt: Date.now()
+
       }
+
     );
-    
-    message.textContent =
-  "ACCOUNT CREATED";
-    document.querySelectorAll(".view").forEach(v=>{
-  v.classList.remove("active");
-});
 
-document
-  .getElementById("home")
-  .classList.add("active");
+    balance = 0;
 
-window.scrollTo(0,0);
+    localStorage.setItem(
 
-  }catch(error){
+      "zynoBalance",
+
+      "0"
+
+    );
+
+    safeUpdateBalance();
+
+    alert(
+
+      "Account successfully create ho gaya."
+
+    );
+
+    if(
+
+      typeof window.openHome ===
+
+      "function"
+
+    ){
+
+      window.openHome();
+
+    }
+
+  }
+
+  catch(error){
 
     console.error(
-      "ZYNO USER REGISTER ERROR:",
+
+      "Register error:",
+
       error
+
     );
 
+    alert(
 
-    if(error.code === "auth/email-already-in-use"){
+      "Register error: " +
 
-      message.textContent =
-        "Ye Email pehle se registered hai";
+      (error.message || error)
 
-    }else if(error.code === "auth/invalid-email"){
+    );
 
-      message.textContent =
-        "Email galat hai";
-
-    }else if(error.code === "auth/weak-password"){
-
-      message.textContent =
-        "Password weak hai";
-
-    }else{
-
-      message.textContent =
-        "Register error: "+error.code;
-    }
   }
+
 };
 
 /* =========================
+
    ADMIN LOGIN
+
 ========================= */
 
-window.zynoAdminLogin = async function(){
+window.zynoAdminLogin =
 
-  const email =
-    document.getElementById("adminEmail").value.trim();
-
-  const password =
-    document.getElementById("adminPassword").value;
-
-  const message =
-    document.getElementById("adminMessage");
-
-
-  if(!email || !password){
-
-    message.textContent =
-      "Email aur Password bharo";
-
-    return;
-  }
-
-
-  message.textContent =
-    "LOGIN CHECKING...";
-
+async function(){
 
   try{
 
-    const result =
-      await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
+    const email =
+
+      document
+
+      .getElementById("adminEmail")
+
+      ?.value
+
+      .trim();
+
+    const password =
+
+      document
+
+      .getElementById("adminPassword")
+
+      ?.value;
+
+    if(!email || !password){
+
+      alert(
+
+        "Admin email aur password enter karein."
+
       );
 
+      return;
 
-    const uid =
-      result.user.uid;
+    }
 
+    const result =
+
+      await signInWithEmailAndPassword(
+
+        auth,
+
+        email,
+
+        password
+
+      );
+
+    const user =
+
+      result.user;
 
     const adminRef =
-      doc(db,"users","admin");
 
+      doc(db, "users", "admin");
 
     const adminSnap =
-      await getDoc(adminRef);
 
+      await getDoc(adminRef);
 
     if(!adminSnap.exists()){
 
       await signOut(auth);
 
-      message.textContent =
-        "Admin document nahi mila";
+      alert(
+
+        "Admin account nahi mila."
+
+      );
 
       return;
+
     }
 
+    const admin =
 
-    const adminData =
       adminSnap.data();
 
-
-    const uidOK =
-      adminData.uid === uid;
-
-    const roleOK =
-      adminData.role === "admin";
-
-    const approvedOK =
-      adminData.approved === true;
-
-
-    if(!uidOK){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin UID match nahi hua";
-
-      return;
-    }
-
-
-    if(!roleOK){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin role galat hai";
-
-      return;
-    }
-
-
-    if(!approvedOK){
-
-      await signOut(auth);
-
-      message.textContent =
-        "Admin approval false hai";
-
-      return;
-    }
-balance = Number(adminData.points) || 0;
-updateBalance();
-
-    message.textContent =
-      "ADMIN LOGIN SUCCESS";
-
-
-    document
-      .getElementById("adminLogin")
-      .classList.remove("active");
-
-    document
-      .getElementById("adminPanel")
-      .classList.add("active");
-
-    window.scrollTo(0,0);
-
-
-  }catch(error){
-
-    console.error("ZYNO ADMIN LOGIN ERROR:",error);
-
-    if(error.code === "auth/invalid-credential"){
-
-      message.textContent =
-        "Email ya Password galat hai";
-
-    }else if(error.code === "auth/user-not-found"){
-
-      message.textContent =
-        "Admin user nahi mila";
-
-    }else if(error.code === "auth/wrong-password"){
-
-      message.textContent =
-        "Password galat hai";
-
-    }else{
-
-      message.textContent =
-        "Login error: "+error.code;
-    }
-  }
-};
-
-
-/* =========================
-   ADMIN LOGOUT
-========================= */
-
-window.zynoAdminLogout = async function(){
-
-  try{
-
-    await signOut(auth);
-
-    document
-      .getElementById("adminPanel")
-      .classList.remove("active");
-
-    document
-      .getElementById("adminLogin")
-      .classList.add("active");
-
-    document
-      .getElementById("adminMessage")
-      .textContent = "";
-
-    document
-      .getElementById("adminEmail")
-      .value = "";
-
-    document
-      .getElementById("adminPassword")
-      .value = "";
-
-    window.scrollTo(0,0);
-
-  }catch(error){
-
-    console.error("LOGOUT ERROR:",error);
-  }
-};
-
-
-/* =========================
-   CHECK EXISTING LOGIN
-========================= */
-/* =========================
-   SAVE CURRENT VIEW
-   FOR REFRESH
-========================= */
-
-window.addEventListener("beforeunload",()=>{
-
-  const activeView =
-    document.querySelector(".view.active");
-
-  if(activeView && activeView.id){
-
-    localStorage.setItem(
-      "zynoLastView",
-      activeView.id
-    );
-
-  }
-
-});
-/* =========================
-   SAVE CURRENT VIEW
-   BEFORE REFRESH
-========================= */
-
-window.addEventListener("beforeunload",()=>{
-
-  const activeView =
-    document.querySelector(".view.active");
-
-  if(activeView && activeView.id){
-
-    localStorage.setItem(
-      "zynoLastView",
-      activeView.id
-    );
-
-  }
-
-});
-onAuthStateChanged(auth,async(user)=>{
-window.zynoUserLoggedIn = !!user;
-  console.log(
-    "REFRESH AUTH USER:",
-    user ? user.uid : "NO USER"
-  );
-
-  /* =========================
-     NO USER → LOGIN SCREEN
-  ========================= */
-
-  if(!user){
-
-    document
-      .querySelectorAll(".view")
-      .forEach(v=>{
-        v.classList.remove("active");
-      });
-
-    document
-      .getElementById("userLogin")
-      .classList.add("active");
-
-    window.scrollTo(0,0);
-
-    return;
-  }
-
-
-  try{
-
-    /* =========================
-       CHECK ADMIN
-    ========================= */
-
-    const adminRef =
-      doc(db,"users","admin");
-
-    const snap =
-      await getDoc(adminRef);
-
-
     if(
-      snap.exists()
+
+      admin.uid !== user.uid ||
+
+      admin.role !== "admin" ||
+
+      admin.approved !== true
+
     ){
 
-      const data =
-        snap.data();
+      await signOut(auth);
 
+      alert(
 
-      if(
-        data.uid === user.uid &&
-        data.role === "admin" &&
-        data.approved === true
-      ){
+        "Admin access denied."
 
-        /* ADMIN BALANCE */
+      );
 
-        balance =
-          Number(data.points) || 0;
+      return;
 
-        updateBalance();
-
-
-        /* LOAD USERS */
-
-        const usersSnapshot =
-          await getDocs(
-            collection(db,"users")
-          );
-
-        const usersList =
-          document.getElementById(
-            "adminUsersList"
-          );
-
-        const usersMessage =
-          document.getElementById(
-            "adminUsersMessage"
-          );
-
-        usersList.innerHTML="";
-
-        let userCount=0;
-
-
-        usersSnapshot.forEach((userDoc)=>{
-
-          if(userDoc.id==="admin")return;
-
-          const userData =
-            userDoc.data();
-
-          userCount++;
-
-
-          const userBox =
-            document.createElement("div");
-
-
-          userBox.style.cssText=`
-            padding:12px;
-            margin-top:10px;
-            border:1px solid rgba(0,229,255,.18);
-            border-radius:12px;
-            background:#061322;
-          `;
-
-
-          userBox.innerHTML=`
-            <div style="
-              color:#00e5ff;
-              font-weight:1000;
-            ">
-              ${userData.username || "No Username"}
-            </div>
-
-            <div style="
-              margin-top:5px;
-              color:#8faac2;
-              font-size:9px;
-            ">
-              ${userData.email || "No Email"}
-            </div>
-
-            <div style="
-              margin-top:8px;
-              color:#fff;
-              font-size:10px;
-            ">
-              POINTS:
-              <span class="user-points">
-                ${Number(userData.points)||0}
-              </span>
-            </div>
-
-          `;
-
-          /* ADD POINTS BUTTON */
-
-          const addPointsBtn =
-            document.createElement("button");
-
-          addPointsBtn.textContent=
-            "ADD POINTS";
-
-
-          addPointsBtn.style.cssText=`
-            width:100%;
-            margin-top:10px;
-            padding:10px;
-            border-radius:9px;
-            border:1px solid rgba(255,211,78,.25);
-            background:#071a30;
-            color:#ffd34e;
-            font-size:9px;
-            font-weight:1000;
-          `;
-
-
-          addPointsBtn.onclick=async()=>{
-
-            const amount =
-              prompt(
-                "Kitne points add karne hain?"
-              );
-
-            if(amount===null)return;
-
-
-            const pointsToAdd =
-              Number(amount);
-
-
-            if(
-              !Number.isFinite(pointsToAdd) ||
-              pointsToAdd<=0
-            ){
-
-              alert(
-                "Valid points enter karo"
-              );
-
-              return;
-            }
-
-
-            addPointsBtn.textContent=
-              "ADDING...";
-
-
-            try{
-
-              const currentPoints =
-                Number(userData.points)||0;
-
-
-              const newPoints =
-                currentPoints+pointsToAdd;
-
-
-              await updateDoc(
-                doc(
-                  db,
-                  "users",
-                  userDoc.id
-                ),
-                {
-                  points:newPoints
-                }
-              );
-
-
-              userData.points=
-                newPoints;
-
-
-              const pointsElement =
-                userBox.querySelector(
-                  ".user-points"
-                );
-
-
-              if(pointsElement){
-
-                pointsElement.textContent=
-                  newPoints;
-              }
-
-
-              addPointsBtn.textContent=
-                "ADD POINTS";
-
-
-            }catch(error){
-
-              console.error(
-                "ADD POINTS ERROR:",
-                error
-              );
-
-              addPointsBtn.textContent=
-                "ADD POINTS";
-
-              alert(
-                "Points add nahi ho paye"
-              );
-            }
-          };
-
-
-          userBox.appendChild(
-            addPointsBtn
-          );
-
-          usersList.appendChild(
-            userBox
-          );
-
-        });
-
-
-        usersMessage.textContent=
-          userCount===0
-          ?"NO USERS FOUND"
-          :userCount+" USER(S) FOUND";
-
-
-        /* ADMIN PANEL OPEN */
-
-        document
-          .querySelectorAll(".view")
-          .forEach(v=>{
-            v.classList.remove("active");
-          });
-
-
-        document
-          .getElementById("adminPanel")
-          .classList.add("active");
-
-
-        window.scrollTo(0,0);
-
-        return;
-      }
     }
 
+    balance =
 
-    /* =========================
-       CHECK NORMAL USER
-    ========================= */
+      Math.max(
 
-    const userRef =
-      doc(db,"users",user.uid);
+        0,
 
-    const userSnap =
-      await getDoc(userRef);
+        Number(admin.points || 0)
 
+      );
+
+    localStorage.setItem(
+
+      "zynoBalance",
+
+      String(balance)
+
+    );
+
+    safeUpdateBalance();
 
     if(
-      userSnap.exists() &&
-      userSnap.data().role==="user"
+
+      typeof window.openAdminPanel ===
+
+      "function"
+
     ){
 
-      /* USER BALANCE */
+      window.openAdminPanel();
 
-      const firestoreBalance =
-  Number(userSnap.data().points);
+    }
 
-balance =
-  Number.isFinite(firestoreBalance)
-  ? firestoreBalance
-  : 0;
+  }
 
-localStorage.setItem(
-  "zynoUserBalance",
-  String(balance)
-);
-
-updateBalance();
-syncZ11Balance();
-
-
-      /* =========================
-   RESTORE LAST VIEW
-   AFTER REFRESH
-========================= */
-
-const lastView =
-  localStorage.getItem("zynoLastView");
-
-document
-  .querySelectorAll(".view")
-  .forEach(v=>{
-    v.classList.remove("active");
-  });
-
-
-const restoreView =
-  lastView &&
-  document.getElementById(lastView)
-    ? document.getElementById(lastView)
-    : document.getElementById("home");
-
-
-restoreView.classList.add("active");
-
-window.scrollTo(0,0);
-
-console.log(
-  "USER LOGIN RESTORED VIEW:",
-  restoreView.id
-);
-
-return;
-
-}  //
-
-    /* =========================
-       NOT APPROVED / INVALID
-    ========================= */
-
-    await signOut(auth);
-
-    document
-      .querySelectorAll(".view")
-      .forEach(v=>{
-        v.classList.remove("active");
-      });
-
-    document
-      .getElementById("userLogin")
-      .classList.add("active");
-
-    window.scrollTo(0,0);
-
-
-  }catch(error){
+  catch(error){
 
     console.error(
-      "ADMIN CHECK ERROR:",
+
+      "Admin login error:",
+
       error
+
+    );
+
+    alert(
+
+      "Admin login error: " +
+
+      (error.message || error)
+
     );
 
   }
 
-});
+};
+
+/* =========================
+
+   LOGOUT
+
+========================= */
+
+window.zynoLogout =
+
+async function(){
+
+  try{
+
+    await signOut(auth);
+
+    localStorage.removeItem(
+
+      "zynoBalance"
+
+    );
+
+    if(
+
+      typeof window.openUserLogin ===
+
+      "function"
+
+    ){
+
+      window.openUserLogin();
+
+    }
+
+  }
+
+  catch(error){
+
+    console.error(
+
+      "Logout error:",
+
+      error
+
+    );
+
+  }
+
+};
+
+/* =========================
+
+   AUTH STATE
+
+========================= */
+
+onAuthStateChanged(
+
+  auth,
+
+  async(user)=>{
+
+    try{
+
+      window.zynoUserLoggedIn =
+
+        !!user;
+
+      if(!user){
+
+        return;
+
+      }
+
+      /* -------------------------
+
+         CHECK ADMIN
+
+      ------------------------- */
+
+      const adminRef =
+
+        doc(db, "users", "admin");
+
+      const adminSnap =
+
+        await getDoc(adminRef);
+
+      if(adminSnap.exists()){
+
+        const admin =
+
+          adminSnap.data();
+
+        if(
+
+          admin.uid === user.uid &&
+
+          admin.role === "admin" &&
+
+          admin.approved === true
+
+        ){
+
+          balance =
+
+            Math.max(
+
+              0,
+
+              Number(admin.points || 0)
+
+            );
+
+          localStorage.setItem(
+
+            "zynoBalance",
+
+            String(balance)
+
+          );
+
+          safeUpdateBalance();
+
+          return;
+
+        }
+
+      }
+
+      /* -------------------------
+
+         NORMAL USER
+
+      ------------------------- */
+
+      const userRef =
+
+        doc(db, "users", user.uid);
+
+      const userSnap =
+
+        await getDoc(userRef);
+
+      if(!userSnap.exists()){
+
+        await signOut(auth);
+
+        return;
+
+      }
+
+      const data =
+
+        userSnap.data();
+
+      if(data.role !== "user"){
+
+        await signOut(auth);
+
+        return;
+
+      }
+
+      balance =
+
+        Math.max(
+
+          0,
+
+          Number(data.points || 0)
+
+        );
+
+      localStorage.setItem(
+
+        "zynoBalance",
+
+        String(balance)
+
+      );
+
+      safeUpdateBalance();
+
+      if(
+
+        typeof syncZ11Balance ===
+
+        "function"
+
+      ){
+
+        syncZ11Balance();
+
+      }
+
+    }
+
+    catch(error){
+
+      console.error(
+
+        "Auth state error:",
+
+        error
+
+      );
+
+    }
+
+  }
+
+);
+
+/* =========================
+
+   ADMIN USER LIST
+
+========================= */
+
+window.loadAdminUsers =
+
+async function(){
+
+  try{
+
+    const usersSnap =
+
+      await getDocs(
+
+        collection(db,"users")
+
+      );
+
+    const container =
+
+      document.getElementById(
+
+        "adminUsers"
+
+      );
+
+    if(!container){
+
+      return;
+
+    }
+
+    container.innerHTML = "";
+
+    usersSnap.forEach(
+
+      (userDoc)=>{
+
+        const data =
+
+          userDoc.data();
+
+        if(
+
+          data.role === "admin"
+
+        ){
+
+          return;
+
+        }
+
+        const row =
+
+          document.createElement("div");
+
+        row.className =
+
+          "admin-user-row";
+
+        row.innerHTML = `
+
+          <div>
+
+            <strong>
+
+              ${data.username || "User"}
+
+            </strong>
+
+            <br>
+
+            <small>
+
+              ${data.email || ""}
+
+            </small>
+
+            <br>
+
+            <span>
+
+              Points:
+
+              ${Number(data.points || 0).toLocaleString()}
+
+            </span>
+
+          </div>
+
+          <button
+
+            onclick="adminAddPoints('${userDoc.id}')"
+
+          >
+
+            ADD POINTS
+
+          </button>
+
+        `;
+
+        container.appendChild(row);
+
+      }
+
+    );
+
+  }
+
+  catch(error){
+
+    console.error(
+
+      "Admin users error:",
+
+      error
+
+    );
+
+  }
+
+};
+
+/* =========================
+
+   ADMIN ADD POINTS
+
+========================= */
+
+window.adminAddPoints =
+
+async function(uid){
+
+  try{
+
+    const input =
+
+      prompt(
+
+        "Kitne points add karne hain?"
+
+      );
+
+    if(input === null){
+
+      return;
+
+    }
+
+    const points =
+
+      Math.floor(
+
+        Number(input)
+
+      );
+
+    if(
+
+      !Number.isFinite(points) ||
+
+      points <= 0
+
+    ){
+
+      alert(
+
+        "Valid points enter karein."
+
+      );
+
+      return;
+
+    }
+
+    const userRef =
+
+      doc(db, "users", uid);
+
+    const userSnap =
+
+      await getDoc(userRef);
+
+    if(!userSnap.exists()){
+
+      alert(
+
+        "User nahi mila."
+
+      );
+
+      return;
+
+    }
+
+    const current =
+
+      Number(
+
+        userSnap.data().points || 0
+
+      );
+
+    await updateDoc(
+
+      userRef,
+
+      {
+
+        points:
+
+          current + points
+
+      }
+
+    );
+
+    alert(
+
+      points.toLocaleString() +
+
+      " points add ho gaye."
+
+    );
+
+    if(
+
+      typeof window.loadAdminUsers ===
+
+      "function"
+
+    ){
+
+      window.loadAdminUsers();
+
+    }
+
+  }
+
+  catch(error){
+
+    console.error(
+
+      "Add points error:",
+
+      error
+
+    );
+
+    alert(
+
+      "Points update error: " +
+
+      (error.message || error)
+
+    );
+
+  }
+
+};
+
 </script>
-</body>
-</html>
