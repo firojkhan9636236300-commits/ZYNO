@@ -133,13 +133,266 @@ function playSpinSound(){try{ensureAudio();spinOsc=audioCtx.createOscillator();s
 function stopSpinSound(){try{if(!spinOsc)return;spinGain.gain.cancelScheduledValues(audioCtx.currentTime);spinGain.gain.setValueAtTime(spinGain.gain.value,audioCtx.currentTime);spinGain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.22);spinOsc.stop(audioCtx.currentTime+.25);spinOsc=null}catch(e){}}
 setInterval(()=>{tickR36();tickR11();if((document.getElementById('r36').classList.contains('active')||document.getElementById('r11').classList.contains('active'))&&Math.random()<.001)playTick()},1000);
 /* ---------- GEMS FORTUNE ---------- */
-const symbols=['◆','✦','●','⬟','✚','✧'],gemGrid=document.getElementById('gemGrid');let gemsRound=0,gemsBusy=false,gemsBet=10;
-function makeGem(){return Math.floor(Math.random()*symbols.length)}
-function buildGems(){gemGrid.innerHTML='';for(let i=0;i<25;i++){const n=makeGem();const e=document.createElement('div');e.className='gem g'+(n+1);e.dataset.v=n;e.textContent=symbols[n];gemGrid.appendChild(e)}}
-function neighbors(i){const out=[];const r=Math.floor(i/5),c=i%5;[[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{if(rr>=0&&rr<5&&cc>=0&&cc<5)out.push(rr*5+cc)});return out}
-function findClusters(){const els=[...gemGrid.children],seen=new Set(),groups=[];for(let i=0;i<25;i++){if(seen.has(i))continue;const val=+els[i].dataset.v,q=[i],g=[];seen.add(i);while(q.length){const x=q.shift();g.push(x);neighbors(x).forEach(y=>{if(!seen.has(y)&&+els[y].dataset.v===val){seen.add(y);q.push(y)}})}if(g.length>=3)groups.push(g)}return groups}
-function playGems(){if(gemsBusy||balance<gemsBet)return;ensureAudio();balance-=gemsBet;syncBalance();gemsBusy=true;gemsRound++;document.getElementById('gemsRound').textContent=gemsRound;document.getElementById('gemWin').textContent='';buildGems();setTimeout(()=>{const groups=findClusters();let score=0;groups.forEach(g=>{score+=g.length*g.length*2;g.forEach(i=>gemGrid.children[i].classList.add('pop'))});document.getElementById('gemsWin').textContent=score?'+'+score+' POINTS':'NO WIN';document.getElementById('gemWin').textContent=score?'WIN +'+score+' POINTS':'No cluster this round';balance+=score;syncBalance();setTimeout(()=>{buildGems();gemsBusy=false},300)},420)}
-buildGems();syncBalance();
+const symbols=['◆','✦','●','⬟','✚','✧'],
+gemGrid=document.getElementById('gemGrid');
+
+let gemsRound=0,
+gemsBusy=false,
+gemsBet=10;
+
+function makeGem(){
+ return Math.floor(Math.random()*symbols.length);
+}
+
+function createGem(n,cls=''){
+ const e=document.createElement('div');
+ e.className='gem g'+(n+1)+(cls?' '+cls:'');
+ e.dataset.v=n;
+ e.textContent=symbols[n];
+ return e;
+}
+
+function buildGems(){
+ gemGrid.innerHTML='';
+ for(let i=0;i<25;i++){
+  gemGrid.appendChild(createGem(makeGem()));
+ }
+}
+
+function neighbors(i){
+ const out=[];
+ const r=Math.floor(i/5);
+ const c=i%5;
+
+ [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{
+  if(rr>=0&&rr<5&&cc>=0&&cc<5){
+   out.push(rr*5+cc);
+  }
+ });
+
+ return out;
+}
+
+function findClusters(){
+
+ const els=[...gemGrid.children];
+ const seen=new Set();
+ const groups=[];
+
+ for(let i=0;i<25;i++){
+
+  if(seen.has(i)) continue;
+
+  const val=+els[i].dataset.v;
+  const queue=[i];
+  const group=[];
+
+  seen.add(i);
+
+  while(queue.length){
+
+   const x=queue.shift();
+   group.push(x);
+
+   neighbors(x).forEach(y=>{
+    if(!seen.has(y)&&+els[y].dataset.v===val){
+     seen.add(y);
+     queue.push(y);
+    }
+   });
+
+  }
+
+  if(group.length>=3){
+   groups.push(group);
+  }
+ }
+
+ return groups;
+}
+
+function gemScore(size){
+
+ if(size===3) return 10;
+ if(size===4) return 20;
+ if(size===5) return 35;
+ if(size===6) return 55;
+
+ return size*12;
+}
+
+function dropGems(groups){
+
+ return new Promise(resolve=>{
+
+  const remove=new Set();
+
+  groups.forEach(group=>{
+   group.forEach(i=>remove.add(i));
+  });
+
+  remove.forEach(i=>{
+   const gem=gemGrid.children[i];
+   if(gem) gem.classList.add('pop');
+  });
+
+  setTimeout(()=>{
+
+   const old=[...gemGrid.children];
+   const board=new Array(25).fill(null);
+
+   /*
+    * Har column mein gems neeche girenge.
+    */
+   for(let c=0;c<5;c++){
+
+    const survivors=[];
+
+    for(let r=4;r>=0;r--){
+
+     const index=r*5+c;
+
+     if(!remove.has(index)){
+      survivors.push(old[index]);
+     }
+    }
+    for(let r=4;r>=0;r--){
+
+     const survivorIndex=4-r;
+
+     if(survivorIndex<survivors.length){
+      board[r*5+c]=survivors[survivorIndex];
+     }
+    }
+   }
+
+   gemGrid.innerHTML='';
+
+   /*
+    * Existing gems + naye gems.
+    */
+
+   for(let i=0;i<25;i++){
+
+    if(board[i]){
+
+     board[i].classList.remove('pop');
+     board[i].classList.add('drop');
+     gemGrid.appendChild(board[i]);
+
+    }else{
+
+     gemGrid.appendChild(
+
+      createGem(makeGem(),'new')
+     );
+
+    }
+   }
+
+   setTimeout(()=>{
+
+    [...gemGrid.children].forEach(g=>{
+     g.classList.remove('drop','new');
+    });
+
+    resolve();
+
+   },450);
+
+  },350);
+
+ });
+}
+
+async function playGems(){
+
+ if(gemsBusy) return;
+
+ if(balance<gemsBet){
+
+  document.getElementById('gemWin').textContent=
+   'NOT ENOUGH POINTS';
+
+  return;
+ }
+
+ ensureAudio();
+
+ balance-=gemsBet;
+ syncBalance();
+
+ gemsBusy=true;
+ gemsRound++;
+
+ document.getElementById('gemsRound').textContent=
+  gemsRound;
+
+ document.getElementById('gemsWin').textContent='0';
+
+ document.getElementById('gemWin').textContent=
+  'GEMS DROPPING...';
+
+ buildGems();
+
+ await new Promise(resolve=>setTimeout(resolve,350));
+
+ let totalWin=0;
+ let cascade=0;
+
+ /*
+  * Multiple matches = cascade.
+  */
+ while(cascade<8){
+
+  const groups=findClusters();
+
+  if(!groups.length) break;
+
+  cascade++;
+
+  let cascadeWin=0;
+
+  groups.forEach(group=>{
+   cascadeWin+=gemScore(group.length);
+  });
+
+  totalWin+=cascadeWin;
+
+  document.getElementById('gemWin').textContent=
+   'MATCH ×'+cascade+
+   '  +'+cascadeWin+' POINTS';
+  await dropGems(groups);
+  
+  await new Promise(resolve=>setTimeout(resolve,180));
+ }
+
+ if(totalWin>0){
+
+  balance+=totalWin;
+  syncBalance();
+
+  document.getElementById('gemsWin').textContent=
+   '+'+money(totalWin);
+
+  document.getElementById('gemWin').textContent=
+   'WIN +'+money(totalWin)+' POINTS';
+
+ }else{
+
+  document.getElementById('gemsWin').textContent='0';
+
+  document.getElementById('gemWin').textContent=
+   'NO WIN — TRY AGAIN';
+ }
+
+ setTimeout(()=>{
+  gemsBusy=false;
+ },350);
+}
+
+buildGems();
+syncBalance();
 </script>
 </body>
 </html>
