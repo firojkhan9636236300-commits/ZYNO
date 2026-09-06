@@ -73,48 +73,6 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
    0 0 40px currentColor;
 }
 
-.gem::after{
- content:"";
- position:absolute;
- width:18px;
- height:140%;
- top:-20%;
- left:-45%;
- background:linear-gradient(
-   90deg,
-   transparent,
-   rgba(255,255,255,.15),
-   rgba(255,255,255,.9),
-   rgba(255,255,255,.15),
-   transparent
- );
- transform:rotate(25deg);
- filter:blur(2px);
- pointer-events:none;
- animation:gemShine 1.25s ease-in-out infinite;
-}
-
-@keyframes gemShine{
- 0%{
-   left:-55%;
-   opacity:0;
- }
- 15%{
-   opacity:1;
- }
- 55%{
-   left:115%;
-   opacity:1;
- }
- 70%{
-   left:125%;
-   opacity:0;
- }
- 100%{
-   left:125%;
-   opacity:0;
- }
-}
 
 .gem.g1{
  color:#00f6ff;
