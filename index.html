@@ -73,6 +73,18 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
    0 0 40px currentColor;
 }
 
+.gem::after{
+ content:"";
+ position:absolute;
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ top:8px;
+ left:10px;
+ background:rgba(255,255,255,.7);
+ filter:blur(1px);
+ pointer-events:none;
+}
 
 .gem.g1{
  color:#00f5ff;
