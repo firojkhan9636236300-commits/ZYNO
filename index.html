@@ -221,7 +221,7 @@ function playSpinSound(){try{ensureAudio();spinOsc=audioCtx.createOscillator();s
 function stopSpinSound(){try{if(!spinOsc)return;spinGain.gain.cancelScheduledValues(audioCtx.currentTime);spinGain.gain.setValueAtTime(spinGain.gain.value,audioCtx.currentTime);spinGain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.22);spinOsc.stop(audioCtx.currentTime+.25);spinOsc=null}catch(e){}}
 setInterval(()=>{tickR36();tickR11();if((document.getElementById('r36').classList.contains('active')||document.getElementById('r11').classList.contains('active'))&&Math.random()<.001)playTick()},1000);
 /* ---------- GEMS FORTUNE ---------- */
-const symbols=['◆','✦','●','⬟','✚','✧'],
+const symbols=['◆','✦','✧','✚','✥','❖'],
 gemGrid=document.getElementById('gemGrid');
 
 let gemsRound=0,
