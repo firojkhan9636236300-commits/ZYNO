@@ -499,6 +499,11 @@ async function playGems(){
 
   document.getElementById('gemsWin').textContent=
    '+'+money(totalWin);
+   const bigWin=document.getElementById('gemBigWin');
+bigWin.textContent='+'+money(totalWin)+' POINTS';
+bigWin.classList.remove('show');
+void bigWin.offsetWidth;
+bigWin.classList.add('show');
 
   document.getElementById('gemWin').textContent=
    'WIN +'+money(totalWin)+' POINTS';
