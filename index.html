@@ -599,7 +599,18 @@ bigWin.innerHTML='<span class="win-amount-text">+'+money(totalWin)+'</span> <spa
 bigWin.classList.remove('show');
 void bigWin.offsetWidth;
 bigWin.classList.add('show');
+if(totalWin>=20){
+  const trophy=document.getElementById('gemTrophy');
 
+  trophy.classList.remove('show');
+  void trophy.offsetWidth;
+  trophy.classList.add('show');
+
+  playGemsWinBig();
+
+}else{
+  playGemsWinSmall();
+}
   document.getElementById('gemWin').textContent=
    'WIN +'+money(totalWin)+' POINTS';
 
