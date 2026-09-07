@@ -875,6 +875,106 @@ document.getElementById('adminBalance').textContent =
   }
 
 };
+async function loadAdminUsers(){
+
+  const usersBox = document.getElementById('adminUsers');
+
+  if(!usersBox) return;
+
+  usersBox.innerHTML = `
+    <div style="
+      text-align:center;
+      color:#ffd34e;
+      font-size:10px;
+      padding:15px;
+    ">
+      Users loading...
+    </div>
+  `;
+
+  try{
+
+    const usersSnap = await getDocs(collection(db, 'users'));
+
+    if(usersSnap.empty){
+
+      usersBox.innerHTML = `
+        <div style="
+          text-align:center;
+          color:#7890aa;
+          font-size:10px;
+          padding:15px;
+        ">
+          कोई user नहीं मिला
+        </div>
+      `;
+
+      return;
+    }
+
+    let html = '';
+
+    usersSnap.forEach((userDoc) => {
+
+      const data = userDoc.data();
+
+      html += `
+        <div style="
+          padding:12px;
+          margin-bottom:8px;
+          border-radius:12px;
+          background:#0b2034;
+          border:1px solid rgba(255,255,255,.08);
+        ">
+
+          <div style="
+            color:#fff;
+            font-weight:800;
+            font-size:12px;
+          ">
+            ${data.email || 'No Email'}
+          </div>
+
+          <div style="
+            color:#7890aa;
+            font-size:9px;
+            margin-top:5px;
+          ">
+            Points: ${money(data.points || 0)}
+          </div>
+
+          <div style="
+            color:${data.approved ? '#55f0b4' : '#ff5360'};
+            font-size:9px;
+            margin-top:4px;
+          ">
+            ${data.approved ? 'APPROVED ✓' : 'PENDING'}
+          </div>
+
+        </div>
+      `;
+    });
+
+    usersBox.innerHTML = html;
+
+  }catch(error){
+
+    console.error(error);
+
+    usersBox.innerHTML = `
+      <div style="
+        text-align:center;
+        color:#ff5360;
+        font-size:10px;
+        padding:15px;
+      ">
+        Users load नहीं हुए
+      </div>
+    `;
+  }
+}
+
+loadAdminUsers();
   console.log("ZYNO Firebase Connected");
 </script>
 </body>
