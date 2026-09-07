@@ -270,6 +270,58 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
  <div class="info"><div class="ibox"><small>BALANCE</small><strong id="gemsBal">1,000,000,000</strong></div><div class="ibox"><small>WIN</small><strong id="gemsWin">0</strong></div><div class="ibox"><small>ROUND</small><strong id="gemsRound">READY</strong></div></div>
  <div class="gems-panel"><div class="gems-top"><strong>GEMS FORTUNE</strong><span id="gemsBetLabel">BET 10</span></div><div class="gem-grid" id="gemGrid"></div><div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
 </section>
+<section id="adminPanel" class="view">
+
+  <div class="game-head">
+    <button class="back" onclick="goHome()">← HOME</button>
+    <div class="game-name">ADMIN PANEL</div>
+    <div style="width:54px"></div>
+  </div>
+
+  <div style="
+    margin-top:20px;
+    padding:18px;
+    border-radius:18px;
+    background:linear-gradient(145deg,#0d2846,#05101e);
+    border:1px solid rgba(255,211,78,.35);
+  ">
+
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="
+        font-size:24px;
+        color:#ffd34e;
+        font-weight:1000;
+      ">
+        ADMIN ✓
+      </div>
+
+      <div style="
+        color:#7890aa;
+        font-size:10px;
+        margin-top:5px;
+      ">
+        ZYNO ADMIN CONTROL
+      </div>
+    </div>
+
+    <div class="ibox" style="margin-bottom:10px">
+      <small>ADMIN BALANCE</small>
+      <strong id="adminBalance">1,000,000,000</strong>
+    </div>
+
+    <div id="adminMsg"
+      style="
+        text-align:center;
+        min-height:20px;
+        color:#7890aa;
+        font-size:9px;
+      ">
+      Admin access verified
+    </div>
+
+  </div>
+
+</section>
 <section id="login" class="view">
   <div class="game-head">
     <button class="back" onclick="goHome()">← HOME</button>
