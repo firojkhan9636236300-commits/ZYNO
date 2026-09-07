@@ -270,6 +270,49 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
  <div class="info"><div class="ibox"><small>BALANCE</small><strong id="gemsBal">1,000,000,000</strong></div><div class="ibox"><small>WIN</small><strong id="gemsWin">0</strong></div><div class="ibox"><small>ROUND</small><strong id="gemsRound">READY</strong></div></div>
  <div class="gems-panel"><div class="gems-top"><strong>GEMS FORTUNE</strong><span id="gemsBetLabel">BET 10</span></div><div class="gem-grid" id="gemGrid"></div><div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
 </section>
+<section id="login" class="view">
+  <div class="game-head">
+    <button class="back" onclick="goHome()">← HOME</button>
+    <div class="game-name">ZYNO LOGIN</div>
+    <div style="width:54px"></div>
+  </div>
+
+  <div style="margin-top:25px;padding:20px;border-radius:18px;background:linear-gradient(145deg,#0d2846,#05101e);border:1px solid rgba(0,229,255,.25);">
+
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-size:28px;color:#00e5ff;font-weight:1000">ZYNO</div>
+      <div style="color:#7890aa;font-size:10px;margin-top:5px">LOGIN TO YOUR ACCOUNT</div>
+    </div>
+
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
+      style="width:100%;height:45px;margin-bottom:10px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password"
+      style="width:100%;height:45px;margin-bottom:12px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <button
+      onclick="loginUser()"
+      style="width:100%;height:45px;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);font-weight:1000;color:#fff;"
+    >
+      LOGIN
+    </button>
+
+    <div id="loginMsg"
+      style="text-align:center;min-height:20px;margin-top:10px;color:#7890aa;font-size:9px;">
+    </div>
+
+  </div>
+</section>
 </div>
 <script>
 'use strict';
