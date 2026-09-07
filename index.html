@@ -631,5 +631,36 @@ if(totalWin>=20){
 buildGems();
 syncBalance();
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDpQHse79QRukas1LD_GTLf-CmDWtArA_c",
+    authDomain: "zyno-dc777.firebaseapp.com",
+    projectId: "zyno-dc777",
+    storageBucket: "zyno-dc777.firebasestorage.app",
+    messagingSenderId: "59378366235",
+    appId: "1:59378366235:web:72021899a3de7bf3a705be"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  console.log("ZYNO Firebase Connected");
+</script>
 </body>
 </html>
