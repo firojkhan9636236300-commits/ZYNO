@@ -899,6 +899,137 @@ runTransaction
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+window.sendPoints = async function(){
+
+  const receiverEmail =
+    document.getElementById('transferEmail').value.trim();
+
+  const amount =
+    Number(document.getElementById('transferAmount').value);
+
+  const msg =
+    document.getElementById('transferMsg');
+
+  if(!receiverEmail || !amount || amount <= 0){
+    msg.textContent = 'Receiver और सही Points डालें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  const sender = auth.currentUser;
+
+  if(!sender){
+    msg.textContent = 'पहले Login करें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  msg.textContent = 'Transfer हो रहा है...';
+  msg.style.color = '#ffd34e';
+
+  try{
+
+    const usersSnap =
+      await getDocs(collection(db, 'users'));
+
+    let receiverId = null;
+
+    usersSnap.forEach((userDoc) => {
+
+      const data = userDoc.data();
+
+      if(
+        data.email &&
+        data.email.toLowerCase() === receiverEmail.toLowerCase()
+      ){
+        receiverId = userDoc.id;
+      }
+
+    });
+
+    if(!receiverId){
+      msg.textContent = 'Receiver user नहीं मिला';
+      msg.style.color = '#ff5360';
+      return;
+    }
+
+    if(receiverId === sender.uid){
+      msg.textContent = 'अपने ही account में transfer नहीं कर सकते';
+      msg.style.color = '#ff5360';
+      return;
+    }
+
+    const senderRef = doc(db, 'users', sender.uid);
+    const receiverRef = doc(db, 'users', receiverId);
+
+    await runTransaction(db, async (transaction) => {
+
+      const senderSnap =
+        await transaction.get(senderRef);
+
+      const receiverSnap =
+        await transaction.get(receiverRef);
+
+      if(!senderSnap.exists()){
+        throw new Error('SENDER_NOT_FOUND');
+      }
+
+      if(!receiverSnap.exists()){
+        throw new Error('RECEIVER_NOT_FOUND');
+      }
+
+      const senderPoints =
+        Number(senderSnap.data().points || 0);
+
+      const receiverPoints =
+        Number(receiverSnap.data().points || 0);
+
+      if(senderPoints < amount){
+        throw new Error('INSUFFICIENT_POINTS');
+      }
+
+      transaction.update(
+        senderRef,
+        {
+          points: senderPoints - amount
+        }
+      );
+
+      transaction.update(
+        receiverRef,
+        {
+          points: receiverPoints + amount
+        }
+      );
+
+    });
+
+    balance -= amount;
+    syncBalance();
+
+    document.getElementById('transferBalance').textContent =
+      money(balance);
+
+    document.getElementById('transferAmount').value = '';
+
+    msg.textContent = 'Points successfully sent ✓';
+    msg.style.color = '#55f0b4';
+
+  }catch(error){
+
+    console.error(error);
+
+    if(error.message === 'INSUFFICIENT_POINTS'){
+      msg.textContent = 'आपके पास इतने Points नहीं हैं';
+    }else{
+      msg.textContent = 'Transfer नहीं हुआ';
+    }
+
+    msg.style.color = '#ff5360';
+
+  }
+
+};
 window.loginUser = async function(){
 
   const email = document.getElementById('loginEmail').value.trim();
