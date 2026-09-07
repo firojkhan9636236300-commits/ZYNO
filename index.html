@@ -857,7 +857,7 @@ document.getElementById('adminBalance').textContent =
   money(data.points || 0);
       msg.style.color = '#55f0b4';
 
-      // Admin Panel अगला step में बनाएँगे
+        // Admin Panel अगला step में बनाएँगे
 
     }else{
 
@@ -877,6 +877,7 @@ document.getElementById('adminBalance').textContent =
   }
 
 };
+
 async function loadAdminUsers(){
 
   const usersBox = document.getElementById('adminUsers');
@@ -945,14 +946,6 @@ async function loadAdminUsers(){
             Points: ${money(data.points || 0)}
           </div>
 
-          <div style="
-            color:${data.approved ? '#55f0b4' : '#ff5360'};
-            font-size:9px;
-            margin-top:4px;
-          ">
-            ${data.approved ? 'APPROVED ✓' : 'PENDING'}
-          </div>
-
         </div>
       `;
     });
@@ -977,6 +970,7 @@ async function loadAdminUsers(){
 }
 
 loadAdminUsers();
+
   console.log("ZYNO Firebase Connected");
 </script>
 </body>
