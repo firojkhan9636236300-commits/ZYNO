@@ -222,7 +222,22 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 </head>
 <body>
 <div class="app">
-<header class="header"><div class="brand">ZYNO</div><div class="balance"><small>BALANCE</small><strong id="topBalance">1,000,000,000</strong></div></header>
+<header class="header">
+  <div class="brand">ZYNO</div>
+
+  <div style="display:flex;align-items:center;gap:7px">
+    <button id="loginBtn"
+      onclick="showLogin()"
+      style="padding:8px 10px;border-radius:10px;background:#071525;border:1px solid rgba(0,229,255,.35);font-size:9px;font-weight:1000;color:#00e5ff">
+      LOGIN
+    </button>
+
+    <div class="balance">
+      <small>BALANCE</small>
+      <strong id="topBalance">1,000,000,000</strong>
+    </div>
+  </div>
+</header>
 
 <section id="home" class="view active">
  <div class="home-title"><h1>ZYNO GAMES</h1><p>3 games • clean standalone build</p></div>
