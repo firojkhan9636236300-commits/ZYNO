@@ -817,6 +817,14 @@ window.loginUser = async function(){
     ){
 
       msg.textContent = 'Admin verified ✓';
+      document.querySelectorAll('.view').forEach(v =>
+  v.classList.remove('active')
+);
+
+document.getElementById('adminPanel').classList.add('active');
+
+document.getElementById('adminBalance').textContent =
+  money(data.points || 0);
       msg.style.color = '#55f0b4';
 
       // Admin Panel अगला step में बनाएँगे
