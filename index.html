@@ -721,7 +721,72 @@ syncBalance();
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+window.loginUser = async function(){
 
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const msg = document.getElementById('loginMsg');
+
+  if(!email || !password){
+    msg.textContent = 'Email और Password डालें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  msg.textContent = 'LOGIN हो रहा है...';
+  msg.style.color = '#ffd34e';
+
+  try{
+
+    const credential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const user = credential.user;
+
+    const userRef = doc(db, 'users', user.uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      await signOut(auth);
+      msg.textContent = 'Account record नहीं मिला';
+      msg.style.color = '#ff5360';
+      return;
+    }
+
+    const data = snap.data();
+
+    if(
+      user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332' &&
+      data.role === 'admin' &&
+      data.approved === true
+    ){
+
+      msg.textContent = 'Admin verified ✓';
+      msg.style.color = '#55f0b4';
+
+      // Admin Panel अगला step में बनाएँगे
+
+    }else{
+
+      await signOut(auth);
+      msg.textContent = 'Admin access नहीं है';
+      msg.style.color = '#ff5360';
+
+    }
+
+  }catch(error){
+
+    console.error(error);
+
+    msg.textContent = 'Email या Password गलत है';
+    msg.style.color = '#ff5360';
+
+  }
+
+};
   console.log("ZYNO Firebase Connected");
 </script>
 </body>
