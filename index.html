@@ -319,6 +319,10 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 const START_BALANCE=1000000000,MAX_BET=5500,POINT_TIME=100;
 let balance=START_BALANCE;
 const money=n=>Math.floor(n).toLocaleString('en-IN');
+function showLogin(){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('login').classList.add('active');
+}
 const topBalance=document.getElementById('topBalance');
 function syncBalance(){topBalance.textContent=money(balance);document.getElementById('r36bal').textContent=money(balance);document.getElementById('r11bal').textContent=money(balance);document.getElementById('gemsBal').textContent=money(balance)}
 function openGame(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='r36')startR36();if(id==='r11')startR11()}
