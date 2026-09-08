@@ -899,6 +899,39 @@ runTransaction
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  // ===== USER BALANCE SAVE =====
+
+window.saveUserBalance = async function(){
+
+  try{
+
+    const user = auth.currentUser;
+
+    if(!user) return;
+
+    if(user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332'){
+
+      return;
+
+    }
+
+    const userRef = doc(db, 'users', user.uid);
+
+    await updateDoc(userRef, {
+
+      points: Math.max(0, Math.floor(balance))
+
+    });
+
+    console.log('User balance saved:', balance);
+
+  }catch(error){
+
+    console.error('Balance save error:', error);
+
+  }
+
+};
 window.sendPoints = async function(){
 
   const receiverEmail =
