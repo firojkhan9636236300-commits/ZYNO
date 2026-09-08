@@ -1240,9 +1240,7 @@ async function loadAdminUsers(){
 
       const points = money(data.points || 0);
       const role = data.role || 'user';
-      const approved = data.approved === true
-        ? 'APPROVED'
-        : 'NOT APPROVED';
+      
 
       html += `
         <div style="
@@ -1274,7 +1272,7 @@ async function loadAdminUsers(){
             font-size:9px;
             margin-top:4px;
           ">
-            Role: ${role} &nbsp; | &nbsp; ${approved}
+            Role: ${role}
           </div>
 
           <div style="
