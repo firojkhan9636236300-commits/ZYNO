@@ -916,6 +916,48 @@ runTransaction
   const auth = getAuth(app);
   const db = getFirestore(app);
   window.zynoIsAdmin = false;
+  const db = getFirestore(app);
+
+window.zynoIsAdmin = false;
+
+window.openAdminUser = async function(uid){
+
+  if(
+    !auth.currentUser ||
+    auth.currentUser.uid !== 'nPAn3k3fFmZWAqskELhEtW8sk332'
+  ){
+    alert('Admin access नहीं है');
+    return;
+  }
+
+  try{
+
+    const userRef = doc(db, 'users', uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      alert('User नहीं मिला');
+      return;
+    }
+
+    const data = snap.data();
+
+    alert(
+      'USER DETAILS\n\n' +
+      'Email: ' + (data.email || 'No Email') + '\n' +
+      'Points: ' + money(data.points || 0) + '\n' +
+      'Role: ' + (data.role || 'user') + '\n' +
+      'UID: ' + uid
+    );
+
+  }catch(error){
+
+    console.error(error);
+    alert('User details load नहीं हुई');
+
+  }
+
+};
   // ===== USER BALANCE SAVE =====
 
 window.saveUserBalance = async function(){
