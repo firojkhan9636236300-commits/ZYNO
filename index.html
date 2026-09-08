@@ -1296,7 +1296,118 @@ async function loadAdminUsers(){
 }
 
 loadAdminUsers();
+window.adminAddPoints = async function(userUid){
 
+  try{
+
+    if(!auth.currentUser ||
+       auth.currentUser.uid !== 'nPAn3k3fFmZWAqskELhEtW8sk332'){
+      alert('Admin access नहीं है');
+      return;
+    }
+
+    const input = document.getElementById(`points_${userUid}`);
+    const amount = Number(input?.value);
+
+    if(!Number.isFinite(amount) || amount <= 0){
+      alert('Valid points amount डालें');
+      return;
+    }
+
+    const userRef = doc(db, 'users', userUid);
+    const userSnap = await getDoc(userRef);
+
+    if(!userSnap.exists()){
+      alert('User नहीं मिला');
+      return;
+    }
+
+    const data = userSnap.data();
+
+    if(data.role === 'admin'){
+      alert('Admin points change नहीं कर सकते');
+      return;
+    }
+
+    const oldPoints = Number(data.points || 0);
+    const newPoints = oldPoints + amount;
+
+    await updateDoc(userRef, {
+      points: newPoints
+    });
+
+    input.value = '';
+
+    alert(`${money(amount)} points ADD हो गए`);
+
+    await loadAdminUsers();
+
+  }catch(error){
+
+    console.error(error);
+    alert('Points ADD नहीं हुए');
+  }
+};
+
+
+window.adminRemovePoints = async function(userUid){
+
+  try{
+
+    if(!auth.currentUser ||
+       auth.currentUser.uid !== 'nPAn3k3fFmZWAqskELhEtW8sk332'){
+      alert('Admin access नहीं है');
+      return;
+    }
+
+    const input = document.getElementById(`points_${userUid}`);
+    const amount = Number(input?.value);
+
+    if(!Number.isFinite(amount) || amount <= 0){
+      alert('Valid points amount डालें');
+      return;
+    }
+
+    const userRef = doc(db, 'users', userUid);
+    const userSnap = await getDoc(userRef);
+
+    if(!userSnap.exists()){
+      alert('User नहीं मिला');
+      return;
+    }
+
+    const data = userSnap.data();
+
+    if(data.role === 'admin'){
+      alert('Admin points change नहीं कर सकते');
+      return;
+    }
+
+    const oldPoints = Number(data.points || 0);
+
+    if(amount > oldPoints){
+      alert(`User के पास सिर्फ ${money(oldPoints)} points हैं`);
+      return;
+    }
+
+    const newPoints = oldPoints - amount;
+
+    await updateDoc(userRef, {
+      points: newPoints
+    });
+
+    input.value = '';
+
+    alert(`${money(amount)} points REMOVE हो गए`);
+
+    await loadAdminUsers();
+
+  }catch(error){
+
+    console.error(error);
+    alert('Points REMOVE नहीं हुए');
+  }
+};
   console.log("ZYNO Firebase Connected");
 </script>
 </body>
