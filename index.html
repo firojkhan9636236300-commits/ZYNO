@@ -1122,8 +1122,10 @@ window.loginUser = async function(){
       user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332' &&
       data.role === 'admin'
     ){
-
-      balance = Number(data.points || 0);
+      
+     window.zynoIsAdmin = true;
+    
+     balance = Number(data.points || 0);
       syncBalance();
 
       msg.textContent = 'Admin verified ✓';
