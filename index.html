@@ -1149,7 +1149,6 @@ async function loadAdminUsers(){
 
       const data = userDoc.data();
 
-      // Same Admin UID को दो बार दिखने से रोकना
       const currentUid = data.uid || userDoc.id;
 
       if(shownUids.has(currentUid)){
@@ -1160,7 +1159,6 @@ async function loadAdminUsers(){
 
       let email = data.email || 'No Email';
 
-      // Admin का सही email
       if(currentUid === 'nPAn3k3fFmZWAqskELhEtW8sk332'){
         email = 'Firojkhan9636236300@gmail.com';
       }
@@ -1212,6 +1210,67 @@ async function loadAdminUsers(){
           ">
             UID: ${currentUid}
           </div>
+
+          ${
+            role !== 'admin'
+            ? `
+              <div style="
+                display:flex;
+                gap:6px;
+                margin-top:10px;
+              ">
+
+                <input
+                  id="points_${currentUid}"
+                  type="number"
+                  min="1"
+                  placeholder="Points"
+                  style="
+                    flex:1;
+                    min-width:0;
+                    padding:8px;
+                    border-radius:8px;
+                    border:1px solid rgba(255,255,255,.12);
+                    background:#071522;
+                    color:#fff;
+                    font-size:10px;
+                  "
+                >
+
+                <button
+                  onclick="adminAddPoints('${currentUid}')"
+                  style="
+                    padding:8px 10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#55f0b4;
+                    color:#06131d;
+                    font-size:9px;
+                    font-weight:900;
+                  "
+                >
+                  ADD
+                </button>
+
+                <button
+                  onclick="adminRemovePoints('${currentUid}')"
+                  style="
+                    padding:8px 10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#ff5360;
+                    color:#fff;
+                    font-size:9px;
+                    font-weight:900;
+                  "
+                >
+                  REMOVE
+                </button>
+
+              </div>
+            `
+            : ''
+          }
 
         </div>
       `;
