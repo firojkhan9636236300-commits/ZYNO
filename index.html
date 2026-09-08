@@ -1148,6 +1148,11 @@ async function loadAdminUsers(){
 
       const data = userDoc.data();
 
+      const email = data.email || 'No Email';
+      const points = money(data.points || 0);
+      const role = data.role || 'user';
+      const approved = data.approved === true ? 'APPROVED' : 'NOT APPROVED';
+
       html += `
         <div style="
           padding:12px;
@@ -1162,15 +1167,32 @@ async function loadAdminUsers(){
             font-weight:800;
             font-size:12px;
           ">
-            ${data.email || 'No Email'}
+            ${email}
+          </div>
+
+          <div style="
+            color:#ffd34e;
+            font-size:10px;
+            margin-top:5px;
+          ">
+            Points: ${points}
           </div>
 
           <div style="
             color:#7890aa;
             font-size:9px;
-            margin-top:5px;
+            margin-top:4px;
           ">
-            Points: ${money(data.points || 0)}
+            Role: ${role} &nbsp; | &nbsp; ${approved}
+          </div>
+
+          <div style="
+            color:#45627a;
+            font-size:8px;
+            margin-top:4px;
+            word-break:break-all;
+          ">
+            UID: ${userDoc.id}
           </div>
 
         </div>
