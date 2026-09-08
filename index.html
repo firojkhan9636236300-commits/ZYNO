@@ -1149,7 +1149,8 @@ window.loginUser = async function(){
     // NORMAL USER LOGIN
     if(data.role === 'user')
     {
-
+      window.zynoIsAdmin = false;
+      
       balance = Number(data.points || 0);
       syncBalance();
 
