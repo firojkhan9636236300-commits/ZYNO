@@ -1128,10 +1128,8 @@ window.loginUser = async function(){
     }
 
     // NORMAL USER LOGIN
-    if(
-      data.role === 'user' &&
-      data.approved === true
-    ){
+    if(data.role === 'user')
+    {
 
       balance = Number(data.points || 0);
       syncBalance();
