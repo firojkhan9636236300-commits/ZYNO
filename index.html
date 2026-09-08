@@ -500,7 +500,23 @@ function showLogin(){
 }
 const topBalance=document.getElementById('topBalance');
 function syncBalance(){topBalance.textContent=money(balance);document.getElementById('r36bal').textContent=money(balance);document.getElementById('r11bal').textContent=money(balance);document.getElementById('gemsBal').textContent=money(balance)}
-function openGame(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='r36')startR36();if(id==='r11')startR11()}
+function openGame(id){
+
+  // ADMIN PANEL — ADMIN ONLY
+  if(id === 'adminPanel' && window.zynoIsAdmin !== true){
+    alert('Admin access नहीं है');
+    return;
+  }
+
+  document.querySelectorAll('.view').forEach(v =>
+    v.classList.remove('active')
+  );
+
+  document.getElementById(id).classList.add('active');
+
+  if(id === 'r36') startR36();
+  if(id === 'r11') startR11();
+}
 function goHome(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('home').classList.add('active')}
 /* ---------- ROULETTE 0-36 ---------- */
 const redNums=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
