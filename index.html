@@ -1143,15 +1143,33 @@ async function loadAdminUsers(){
     }
 
     let html = '';
+    const shownUids = new Set();
 
     usersSnap.forEach((userDoc) => {
 
       const data = userDoc.data();
 
-      const email = data.email || 'No Email';
+      // Same Admin UID को दो बार दिखने से रोकना
+      const currentUid = data.uid || userDoc.id;
+
+      if(shownUids.has(currentUid)){
+        return;
+      }
+
+      shownUids.add(currentUid);
+
+      let email = data.email || 'No Email';
+
+      // Admin का सही email
+      if(currentUid === 'nPAn3k3fFmZWAqskELhEtW8sk332'){
+        email = 'Firojkhan9636236300@gmail.com';
+      }
+
       const points = money(data.points || 0);
       const role = data.role || 'user';
-      const approved = data.approved === true ? 'APPROVED' : 'NOT APPROVED';
+      const approved = data.approved === true
+        ? 'APPROVED'
+        : 'NOT APPROVED';
 
       html += `
         <div style="
@@ -1192,7 +1210,7 @@ async function loadAdminUsers(){
             margin-top:4px;
             word-break:break-all;
           ">
-            UID: ${userDoc.id}
+            UID: ${currentUid}
           </div>
 
         </div>
