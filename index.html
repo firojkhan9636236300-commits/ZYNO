@@ -1275,14 +1275,19 @@ async function loadAdminUsers(){
             Role: ${role}
           </div>
 
-          <div style="
-            color:#45627a;
-            font-size:8px;
-            margin-top:4px;
-            word-break:break-all;
-          ">
-            UID: ${currentUid}
-          </div>
+          <div
+  onclick="openAdminUser('${currentUid}')"
+  style="
+    color:#00e5ff;
+    font-size:8px;
+    margin-top:4px;
+    word-break:break-all;
+    cursor:pointer;
+    text-decoration:underline;
+  "
+>
+  UID: ${currentUid}
+</div>
 
           ${
             role !== 'admin'
