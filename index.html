@@ -1067,32 +1067,59 @@ window.loginUser = async function(){
 
     const data = snap.data();
 
+    // ADMIN LOGIN
     if(
       user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332' &&
       data.role === 'admin' &&
       data.approved === true
     ){
 
+      balance = Number(data.points || 0);
+      syncBalance();
+
       msg.textContent = 'Admin verified ✓';
+
       document.querySelectorAll('.view').forEach(v =>
-  v.classList.remove('active')
-);
+        v.classList.remove('active')
+      );
 
-document.getElementById('adminPanel').classList.add('active');
+      document.getElementById('adminPanel').classList.add('active');
 
-document.getElementById('adminBalance').textContent =
-  money(data.points || 0);
+      document.getElementById('adminBalance').textContent =
+        money(balance);
+
       msg.style.color = '#55f0b4';
 
-        // Admin Panel अगला step में बनाएँगे
+      await loadAdminUsers();
 
-    }else{
-
-      await signOut(auth);
-      msg.textContent = 'Admin access नहीं है';
-      msg.style.color = '#ff5360';
-
+      return;
     }
+
+    // NORMAL USER LOGIN
+    if(
+      data.role === 'user' &&
+      data.approved === true
+    ){
+
+      balance = Number(data.points || 0);
+      syncBalance();
+
+      msg.textContent = 'Login successful ✓';
+      msg.style.color = '#55f0b4';
+
+      document.querySelectorAll('.view').forEach(v =>
+        v.classList.remove('active')
+      );
+
+      document.getElementById('home').classList.add('active');
+
+      return;
+    }
+
+    await signOut(auth);
+
+    msg.textContent = 'Account अभी approved नहीं है';
+    msg.style.color = '#ff5360';
 
   }catch(error){
 
@@ -1100,9 +1127,7 @@ document.getElementById('adminBalance').textContent =
 
     msg.textContent = 'Email या Password गलत है';
     msg.style.color = '#ff5360';
-
   }
-
 };
 
 async function loadAdminUsers(){
