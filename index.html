@@ -602,7 +602,7 @@ function bindHold36(btn,n){
   disableLongPressMenu(btn);
 
   const betNow=()=>{
-    if(!r36Open || r36Spin)return;
+    if(r36Spin)return;
 
     const betAmount=BET_OPTIONS36[selectedBetIndex36];
     const current=bets36[n]||0;
