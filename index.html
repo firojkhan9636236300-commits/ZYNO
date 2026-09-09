@@ -796,7 +796,31 @@ function tickR11(){const v=document.getElementById('r11timer');if(!document.getE
 function startR11(){if(r11Time<=0&&!r11Spin){r11Time=60;r11Open=true;document.getElementById('r11timer').textContent=60;document.getElementById('r11timer').classList.remove('closed');clearBets11()}}
 function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
 function spin11(){r11Spin=true;r11Open=false;document.getElementById('r11msg').textContent='Result spinning...';playSpinSound();const winner=Math.floor(Math.random()*12);wheel11.animate([{transform:'rotate(0deg)'},{transform:'rotate(1080deg)'}],{duration:1800,easing:'cubic-bezier(.12,.72,.12,1)'});setTimeout(()=>{stopSpinSound();document.getElementById('r11msg').textContent='WINNING NUMBER: '+winner;grid11.querySelectorAll('.bet-number').forEach(b=>{if(+b.dataset.n===winner)b.classList.add('winner')});let win=(bets11[winner]||0)*10;balance+=win;r11Last.unshift(winner);r11Last=r11Last.slice(0,4);renderLast('r11last',r11Last);syncBalance();r11Spin=false;setTimeout(()=>{r11Time=60;r11Open=true;document.getElementById('r11timer').textContent=60;document.getElementById('r11timer').classList.remove('closed');clearBets11();document.getElementById('r11msg').textContent='Press and hold a number to bet'},700)},1900)}
-function renderLast(id,arr){const el=document.getElementById(id);el.innerHTML='';arr.forEach(n=>{const s=document.createElement('span');s.textContent=n;s.className=colorClass(n);if(n===0)s.style.color='#55f0b4';else if(redNums.has(n))s.style.color='#ff5360';else s.style.color='#fff';el.appendChild(s)})}
+function renderLast(id,arr){
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  const list = [...arr];
+  while(list.length < 4){
+    list.push('-');
+  }
+  list.reverse().forEach(n=>{
+    const s = document.createElement('span');
+    s.textContent = n;
+    if(n === '-'){
+      s.className = 'last-number';
+    }else{
+      s.className = colorClass(n);
+      if(n === 0){
+        s.style.color = '#55f0b4';
+      }else if(redNums.has(n)){
+        s.style.color = '#ff5360';
+      }else{
+        s.style.color = '#fff';
+      }
+    }
+    el.appendChild(s);
+  });
+}
 /* ---------- AUDIO ---------- */
 let audioCtx=null,spinOsc=null,spinGain=null,spinFilter=null;
 function ensureAudio(){if(!audioCtx)audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume()}
