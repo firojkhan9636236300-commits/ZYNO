@@ -743,6 +743,12 @@ function spin36(){
   // Sirf 1 winning number
   const winner =
     Math.floor(Math.random() * 37);
+    const winnerEl =
+  document.getElementById('wheel36Winner');
+
+if(winnerEl){
+  winnerEl.textContent = winner;
+}
   const index =
     wheelNums.indexOf(winner);
   const slice =
