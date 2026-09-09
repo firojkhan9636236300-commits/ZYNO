@@ -574,6 +574,57 @@ function disableLongPressMenu(btn){
     e.preventDefault();
   });
 }
+function bindHold36(btn,n){
+  disableLongPressMenu(btn);
+
+  let holding=false;
+
+  const begin=e=>{
+    if(e.pointerType==='mouse' && e.button!==0)return;
+    if(holding)return;
+    if(!r36Open || r36Spin)return;
+
+    e.preventDefault();
+
+    holding=true;
+    btn.classList.add('active');
+
+    const betAmount=BET_OPTIONS36[selectedBetIndex36];
+    const current=bets36[n]||0;
+
+    if(current>=MAX_BET){
+      holding=false;
+      btn.classList.remove('active');
+      return;
+    }
+
+    const newBet=Math.min(MAX_BET,current+betAmount);
+    const add=newBet-current;
+
+    if(balance<add){
+      holding=false;
+      btn.classList.remove('active');
+      return;
+    }
+
+    balance-=add;
+    bets36[n]=newBet;
+
+    syncBalance();
+    updateCount36(btn,newBet);
+    window.saveUserBalance();
+  };
+
+  const end=()=>{
+    holding=false;
+    btn.classList.remove('active');
+  };
+
+  btn.addEventListener('pointerdown',begin);
+  btn.addEventListener('pointerup',end);
+  btn.addEventListener('pointercancel',end);
+  btn.addEventListener('pointerleave',end);
+}
 function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?money(n):''}
 function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
 function startR36(){if(r36Spin)return;if(r36Time<=0){r36Time=60;r36Open=true;document.getElementById('r36timer').textContent=60;document.getElementById('r36timer').classList.remove('closed');clearBets36()} }
