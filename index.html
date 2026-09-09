@@ -601,6 +601,9 @@ function disableLongPressMenu(btn){
 function bindHold36(btn,n){
   disableLongPressMenu(btn);
 
+  let holdTimer=null;
+  let holding=false;
+
   const betNow=()=>{
     if(r36Spin)return;
 
@@ -612,7 +615,10 @@ function bindHold36(btn,n){
     const newBet=Math.min(MAX_BET,current+betAmount);
     const add=newBet-current;
 
-    if(balance<add)return;
+    if(balance<add){
+      holding=false;
+      return;
+    }
 
     balance-=add;
     bets36[n]=newBet;
@@ -620,18 +626,65 @@ function bindHold36(btn,n){
     btn.classList.add('active');
     updateCount36(btn,newBet);
     syncBalance();
-    window.saveUserBalance();
+
+    if(window.saveUserBalance){
+      window.saveUserBalance();
+    }
 
     setTimeout(()=>{
       btn.classList.remove('active');
     },150);
   };
 
+  const startHold=()=>{
+    if(r36Spin)return;
+
+    betNow();
+
+    holding=true;
+
+    holdTimer=setInterval(()=>{
+      if(!holding || r36Spin){
+        clearInterval(holdTimer);
+        holdTimer=null;
+        return;
+      }
+
+      betNow();
+
+      if((bets36[n]||0)>=MAX_BET){
+        holding=false;
+        clearInterval(holdTimer);
+        holdTimer=null;
+      }
+    },120);
+  };
+
+  const stopHold=()=>{
+    holding=false;
+
+    if(holdTimer){
+      clearInterval(holdTimer);
+      holdTimer=null;
+    }
+
+    btn.classList.remove('active');
+  };
+
   btn.addEventListener('pointerdown',e=>{
     if(e.pointerType==='mouse' && e.button!==0)return;
+
     e.preventDefault();
-    betNow();
+    startHold();
   });
+
+  btn.addEventListener('pointerup',e=>{
+    e.preventDefault();
+    stopHold();
+  });
+
+  btn.addEventListener('pointercancel',stopHold);
+  btn.addEventListener('pointerleave',stopHold);
 }
 function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?money(n):''}
 function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
