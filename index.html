@@ -689,7 +689,41 @@ function bindHold36(btn,n){
 function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?money(n):''}
 function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
 function startR36(){if(r36Spin)return;if(r36Time<=0){r36Time=30;r36Open=true;document.getElementById('r36timer').textContent=30;document.getElementById('r36timer').classList.remove('closed');clearBets36()}}
-function tickR36(){const v=document.getElementById('r36timer');if(!document.getElementById('r36').classList.contains('active')||r36Spin)return;if(r36Time>0){r36Time--;v.textContent=r36Time}if(r36Time<=4&&r36Time>0){r36Open=false;v.classList.add('closed');document.getElementById('r36msg').textContent='BETTING CLOSED — spinning...'}if(r36Time===0&&!r36Spin){r36Open=false;spin36()}}
+function tickR36(){
+  const v =
+    document.getElementById('r36timer');
+  if(
+    !document
+      .getElementById('r36')
+      .classList
+      .contains('active')
+  ) return;
+  if(r36Spin) return;
+  if(r36Time > 0){
+    r36Time--;
+    v.textContent = r36Time;
+  }
+  if(
+    r36Time <= 4 &&
+    r36Time > 0
+  ){
+    r36Open = false;
+    v.classList.add('closed');
+    document.getElementById('r36msg').textContent =
+      'BETTING CLOSED — spinning...';
+  }
+  if(
+    r36Time === 0 &&
+    r36Spin === false
+  ){
+    // IMPORTANT:
+    // timer ko dobara 0 par spin trigger
+    // karne se rokta hai
+    r36Time = -1;
+    r36Open = false;
+    spin36();
+  }
+}
 function spin36(){
   if(r36Spin) return;
   r36Spin = true;
