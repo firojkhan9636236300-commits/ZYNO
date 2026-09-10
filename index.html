@@ -767,22 +767,7 @@ async function spin36(){
   document.getElementById('r36msg').textContent =
     'Wheel spinning...';
   playSpinSound();
-  // Global winning number — sabhi users ke liye same
-const winner =
-  Math.floor(Math.random() * 37);
-
-try{
-  await setDoc(
-    doc(db,"gameResults","roulette"),
-    {
-      result36: winner,
-      lastWins36: [winner,...globalLastWins36].slice(0,4)
-    },
-    {merge:true}
-  );
-}catch(e){
-  console.error("Global 0-36 result save failed:",e);
-}
+  
     
   const index =
     wheelNums.indexOf(winner);
