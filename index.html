@@ -556,6 +556,12 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 <script>
 'use strict';
 const START_BALANCE=1000000000,MAX_BET=5500,POINT_TIME=100;
+let globalLastWins36=[];
+let globalLastWins11=[];
+let globalResult36=null;
+let globalResult11=null;
+let globalResultUnsubscribe36=null;
+let globalResultUnsubscribe11=null;
 let balance=START_BALANCE;
 const money=n=>Math.floor(n).toLocaleString('en-IN');
 function showLogin(){
