@@ -1239,7 +1239,28 @@ onSnapshot
   const auth = getAuth(app);
   const db = getFirestore(app);
   window.zynoIsAdmin = false;
+  
+onSnapshot(doc(db,"gameResults","roulette"), snap=>{
+  if(!snap.exists()) return;
 
+  const data=snap.data();
+
+  if(Array.isArray(data.lastWins36)){
+    globalLastWins36=data.lastWins36;
+  }
+
+  if(Array.isArray(data.lastWins11)){
+    globalLastWins11=data.lastWins11;
+  }
+
+  if(data.result36!==undefined){
+    globalResult36=data.result36;
+  }
+
+  if(data.result11!==undefined){
+    globalResult11=data.result11;
+  }
+});
 window.openAdminUser = async function(uid){
 
   if(
