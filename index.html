@@ -768,7 +768,15 @@ function spin36(){
     'Wheel spinning...';
   playSpinSound();
   
-    
+    if(globalResult36 === null){
+    r36Spin = false;
+    r36Open = false;
+    document.getElementById('r36msg').textContent =
+      'Waiting for global result...';
+    return;
+  }
+
+  const winner = globalResult36;
   const index =
     wheelNums.indexOf(winner);
   const slice =
