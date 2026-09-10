@@ -1249,7 +1249,21 @@ onSnapshot(doc(db,"gameResults","roulette"), snap=>{
   if(!snap.exists()) return;
 
   const data=snap.data();
+  if(data.roundId36 !== undefined){
+    globalRound36 = data.roundId36;
+  }
 
+  if(data.roundStart36 !== undefined){
+    globalRoundStart36 = data.roundStart36;
+  }
+
+  if(data.betClose36 !== undefined){
+    globalBetClose36 = data.betClose36;
+  }
+
+  if(data.spinEnd36 !== undefined){
+    globalSpinEnd36 = data.spinEnd36;
+  }
   if(Array.isArray(data.lastWins36)){
     globalLastWins36=data.lastWins36;
   }
