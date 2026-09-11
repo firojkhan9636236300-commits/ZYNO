@@ -1237,6 +1237,20 @@ if(totalWin>=20){
 buildGems();
 syncBalance();
 try{
+  const savedLastWins =
+    localStorage.getItem('zynoR36LastWins');
+
+  if(savedLastWins){
+    const parsedLastWins =
+      JSON.parse(savedLastWins);
+
+    if(Array.isArray(parsedLastWins)){
+      r36Last = parsedLastWins.slice(0,4);
+      renderLast('r36last', r36Last);
+    }
+  }
+}catch(e){}
+try{
   const savedView = localStorage.getItem('zynoActiveView');
 
   if(
