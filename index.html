@@ -736,33 +736,45 @@ function startR36(){if(r36Spin)return;if(r36Time<=0){r36Time=30;r36Open=true;doc
 function tickR36(){
   const v =
     document.getElementById('r36timer');
-  if(
-    !document
-      .getElementById('r36')
-      .classList
-      .contains('active')
-  ) return;
+
   if(r36Spin) return;
+
   if(r36Time > 0){
     r36Time--;
-    v.textContent = r36Time;
+
+    if(
+      document
+        .getElementById('r36')
+        .classList
+        .contains('active')
+    ){
+      v.textContent = r36Time;
+    }
   }
+
   if(
     r36Time <= 4 &&
     r36Time > 0
   ){
     r36Open = false;
-    v.classList.add('closed');
-    document.getElementById('r36msg').textContent =
-      'BETTING CLOSED — spinning...';
+
+    if(
+      document
+        .getElementById('r36')
+        .classList
+        .contains('active')
+    ){
+      v.classList.add('closed');
+
+      document.getElementById('r36msg').textContent =
+        'BETTING CLOSED — spinning...';
+    }
   }
+
   if(
     r36Time === 0 &&
     r36Spin === false
   ){
-    // IMPORTANT:
-    // timer ko dobara 0 par spin trigger
-    // karne se rokta hai
     r36Time = -1;
     r36Open = false;
     spin36();
