@@ -591,7 +591,11 @@ function openGame(id){
   if(id === 'r36') startR36();
   if(id === 'r11') startR11();
 }
-function goHome(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('home').classList.add('active')}
+function goHome(){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('home').classList.add('active');
+  localStorage.setItem('zynoActiveView','home');
+}
 /* ---------- ROULETTE 0-36 ---------- */
 const BET_OPTIONS36=[
   1,2,3,4,5,6,7,8,9,10,
