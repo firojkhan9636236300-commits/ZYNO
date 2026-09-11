@@ -738,12 +738,83 @@ function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?mone
 function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
 function startR36(){if(r36Spin)return;if(r36Time<=0){r36Time=30;r36Open=true;document.getElementById('r36timer').textContent=30;document.getElementById('r36timer').classList.remove('closed');clearBets36()}}
 function tickR36(){
+
   const v =
     document.getElementById('r36timer');
 
   if(r36Spin) return;
 
+  /*
+    FIREBASE GLOBAL TIMER
+    Agar Firestore me valid roundStart36
+    aur betClose36 milega to wahi timer use hoga.
+  */
+  const now = Date.now();
+
+  if(
+    typeof globalRoundStart36 === 'number' &&
+    typeof globalBetClose36 === 'number' &&
+    globalRoundStart36 > 0 &&
+    globalBetClose36 > globalRoundStart36
+  ){
+
+    const remaining =
+      Math.max(
+        0,
+        Math.ceil(
+          (globalBetClose36 - now) / 1000
+        )
+      );
+
+    r36Time = remaining;
+
+    if(
+      document
+        .getElementById('r36')
+        .classList
+        .contains('active')
+    ){
+      v.textContent = remaining;
+    }
+
+    if(
+      remaining <= 4 &&
+      remaining > 0
+    ){
+      r36Open = false;
+
+      if(
+        document
+          .getElementById('r36')
+          .classList
+          .contains('active')
+      ){
+        v.classList.add('closed');
+
+        document.getElementById('r36msg').textContent =
+          'BETTING CLOSED — spinning...';
+      }
+    }
+
+    if(
+      remaining === 0 &&
+      r36Spin === false
+    ){
+      r36Time = -1;
+      r36Open = false;
+      spin36();
+    }
+
+    return;
+  }
+
+  /*
+    FIRESTORE TIMER ABHI SET NAHI HAI.
+    Isliye current working 30-second
+    fallback behavior rahega.
+  */
   if(r36Time > 0){
+
     r36Time--;
 
     if(
@@ -760,6 +831,7 @@ function tickR36(){
     r36Time <= 4 &&
     r36Time > 0
   ){
+
     r36Open = false;
 
     if(
@@ -768,6 +840,7 @@ function tickR36(){
         .classList
         .contains('active')
     ){
+
       v.classList.add('closed');
 
       document.getElementById('r36msg').textContent =
@@ -779,8 +852,10 @@ function tickR36(){
     r36Time === 0 &&
     r36Spin === false
   ){
+
     r36Time = -1;
     r36Open = false;
+
     spin36();
   }
 }
