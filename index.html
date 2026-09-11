@@ -705,8 +705,15 @@ function bindHold36(btn,n){
       holdTimer=null;
     }
 
-    btn.classList.remove('active');
-  };
+     btn.classList.remove('active');
+
+  if(window.saveUserBalance){
+
+    window.saveUserBalance();
+
+  }
+
+}
 
   btn.addEventListener('pointerdown',e=>{
     if(e.pointerType==='mouse' && e.button!==0)return;
