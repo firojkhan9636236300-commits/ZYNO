@@ -840,6 +840,7 @@ function spin36(){
       });
     // LAST 4 WIN update
     r36Last.unshift(winner);
+    localStorage.setItem('zynoR36LastWins', JSON.stringify(r36Last));
     r36Last = r36Last.slice(0,4);
     renderLast('r36last', r36Last);
     localStorage.setItem(
