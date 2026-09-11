@@ -667,9 +667,6 @@ function bindHold36(btn,n){
     updateCount36(btn,newBet);
     syncBalance();
 
-    if(window.saveUserBalance){
-      window.saveUserBalance();
-    }
 
     setTimeout(()=>{
       btn.classList.remove('active');
