@@ -587,7 +587,7 @@ function openGame(id){
   );
 
   document.getElementById(id).classList.add('active');
-
+  localStorage.setItem('zynoActiveView', id);
   if(id === 'r36') startR36();
   if(id === 'r11') startR11();
 }
