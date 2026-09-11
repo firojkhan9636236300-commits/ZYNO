@@ -830,6 +830,13 @@ function spin36(){
         if(+btn.dataset.n === winner){
           btn.classList.add('winner');
         }
+        setTimeout(()=>{
+  grid36
+    .querySelectorAll('.bet-number')
+    .forEach(btn=>{
+      btn.classList.remove('winner');
+    });
+},3500);
       });
     // LAST 4 WIN update
     r36Last.unshift(winner);
