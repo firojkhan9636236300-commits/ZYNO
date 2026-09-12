@@ -1107,16 +1107,74 @@ function startR11(){
   }
 }
 function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
-function spin11(){r11Spin=true;r11Open=false;document.getElementById('r11msg').textContent='Result spinning...';playSpinSound();const winner=Math.floor(Math.random()*12);wheel11.animate([{transform:'rotate(0deg)'},{transform:'rotate(1080deg)'}],{duration:1800,easing:'cubic-bezier(.12,.72,.12,1)'});setTimeout(()=>{stopSpinSound();document.getElementById('r11msg').textContent='WINNING NUMBER: '+winner;grid11.querySelectorAll('.bet-number').forEach(b=>{if(+b.dataset.n===winner)b.classList.add('winner')});let win=(bets11[winner]||0)*10;balance+=win;r11Last.unshift(winner);r11Last=r11Last.slice(0,4);renderLast('r11last',r11Last);syncBalance();r11Spin=false;setTimeout(()=>{
-resetR11Round();
-clearBets11();
-document.getElementById('r11msg').textContent ='Press and hold a number to bet';
-},700)},1900)
-  resetR11Round();
-  clearBets11();
+function spin11(){
+  r11Spin=true;
+  r11Open=false;
+
   document.getElementById('r11msg').textContent =
-    'Press and hold a number to bet';
-},700)},1900)
+    'Result spinning...';
+
+  playSpinSound();
+
+  const winner =
+    Math.floor(Math.random()*12);
+
+  wheel11.animate(
+    [
+      {transform:'rotate(0deg)'},
+      {transform:'rotate(1080deg)'}
+    ],
+    {
+      duration:1800,
+      easing:'cubic-bezier(.12,.72,.12,1)'
+    }
+  );
+
+  setTimeout(()=>{
+
+    stopSpinSound();
+
+    document.getElementById('r11msg').textContent =
+      'WINNING NUMBER: '+winner;
+
+    grid11
+      .querySelectorAll('.bet-number')
+      .forEach(b=>{
+        if(+b.dataset.n===winner){
+          b.classList.add('winner');
+        }
+      });
+
+    let win =
+      (bets11[winner]||0)*10;
+
+    balance += win;
+
+    r11Last.unshift(winner);
+    r11Last =
+      r11Last.slice(0,4);
+
+    renderLast(
+      'r11last',
+      r11Last
+    );
+
+    syncBalance();
+
+    r11Spin=false;
+
+    setTimeout(()=>{
+
+      resetR11Round();
+      clearBets11();
+
+      document.getElementById('r11msg').textContent =
+        'Press and hold a number to bet';
+
+    },700);
+
+  },1900);
+}
 function renderLast(id,arr){
   const el = document.getElementById(id);
   el.innerHTML = '';
