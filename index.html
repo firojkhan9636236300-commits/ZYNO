@@ -322,8 +322,8 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 
 <section id="r11" class="view">
  <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">ROULETTE 0–11</div><div style="width:54px"></div></div>
- <div class="rule">60 SEC • MIN 10 • MAX 5500 PER NUMBER</div>
- <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r11bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><div class="last" id="r11last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r11timer">60</strong></div></div>
+ <div class="rule">30 SEC • MIN 10 • MAX 5500 PER NUMBER</div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r11bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><div class="last" id="r11last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r11timer">30</strong></div></div>
  <div class="z11-wheel" id="wheel11"><div class="z11-center">0–11</div></div>
  <div class="message" id="r11msg">Press and hold a number to bet</div><div class="grid" id="grid11"></div>
 </section>
@@ -992,11 +992,11 @@ function spin36(){
   },5900);
 }
 /* ---------- ROULETTE 0-11 ---------- */
-const grid11=document.getElementById('grid11'),wheel11=document.getElementById('wheel11');let bets11={},r11Open=true,r11Time=60,r11Spin=false,r11Last=[];
+const grid11=document.getElementById('grid11'),wheel11=document.getElementById('wheel11');let bets11={},r11Open=true,r11Time=30,r11Spin=false,r11Last=[];
 for(let i=0;i<12;i++){const e=document.createElement('div');e.className='z11n';e.style.setProperty('--a',(i*30)+'deg');e.textContent=i;wheel11.appendChild(e)}
 for(let n=0;n<=11;n++){const b=document.createElement('div');b.className='bet-number '+colorClass(n);b.dataset.n=n;b.innerHTML='<span>'+n+'</span><span class="bet-count"></span>';bindHold11(b,n);grid11.appendChild(b)}
 function bindHold11(btn,n){disableLongPressMenu(btn);let start=0,timer=null,holding=false;const begin=e=>{if(e.type==='mousedown'&&e.button!==0)return;if(!r11Open||r11Spin)return;holding=true;start=performance.now();btn.classList.add('active');const tick=()=>{if(!holding)return;const amt=Math.min(MAX_BET,Math.floor((performance.now()-start)/POINT_TIME)+1);const current=bets11[n]||0;if(amt>current){const add=amt-current;if(balance>=add){balance-=add;bets11[n]=amt;btn.querySelector('.bet-count').textContent=money(amt);syncBalance()}else holding=false}timer=requestAnimationFrame(tick)};timer=requestAnimationFrame(tick)};const end=()=>{holding=false;btn.classList.remove('active');if(timer)cancelAnimationFrame(timer)};btn.addEventListener('mousedown',begin);btn.addEventListener('touchstart',begin,{passive:true});btn.addEventListener('mouseup',end);btn.addEventListener('mouseleave',end);btn.addEventListener('touchend',end,{passive:true});btn.addEventListener('touchcancel',end,{passive:true})}
-const R11_ROUND_MS = 60000;
+const R11_ROUND_MS = 30000;
 const R11_ROUND_KEY = 'zynoR11RoundEnd';
 
 function getR11RoundEnd(){
@@ -1025,10 +1025,10 @@ function resetR11Round(){
     String(end)
   );
 
-  r11Time = 60;
+  r11Time = 30;
   r11Open = true;
 
-  document.getElementById('r11timer').textContent = '60';
+  document.getElementById('r11timer').textContent = '30';
   document.getElementById('r11timer').classList.remove('closed');
 }
 
@@ -1081,9 +1081,42 @@ function tickR11(){
     spin11();
   }
 }
-function startR11(){if(r11Time<=0&&!r11Spin){r11Time=60;r11Open=true;document.getElementById('r11timer').textContent=60;document.getElementById('r11timer').classList.remove('closed');clearBets11()}}
+function startR11(){
+  if(r11Spin) return;
+
+  const end = getR11RoundEnd();
+
+  r11Time = Math.max(
+    0,
+    Math.ceil(
+      (end - Date.now()) / 1000
+    )
+  );
+
+  if(r11Time > 0){
+    r11Open = r11Time > 4;
+
+    document.getElementById('r11timer').textContent =
+      r11Time;
+
+    if(r11Open){
+      document.getElementById('r11timer').classList.remove('closed');
+    }else{
+      document.getElementById('r11timer').classList.add('closed');
+    }
+  }
+}
 function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
-function spin11(){r11Spin=true;r11Open=false;document.getElementById('r11msg').textContent='Result spinning...';playSpinSound();const winner=Math.floor(Math.random()*12);wheel11.animate([{transform:'rotate(0deg)'},{transform:'rotate(1080deg)'}],{duration:1800,easing:'cubic-bezier(.12,.72,.12,1)'});setTimeout(()=>{stopSpinSound();document.getElementById('r11msg').textContent='WINNING NUMBER: '+winner;grid11.querySelectorAll('.bet-number').forEach(b=>{if(+b.dataset.n===winner)b.classList.add('winner')});let win=(bets11[winner]||0)*10;balance+=win;r11Last.unshift(winner);r11Last=r11Last.slice(0,4);renderLast('r11last',r11Last);syncBalance();r11Spin=false;setTimeout(()=>{r11Time=60;r11Open=true;document.getElementById('r11timer').textContent=60;document.getElementById('r11timer').classList.remove('closed');clearBets11();document.getElementById('r11msg').textContent='Press and hold a number to bet'},700)},1900)}
+function spin11(){r11Spin=true;r11Open=false;document.getElementById('r11msg').textContent='Result spinning...';playSpinSound();const winner=Math.floor(Math.random()*12);wheel11.animate([{transform:'rotate(0deg)'},{transform:'rotate(1080deg)'}],{duration:1800,easing:'cubic-bezier(.12,.72,.12,1)'});setTimeout(()=>{stopSpinSound();document.getElementById('r11msg').textContent='WINNING NUMBER: '+winner;grid11.querySelectorAll('.bet-number').forEach(b=>{if(+b.dataset.n===winner)b.classList.add('winner')});let win=(bets11[winner]||0)*10;balance+=win;r11Last.unshift(winner);r11Last=r11Last.slice(0,4);renderLast('r11last',r11Last);syncBalance();r11Spin=false;setTimeout(()=>{
+resetR11Round();
+clearBets11();
+document.getElementById('r11msg').textContent ='Press and hold a number to bet';
+},700)},1900)
+  resetR11Round();
+  clearBets11();
+  document.getElementById('r11msg').textContent =
+    'Press and hold a number to bet';
+},700)},1900)
 function renderLast(id,arr){
   const el = document.getElementById(id);
   el.innerHTML = '';
