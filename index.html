@@ -1002,27 +1002,36 @@ const R11_ROUND_MS = 30000;
 const R11_ROUND_KEY = 'zynoR11RoundEnd';
 
 function getR11RoundEnd(){
+
   if(
     globalRoundStart11 !== null &&
-    globalRoundStart11 !== undefined
+    globalRoundStart11 !== undefined &&
+    Number(globalRoundStart11) > 0
   ){
     return Number(globalRoundStart11) + R11_ROUND_MS;
   }
 
-  return null;
+  const saved = Number(
+    localStorage.getItem(R11_ROUND_KEY) || 0
+  );
+
+  if(saved > Date.now()){
+    return saved;
+  }
+
+  const end = Date.now() + R11_ROUND_MS;
+
+  localStorage.setItem(
+    R11_ROUND_KEY,
+    String(end)
+  );
+
+  return end;
 }
 
 function resetR11Round(){
 
-  if(
-    globalRoundStart11 === null ||
-    globalRoundStart11 === undefined
-  ){
-    return;
-  }
-
-  const end =
-    Number(globalRoundStart11) + R11_ROUND_MS;
+  const end = getR11RoundEnd();
 
   r11Time = Math.max(
     0,
@@ -1033,19 +1042,15 @@ function resetR11Round(){
 
   r11Open = r11Time > 4;
 
-  document.getElementById('r11timer').textContent =
-    r11Time;
+  const timer =
+    document.getElementById('r11timer');
+
+  timer.textContent = r11Time;
 
   if(r11Open){
-    document
-      .getElementById('r11timer')
-      .classList
-      .remove('closed');
+    timer.classList.remove('closed');
   }else{
-    document
-      .getElementById('r11timer')
-      .classList
-      .add('closed');
+    timer.classList.add('closed');
   }
 }
 
@@ -1065,10 +1070,7 @@ function tickR11(){
   }
 
   const end = getR11RoundEnd();
-  
-  if(end === null){
-  return;
-}
+
   r11Time = Math.max(
     0,
     Math.ceil(
@@ -1101,14 +1103,13 @@ function tickR11(){
     spin11();
   }
 }
+
 function startR11(){
+
   if(r11Spin) return;
 
   const end = getR11RoundEnd();
-  
-if(end === null){
-  return;
-}
+
   r11Time = Math.max(
     0,
     Math.ceil(
@@ -1116,39 +1117,37 @@ if(end === null){
     )
   );
 
-  if(r11Time > 0){
-    r11Open = r11Time > 4;
+  r11Open = r11Time > 4;
 
-    document.getElementById('r11timer').textContent =
-      r11Time;
+  const timer =
+    document.getElementById('r11timer');
 
-    if(r11Open){
-      document.getElementById('r11timer').classList.remove('closed');
-    }else{
-      document.getElementById('r11timer').classList.add('closed');
-    }
+  timer.textContent = r11Time;
+
+  if(r11Open){
+    timer.classList.remove('closed');
+  }else{
+    timer.classList.add('closed');
   }
 }
 function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
 function spin11(){
-  r11Spin=true;
-  r11Open=false;
+
+  r11Spin = true;
+  r11Open = false;
 
   document.getElementById('r11msg').textContent =
     'Result spinning...';
 
   playSpinSound();
 
-  const winner = Number(globalResult11);
-  if(
-  !Number.isInteger(winner) ||
-  winner < 0 ||
-  winner > 11
-){
-  r11Spin = false;
-  stopSpinSound();
-  return;
-}
+  const winner =
+    Number.isInteger(globalResult11) &&
+    globalResult11 >= 0 &&
+    globalResult11 <= 11
+      ? globalResult11
+      : Math.floor(Math.random() * 12);
+
   wheel11.animate(
     [
       {transform:'rotate(0deg)'},
@@ -1179,20 +1178,22 @@ function spin11(){
       (bets11[winner]||0)*10;
 
     balance += win;
+
     window.saveUserBalance();
 
-    r11Last = Array.isArray(globalLastWins11)
-  ? globalLastWins11
-  : [];
+    r11Last =
+      Array.isArray(globalLastWins11)
+        ? globalLastWins11
+        : [];
 
-renderLast(
-  'r11last',
-  r11Last
-);
+    renderLast(
+      'r11last',
+      r11Last
+    );
 
     syncBalance();
 
-    r11Spin=false;
+    r11Spin = false;
 
     setTimeout(()=>{
 
