@@ -1018,6 +1018,9 @@ function getR11RoundEnd(){
   if(saved > Date.now()){
     return saved;
   }
+  if(saved > 0 && saved <= Date.now()){
+  return Date.now();
+}
 
   const end = Date.now() + R11_ROUND_MS;
 
