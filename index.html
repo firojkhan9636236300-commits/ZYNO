@@ -860,17 +860,31 @@ function tickR36(){
   */
   if(r36Time > 0){
 
-    r36Time--;
+  const savedEnd = Number(
+    localStorage.getItem(R36_ROUND_KEY) || 0
+  );
 
-    if(
-      document
-        .getElementById('r36')
-        .classList
-        .contains('active')
-    ){
-      v.textContent = r36Time;
-    }
+  if(savedEnd > Date.now()){
+
+    r36Time = Math.ceil(
+      (savedEnd - Date.now()) / 1000
+    );
+
+  }else{
+
+    r36Time = 0;
+
   }
+
+  if(
+    document
+      .getElementById('r36')
+      .classList
+      .contains('active')
+  ){
+    v.textContent = r36Time;
+  }
+}
 
   if(
     r36Time <= 4 &&
