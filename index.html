@@ -1000,21 +1000,15 @@ const R11_ROUND_MS = 30000;
 const R11_ROUND_KEY = 'zynoR11RoundEnd';
 
 function getR11RoundEnd(){
-  const saved = Number(
-    localStorage.getItem(R11_ROUND_KEY) || 0
-  );
+  if(globalRoundStart11 !== null && globalRoundStart11 !== undefined){
+    const end = Number(globalRoundStart11) + R11_ROUND_MS;
 
-  if(saved > Date.now()){
-    return saved;
+    if(end > Date.now()){
+      return end;
+    }
   }
 
-  const end = Date.now() + R11_ROUND_MS;
-  localStorage.setItem(
-    R11_ROUND_KEY,
-    String(end)
-  );
-
-  return end;
+  return Date.now() + R11_ROUND_MS;
 }
 
 function resetR11Round(){
@@ -1609,7 +1603,13 @@ onSnapshot(doc(db,"gameResults","roulette"), snap=>{
   if(data.roundId36 !== undefined){
     globalRound36 = data.roundId36;
   }
+if(data.roundId11 !== undefined){
+  globalRound11 = data.roundId11;
+}
 
+if(data.roundStart11 !== undefined){
+  globalRoundStart11 = data.roundStart11;
+}
   if(data.roundStart36 !== undefined){
     globalRoundStart36 = data.roundStart36;
   }
