@@ -782,7 +782,6 @@ function bindHold36(btn,n){
 }
 function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?money(n):''}
 function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
-function startR36(){if(r36Spin)return;if(r36Time<=0){r36Time=30;r36Open=true;document.getElementById('r36timer').textContent=30;document.getElementById('r36timer').classList.remove('closed');clearBets36()}}
 function tickR36(){
 
   const v =
