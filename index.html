@@ -1002,30 +1002,51 @@ const R11_ROUND_MS = 30000;
 const R11_ROUND_KEY = 'zynoR11RoundEnd';
 
 function getR11RoundEnd(){
-  if(globalRoundStart11 !== null && globalRoundStart11 !== undefined){
-    const end = Number(globalRoundStart11) + R11_ROUND_MS;
-
-    if(end > Date.now()){
-      return end;
-    }
+  if(
+    globalRoundStart11 !== null &&
+    globalRoundStart11 !== undefined
+  ){
+    return Number(globalRoundStart11) + R11_ROUND_MS;
   }
 
-  return Date.now() + R11_ROUND_MS;
+  return null;
 }
 
 function resetR11Round(){
-  const end = Date.now() + R11_ROUND_MS;
 
-  localStorage.setItem(
-    R11_ROUND_KEY,
-    String(end)
+  if(
+    globalRoundStart11 === null ||
+    globalRoundStart11 === undefined
+  ){
+    return;
+  }
+
+  const end =
+    Number(globalRoundStart11) + R11_ROUND_MS;
+
+  r11Time = Math.max(
+    0,
+    Math.ceil(
+      (end - Date.now()) / 1000
+    )
   );
 
-  r11Time = 30;
-  r11Open = true;
+  r11Open = r11Time > 4;
 
-  document.getElementById('r11timer').textContent = '30';
-  document.getElementById('r11timer').classList.remove('closed');
+  document.getElementById('r11timer').textContent =
+    r11Time;
+
+  if(r11Open){
+    document
+      .getElementById('r11timer')
+      .classList
+      .remove('closed');
+  }else{
+    document
+      .getElementById('r11timer')
+      .classList
+      .add('closed');
+  }
 }
 
 function tickR11(){
@@ -1044,7 +1065,10 @@ function tickR11(){
   }
 
   const end = getR11RoundEnd();
-
+  
+  if(end === null){
+  return;
+}
   r11Time = Math.max(
     0,
     Math.ceil(
@@ -1081,7 +1105,10 @@ function startR11(){
   if(r11Spin) return;
 
   const end = getR11RoundEnd();
-
+  
+if(end === null){
+  return;
+}
   r11Time = Math.max(
     0,
     Math.ceil(
@@ -1112,9 +1139,16 @@ function spin11(){
 
   playSpinSound();
 
-  const winner =
-    Math.floor(Math.random()*12);
-
+  const winner = Number(globalResult11);
+  if(
+  !Number.isInteger(winner) ||
+  winner < 0 ||
+  winner > 11
+){
+  r11Spin = false;
+  stopSpinSound();
+  return;
+}
   wheel11.animate(
     [
       {transform:'rotate(0deg)'},
@@ -1145,15 +1179,16 @@ function spin11(){
       (bets11[winner]||0)*10;
 
     balance += win;
+    window.saveUserBalance();
 
-    r11Last.unshift(winner);
-    r11Last =
-      r11Last.slice(0,4);
+    r11Last = Array.isArray(globalLastWins11)
+  ? globalLastWins11
+  : [];
 
-    renderLast(
-      'r11last',
-      r11Last
-    );
+renderLast(
+  'r11last',
+  r11Last
+);
 
     syncBalance();
 
