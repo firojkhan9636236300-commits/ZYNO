@@ -971,11 +971,7 @@ function spin36(){
     r36Spin = false;
     // Next round
     setTimeout(()=>{
-      r36Time = 30;
-      r36Open = true;
-      document.getElementById('r36timer').textContent = '30';
-      document.getElementById('r36timer')
-        .classList.remove('closed');
+      resetR36Round();
       clearBets36();
       document.getElementById('r36msg').textContent =
         'Press and hold a number to bet';
