@@ -1488,7 +1488,104 @@ window.openAdminUser = async function(uid){
 
 };
   // ===== USER BALANCE SAVE =====
+// ===== LOAD EXACT FIRESTORE USER BALANCE =====
 
+let balanceLoadedFromFirestore = false;
+let balanceUnsubscribe = null;
+
+function applyFirestoreBalance(points){
+
+  const exactPoints = Number(points || 0);
+
+  balance = exactPoints;
+  balanceLoadedFromFirestore = true;
+
+  syncBalance();
+
+  const transferBalance =
+    document.getElementById('transferBalance');
+
+  if(transferBalance){
+    transferBalance.textContent = money(exactPoints);
+  }
+
+  const adminBalance =
+    document.getElementById('adminBalance');
+
+  if(adminBalance && window.zynoIsAdmin === true){
+    adminBalance.textContent = money(exactPoints);
+  }
+}
+
+onAuthStateChanged(auth, async (user)=>{
+
+  if(balanceUnsubscribe){
+    balanceUnsubscribe();
+    balanceUnsubscribe = null;
+  }
+
+  balanceLoadedFromFirestore = false;
+
+  if(!user){
+    window.zynoIsAdmin = false;
+    return;
+  }
+
+  try{
+
+    const userRef = doc(db, 'users', user.uid);
+
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      console.error('Firestore user document not found');
+      return;
+    }
+
+    const data = snap.data();
+
+    applyFirestoreBalance(data.points);
+
+    if(
+      user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332' &&
+      data.role === 'admin'
+    ){
+      window.zynoIsAdmin = true;
+
+      const adminBalance =
+        document.getElementById('adminBalance');
+
+      if(adminBalance){
+        adminBalance.textContent =
+          money(Number(data.points || 0));
+      }
+
+    }else{
+      window.zynoIsAdmin = false;
+    }
+
+    // Firestore se balance change ho to screen bhi update ho
+    balanceUnsubscribe = onSnapshot(
+      userRef,
+      snap=>{
+        if(!snap.exists()) return;
+
+        const data = snap.data();
+
+        applyFirestoreBalance(data.points);
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      'Firestore balance load error:',
+      error
+    );
+
+  }
+
+});
 window.saveUserBalance = async function(){
 
   try{
