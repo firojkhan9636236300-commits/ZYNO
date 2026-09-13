@@ -1103,12 +1103,21 @@ function tickR11(){
 
     r11Open = false;
 
-    spin11();
+    ensureGlobalR11Round().then(()=>{
+
+      if(!r11Spin){
+        spin11();
+      }
+
+    });
+
   }
 }
 
 function startR11(){
-
+  
+    ensureGlobalR11Round();
+    
   if(r11Spin) return;
 
   const end = getR11RoundEnd();
@@ -1144,12 +1153,12 @@ function spin11(){
 
   playSpinSound();
 
-  const winner =
-    Number.isInteger(globalResult11) &&
-    globalResult11 >= 0 &&
-    globalResult11 <= 11
-      ? globalResult11
-      : Math.floor(Math.random() * 12);
+const winner =
+  Number.isInteger(globalResult11) &&
+  globalResult11 >= 0 &&
+  globalResult11 <= 11
+    ? globalResult11
+    : 0;
 
   wheel11.animate(
     [
@@ -1200,7 +1209,9 @@ function spin11(){
 
     setTimeout(()=>{
 
-      resetR11Round();
+      ensureGlobalR11Round().then(()=>{
+  resetR11Round();
+});
       clearBets11();
 
       document.getElementById('r11msg').textContent =
@@ -1636,7 +1647,68 @@ onSnapshot
   const auth = getAuth(app);
   const db = getFirestore(app);
   window.zynoIsAdmin = false;
-  
+  let r11EnsuringRound = false;
+
+async function ensureGlobalR11Round(){
+
+  if(r11EnsuringRound) return;
+
+  r11EnsuringRound = true;
+
+  try{
+
+    const ref = doc(db,"gameResults","roulette");
+
+    await runTransaction(db, async(transaction)=>{
+
+      const snap = await transaction.get(ref);
+      const data = snap.exists() ? snap.data() : {};
+
+      const now = Date.now();
+
+      const start = Number(data.roundStart11 || 0);
+
+      const valid =
+        start > 0 &&
+        (now - start) < R11_ROUND_MS;
+
+      if(valid) return;
+
+      const oldLast =
+        Array.isArray(data.lastWins11)
+          ? data.lastWins11
+          : [];
+
+      const result =
+        Math.floor(Math.random() * 12);
+
+      const lastWins =
+        [result, ...oldLast].slice(0,4);
+
+      transaction.set(ref,{
+
+        roundId11: now,
+        roundStart11: now,
+        result11: result,
+        lastWins11: lastWins
+
+      },{merge:true});
+
+    });
+
+  }catch(error){
+
+    console.error(
+      "R11 global round error:",
+      error
+    );
+
+  }finally{
+
+    r11EnsuringRound = false;
+
+  }
+}
 onSnapshot(doc(db,"gameResults","roulette"), snap=>{
   if(!snap.exists()) return;
 
