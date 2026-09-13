@@ -1188,14 +1188,15 @@ const winner =
 
     syncBalance();
 
-    r11Spin = false;
-setTimeout(async ()=>{
+    setTimeout(async ()=>{
 
   clearBets11();
 
   await ensureGlobalR11Round();
 
   resetR11Round();
+
+  r11Spin = false;
 
   document.getElementById('r11msg').textContent =
     'Press and hold a number to bet';
