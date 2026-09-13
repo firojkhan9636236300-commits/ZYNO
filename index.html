@@ -1014,27 +1014,6 @@ function getR11RoundEnd(){
   return Date.now() + R11_ROUND_MS;
 }
 
-  const saved = Number(
-    localStorage.getItem(R11_ROUND_KEY) || 0
-  );
-
-  if(saved > Date.now()){
-    return saved;
-  }
-  if(saved > 0 && saved <= Date.now()){
-  return Date.now();
-}
-
-  const end = Date.now() + R11_ROUND_MS;
-
-  localStorage.setItem(
-    R11_ROUND_KEY,
-    String(end)
-  );
-
-  return end;
-}
-
 function resetR11Round(){
 
   const end = getR11RoundEnd();
@@ -1118,32 +1097,37 @@ function tickR11(){
 }
 
 function startR11(){
-  
-    ensureGlobalR11Round();
-    
+
   if(r11Spin) return;
 
-  const end = getR11RoundEnd();
+  ensureGlobalR11Round().then(()=>{
 
-  r11Time = Math.max(
-    0,
-    Math.ceil(
-      (end - Date.now()) / 1000
-    )
-  );
+    if(r11Spin) return;
 
-  r11Open = r11Time > 4;
+    const end = getR11RoundEnd();
 
-  const timer =
-    document.getElementById('r11timer');
+    r11Time = Math.max(
+      0,
+      Math.ceil(
+        (end - Date.now()) / 1000
+      )
+    );
 
-  timer.textContent = r11Time;
+    r11Open = r11Time > 4;
 
-  if(r11Open){
-    timer.classList.remove('closed');
-  }else{
-    timer.classList.add('closed');
-  }
+    const timer =
+      document.getElementById('r11timer');
+
+    timer.textContent = r11Time;
+
+    if(r11Open){
+      timer.classList.remove('closed');
+    }else{
+      timer.classList.add('closed');
+    }
+
+  });
+
 }
 function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
 function spin11(){
@@ -1721,6 +1705,8 @@ async function ensureGlobalR11Round(){
 
   }
 }
+ensureGlobalR11Round();
+
 onSnapshot(doc(db,"gameResults","roulette"), snap=>{
   if(!snap.exists()) return;
 
