@@ -1085,13 +1085,9 @@ function tickR11(){
 
     r11Open = false;
 
-    ensureGlobalR11Round().then(()=>{
-
-      if(!r11Spin){
-        spin11();
-      }
-
-    });
+    if(!r11Spin){
+      spin11();
+    }
 
   }
 }
@@ -1193,18 +1189,18 @@ const winner =
     syncBalance();
 
     r11Spin = false;
+setTimeout(async ()=>{
 
-    setTimeout(()=>{
+  clearBets11();
 
-      ensureGlobalR11Round().then(()=>{
+  await ensureGlobalR11Round();
+
   resetR11Round();
-});
-      clearBets11();
 
-      document.getElementById('r11msg').textContent =
-        'Press and hold a number to bet';
+  document.getElementById('r11msg').textContent =
+    'Press and hold a number to bet';
 
-    },700);
+},700);
 
   },1900);
 }
