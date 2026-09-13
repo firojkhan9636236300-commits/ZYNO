@@ -1657,7 +1657,6 @@ async function ensureGlobalR11Round(){
           ? start + R11_ROUND_MS
           : 0;
 
-      // Current global round is still running.
       if(
         start > 0 &&
         now < end
@@ -1688,6 +1687,30 @@ async function ensureGlobalR11Round(){
       );
 
     });
+
+    const freshSnap = await getDoc(ref);
+
+    if(freshSnap.exists()){
+
+      const freshData = freshSnap.data();
+
+      if(freshData.roundId11 !== undefined){
+        globalRound11 = freshData.roundId11;
+      }
+
+      if(freshData.roundStart11 !== undefined){
+        globalRoundStart11 = freshData.roundStart11;
+      }
+
+      if(freshData.result11 !== undefined){
+        globalResult11 = freshData.result11;
+      }
+
+      if(Array.isArray(freshData.lastWins11)){
+        globalLastWins11 = freshData.lastWins11;
+      }
+
+    }
 
   }catch(error){
 
