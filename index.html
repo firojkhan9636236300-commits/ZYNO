@@ -1011,6 +1011,9 @@ function getR11RoundEnd(){
     return Number(globalRoundStart11) + R11_ROUND_MS;
   }
 
+  return Date.now() + R11_ROUND_MS;
+}
+
   const saved = Number(
     localStorage.getItem(R11_ROUND_KEY) || 0
   );
@@ -1668,11 +1671,18 @@ async function ensureGlobalR11Round(){
 
       const start = Number(data.roundStart11 || 0);
 
-      const valid =
-        start > 0 &&
-        (now - start) < R11_ROUND_MS;
+      const end =
+        start > 0
+          ? start + R11_ROUND_MS
+          : 0;
 
-      if(valid) return;
+      // Current global round is still running.
+      if(
+        start > 0 &&
+        now < end
+      ){
+        return;
+      }
 
       const oldLast =
         Array.isArray(data.lastWins11)
@@ -1685,14 +1695,16 @@ async function ensureGlobalR11Round(){
       const lastWins =
         [result, ...oldLast].slice(0,4);
 
-      transaction.set(ref,{
-
-        roundId11: now,
-        roundStart11: now,
-        result11: result,
-        lastWins11: lastWins
-
-      },{merge:true});
+      transaction.set(
+        ref,
+        {
+          roundId11: now,
+          roundStart11: now,
+          result11: result,
+          lastWins11: lastWins
+        },
+        {merge:true}
+      );
 
     });
 
