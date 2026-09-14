@@ -1143,7 +1143,9 @@ async function ensureGlobalR11Round(){
 
 }
 
-
+window.ensureGlobalR11Round =
+  ensureGlobalR11Round;
+  
 function resetR11Round(){
 
   const start =
@@ -1349,28 +1351,140 @@ function tickR11(){
     Local spin chal raha hai to timer
     dobara interfere nahi karega.
   */
-  
   if(r11Spin){
 
-  const currentStart =
+    const currentStart =
+      Number(globalRoundStart11 || 0);
+
+    /*
+      Naya global round aa gaya ho
+      to local spin state reset.
+    */
+    if(
+      currentStart > 0 &&
+      Date.now() >= currentStart &&
+      Date.now() < currentStart + R11_ROUND_MS
+    ){
+
+      r11Spin = false;
+      r11LockedResult = null;
+
+      resetR11Round();
+
+      document.getElementById('r11msg').textContent =
+        'Press and hold a number to bet';
+    }
+
+    return;
+  }
+
+  /*
+    Firestore se global round start
+    abhi nahi mila.
+  */
+  const start =
     Number(globalRoundStart11 || 0);
 
+  if(start <= 0){
+
+    if(
+      typeof window.ensureGlobalR11Round === 'function'
+    ){
+      window.ensureGlobalR11Round();
+    }
+
+    return;
+  }
+
+  /*
+    Sab users ke liye same 30 second
+    global countdown.
+  */
+  const end =
+    start + R11_ROUND_MS;
+
+  const remaining =
+    Math.max(
+      0,
+      Math.ceil(
+        (end - Date.now()) / 1000
+      )
+    );
+
+  r11Time = remaining;
+
+  v.textContent = remaining;
+
+  /*
+    Last 4 seconds mein betting close.
+  */
   if(
-    currentStart > 0 &&
-    Date.now() >= currentStart &&
-    Date.now() < currentStart + R11_ROUND_MS
+    remaining <= 4 &&
+    remaining > 0
   ){
 
-    r11Spin = false;
-    r11LockedResult = null;
+    r11Open = false;
+
+    v.classList.add('closed');
+
+    document.getElementById('r11msg').textContent =
+      'BETTING CLOSED — spinning...';
+
+  }else if(remaining > 4){
+
+    r11Open = true;
+
+    v.classList.remove('closed');
+
+  }
+
+  /*
+    0 par ek hi user global spin claim karega.
+    Baaki users Firestore phase11 = spinning
+    dekhkar same result spin karenge.
+  */
+  if(
+    remaining === 0 &&
+    !r11Spin
+  ){
+
+    r11Time = -1;
+
+    r11Open = false;
+
+    claimR11Spin();
+  }
+
+}
+
+
+function startR11(){
+
+  if(r11Spin) return;
+
+  /*
+    Firebase module load hone ka wait.
+  */
+  if(
+    typeof window.ensureGlobalR11Round !== 'function'
+  ){
+
+    setTimeout(
+      startR11,
+      100
+    );
+
+    return;
+  }
+
+  window.ensureGlobalR11Round().then(()=>{
+
+    if(r11Spin) return;
 
     resetR11Round();
 
-    document.getElementById('r11msg').textContent =
-      'Press and hold a number to bet';
-  }
+  });
 
-  return;
 }
 
 function startR11(){
