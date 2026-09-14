@@ -1085,9 +1085,14 @@ function tickR11(){
 
     r11Open = false;
 
-    if(!r11Spin){
-      spin11();
-    }
+    r11LockedResult =
+      Number.isInteger(globalResult11) &&
+      globalResult11 >= 0 &&
+      globalResult11 <= 11
+        ? globalResult11
+        : 0;
+
+    spin11();
 
   }
 }
@@ -1126,6 +1131,8 @@ function startR11(){
 
 }
 function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
+let r11LockedResult = null;
+
 function spin11(){
 
   r11Spin = true;
@@ -1137,11 +1144,17 @@ function spin11(){
   playSpinSound();
 
 const winner =
-  Number.isInteger(globalResult11) &&
-  globalResult11 >= 0 &&
-  globalResult11 <= 11
-    ? globalResult11
-    : 0;
+  Number.isInteger(r11LockedResult) &&
+  r11LockedResult >= 0 &&
+  r11LockedResult <= 11
+    ? r11LockedResult
+    : (
+        Number.isInteger(globalResult11) &&
+        globalResult11 >= 0 &&
+        globalResult11 <= 11
+          ? globalResult11
+          : 0
+      );
 
   wheel11.animate(
     [
@@ -1197,6 +1210,7 @@ const winner =
   resetR11Round();
 
   r11Spin = false;
+  r11LockedResult = null;
 
   document.getElementById('r11msg').textContent =
     'Press and hold a number to bet';
@@ -1657,10 +1671,8 @@ async function ensureGlobalR11Round(){
           ? start + R11_ROUND_MS
           : 0;
 
-      if(
-        start > 0 &&
-        now < end
-      ){
+      // Current round is still active — DO NOT change result
+      if(start > 0 && now < end){
         return;
       }
 
@@ -1672,16 +1684,14 @@ async function ensureGlobalR11Round(){
       const result =
         Math.floor(Math.random() * 12);
 
-      const lastWins =
-        [result, ...oldLast].slice(0,4);
-
+      // New round starts only after previous round has finished
       transaction.set(
         ref,
         {
           roundId11: now,
           roundStart11: now,
           result11: result,
-          lastWins11: lastWins
+          lastWins11: oldLast
         },
         {merge:true}
       );
@@ -1725,6 +1735,7 @@ async function ensureGlobalR11Round(){
 
   }
 }
+
 ensureGlobalR11Round();
 
 onSnapshot(doc(db,"gameResults","roulette"), snap=>{
