@@ -1349,92 +1349,29 @@ function tickR11(){
     Local spin chal raha hai to timer
     dobara interfere nahi karega.
   */
-  if(r11Spin) return;
+  
+  if(r11Spin){
 
-  const start =
+  const currentStart =
     Number(globalRoundStart11 || 0);
 
-  if(start <= 0){
-
-    ensureGlobalR11Round();
-
-    return;
-
-  }
-
-  /*
-    Agar Firestore already spinning hai,
-    sab users same winner spin karenge.
-  */
-  if(window.r11GlobalPhase11 === "spinning"){
-
-    r11Time = 0;
-    r11Open = false;
-
-    r11LockedResult =
-      Number.isInteger(globalResult11) &&
-      globalResult11 >= 0 &&
-      globalResult11 <= 11
-        ? globalResult11
-        : 0;
-
-    spin11();
-
-    return;
-
-  }
-
-  const end =
-    start + R11_ROUND_MS;
-
-  const remaining =
-    Math.max(
-      0,
-      Math.ceil(
-        (end - Date.now()) / 1000
-      )
-    );
-
-  r11Time =
-    remaining;
-
-  v.textContent =
-    remaining;
-
   if(
-    remaining <= 4 &&
-    remaining > 0
+    currentStart > 0 &&
+    Date.now() >= currentStart &&
+    Date.now() < currentStart + R11_ROUND_MS
   ){
 
-    r11Open = false;
+    r11Spin = false;
+    r11LockedResult = null;
 
-    v.classList.add('closed');
+    resetR11Round();
 
     document.getElementById('r11msg').textContent =
-      'BETTING CLOSED — spinning...';
-
-  }else{
-
-    r11Open = true;
-
-    v.classList.remove('closed');
-
+      'Press and hold a number to bet';
   }
 
-  if(
-    remaining === 0 &&
-    !r11Spin
-  ){
-
-    r11Time = -1;
-    r11Open = false;
-
-    claimR11Spin();
-
-  }
-
+  return;
 }
-
 
 function startR11(){
 
