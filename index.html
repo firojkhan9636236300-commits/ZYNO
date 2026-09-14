@@ -1600,15 +1600,12 @@ function spin11(){
                 ? snap.data()
                 : {};
 
-            const currentRound =
-              data.roundId11;
-
             /*
-              Sirf current global round ka client
-              next round create karega.
+              Sirf spinning phase mein hi
+              next global round create hoga.
             */
             if(
-              currentRound !== globalRound11
+              data.phase11 !== "spinning"
             ){
               return;
             }
