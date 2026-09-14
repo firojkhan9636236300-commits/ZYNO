@@ -556,18 +556,18 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 <script>
 'use strict';
 const START_BALANCE=1000000000,MAX_BET=5500,POINT_TIME=100;
-let globalLastWins36=[];
-let globalLastWins11=[];
-let globalResult36=null;
-let globalResult11=null;
-let globalResultUnsubscribe36=null;
-let globalResultUnsubscribe11=null;
-let globalRound36=null;
-let globalRound11=null;
-let globalRoundStart36=null;
-let globalRoundStart11=null;
-let globalBetClose36=null;
-let globalSpinEnd36=null;
+var globalLastWins36=[];
+var globalLastWins11=[];
+var globalResult36=null;
+var globalResult11=null;
+var globalResultUnsubscribe36=null;
+var globalResultUnsubscribe11=null;
+var globalRound36=null;
+var globalRound11=null;
+var globalRoundStart36=null;
+var globalRoundStart11=null;
+var globalBetClose36=null;
+var globalSpinEnd36=null;
 let balance=START_BALANCE;
 const money=n=>Math.floor(n).toLocaleString('en-IN');
 function showLogin(){
@@ -1014,6 +1014,7 @@ function getR11RoundEnd(){
   return Date.now() + R11_ROUND_MS;
 }
 
+let r11EnsuringRound = false;
 let r11LockedResult = null;
 let r11ClaimingSpin = false;
 
@@ -1441,7 +1442,6 @@ function startR11(){
 
 }
 
-
 function spin11(){
 
   if(r11Spin) return;
@@ -1491,18 +1491,12 @@ function spin11(){
 
         b.classList.remove('winner');
 
-        if(
-          +b.dataset.n === winner
-        ){
+        if(+b.dataset.n === winner){
           b.classList.add('winner');
         }
 
       });
 
-    /*
-      WIN PAYOUT
-      R11 = 10x
-    */
     const win =
       (bets11[winner] || 0) * 10;
 
@@ -1510,10 +1504,6 @@ function spin11(){
 
     window.saveUserBalance();
 
-    /*
-      Local display immediately.
-      R11 ka Last 4 alag hai.
-    */
     r11Last = [
       winner,
       ...(Array.isArray(globalLastWins11)
@@ -1528,22 +1518,19 @@ function spin11(){
 
     syncBalance();
 
-    /*
-      4 sec winner display ke baad
-      Firestore mein NEXT GLOBAL ROUND.
-      
-      Last 4 + next result + next timer
-      ek hi transaction mein.
-    */
     setTimeout(async()=>{
 
       const ref =
-        doc(db,"gameResults","roulette");
+        window.zynoDoc(
+          window.zynoDb,
+          "gameResults",
+          "roulette"
+        );
 
       try{
 
-        await runTransaction(
-          db,
+        await window.zynoRunTransaction(
+          window.zynoDb,
           async(transaction)=>{
 
             const snap =
@@ -1554,15 +1541,13 @@ function spin11(){
                 ? snap.data()
                 : {};
 
-            /*
-              Agar kisi aur client ne next round
-              already create kar diya hai,
-              current round ko dobara update
-              nahi karna.
-            */
             const currentRound =
               data.roundId11;
 
+            /*
+              Sirf current global round ka client
+              next round create karega.
+            */
             if(
               currentRound !== globalRound11
             ){
@@ -1604,11 +1589,8 @@ function spin11(){
           }
         );
 
-        /*
-          Fresh Firestore state load.
-        */
         const freshSnap =
-          await getDoc(ref);
+          await window.zynoGetDoc(ref);
 
         if(freshSnap.exists()){
 
@@ -1677,183 +1659,6 @@ function spin11(){
           'Press and hold a number to bet';
 
       }
-
-    },4000);
-
-  },5900);
-
-}
-
-function spin11(){
-
-  if(r11Spin) return;
-
-  r11Spin = true;
-  r11Open = false;
-
-  document.getElementById('r11msg').textContent =
-    'Result spinning...';
-
-  playSpinSound();
-
-
-  const winner =
-    Number.isInteger(r11LockedResult) &&
-    r11LockedResult >= 0 &&
-    r11LockedResult <= 11
-      ? r11LockedResult
-      : (
-          Number.isInteger(globalResult11) &&
-          globalResult11 >= 0 &&
-          globalResult11 <= 11
-            ? globalResult11
-            : 0
-        );
-
-
-  wheel11.animate(
-    [
-      {transform:'rotate(0deg)'},
-      {transform:'rotate(1080deg)'}
-    ],
-    {
-      duration:5900,
-      easing:'cubic-bezier(.12,.72,.12,1)'
-    }
-  );
-
-
-  setTimeout(()=>{
-
-    stopSpinSound();
-
-    document.getElementById('r11msg').textContent =
-      'WINNING NUMBER: ' + winner;
-
-
-    grid11
-      .querySelectorAll('.bet-number')
-      .forEach(b=>{
-
-        b.classList.remove('winner');
-
-        if(+b.dataset.n === winner){
-          b.classList.add('winner');
-        }
-
-      });
-
-
-    let win =
-      (bets11[winner] || 0) * 10;
-
-    balance += win;
-
-    window.saveUserBalance();
-
-
-    /*
-      R11 KA APNA LAST 4
-      Current winner sabse pehle.
-      R36 LAST 4 se koi connection nahi.
-    */
-
-    r11Last = [
-      winner,
-      ...(Array.isArray(globalLastWins11)
-        ? globalLastWins11
-        : [])
-    ].slice(0,4);
-
-
-    renderLast(
-      'r11last',
-      r11Last
-    );
-
-
-    syncBalance();
-
-
-    /*
-      Current R11 winner ko Firestore ke
-      global Last 4 mein save karo.
-      R36 data ko touch nahi karna.
-    */
-
-    const ref =
-      doc(db,"gameResults","roulette");
-
-    runTransaction(
-      db,
-      async(transaction)=>{
-
-        const snap =
-          await transaction.get(ref);
-
-        const data =
-          snap.exists()
-            ? snap.data()
-            : {};
-
-        const oldLast =
-          Array.isArray(data.lastWins11)
-            ? data.lastWins11
-            : [];
-
-        const newLast =
-          [
-            winner,
-            ...oldLast
-          ].slice(0,4);
-
-        transaction.set(
-          ref,
-          {
-            lastWins11: newLast
-          },
-          {merge:true}
-        );
-
-      }
-    ).catch(error=>{
-      console.error(
-        "R11 Last 4 save error:",
-        error
-      );
-    });
-
-
-    /*
-      R36 jaisa next round flow.
-      Current spin complete hone ke baad
-      thoda gap, phir new 30 sec round.
-    */
-
-    setTimeout(async()=>{
-
-      clearBets11();
-
-      /*
-        Purana locked result hatao.
-      */
-      r11LockedResult = null;
-
-      /*
-        Firestore mein next global R11 round
-        create/update karo.
-      */
-      await ensureGlobalR11Round();
-
-      /*
-        Next round ka timer.
-      */
-      resetR11Round();
-
-      r11Spin = false;
-
-      document.getElementById('r11msg').textContent =
-        'Press and hold a number to bet';
 
     },4000);
 
@@ -2283,10 +2088,19 @@ onSnapshot
   };
 
   const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
-  window.zynoIsAdmin = false;
-  let r11EnsuringRound = false;
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+window.zynoIsAdmin = false;
+
+/*
+ * Firebase functions required by the classic
+ * Part-1 R11 code.
+ */
+window.zynoDb = db;
+window.zynoDoc = doc;
+window.zynoGetDoc = getDoc;
+window.zynoRunTransaction = runTransaction;
 
 async function ensureGlobalR11Round(){
 
