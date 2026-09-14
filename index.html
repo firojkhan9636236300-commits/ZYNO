@@ -1056,12 +1056,13 @@ function tickR11(){
 
   const end = getR11RoundEnd();
 
-  r11Time = Math.max(
-    0,
-    Math.ceil(
-      (end - Date.now()) / 1000
-    )
-  );
+  r11Time =
+    Math.max(
+      0,
+      Math.ceil(
+        (end - Date.now()) / 1000
+      )
+    );
 
   v.textContent = r11Time;
 
@@ -1075,14 +1076,15 @@ function tickR11(){
     v.classList.add('closed');
 
     document.getElementById('r11msg').textContent =
-      'BETTING CLOSED — result coming...';
+      'BETTING CLOSED — spinning...';
   }
 
   if(
     r11Time === 0 &&
-    !r11Spin
+    r11Spin === false
   ){
 
+    r11Time = -1;
     r11Open = false;
 
     r11LockedResult =
@@ -1093,9 +1095,9 @@ function tickR11(){
         : 0;
 
     spin11();
-
   }
 }
+
 
 function startR11(){
 
@@ -1105,21 +1107,25 @@ function startR11(){
 
     if(r11Spin) return;
 
-    const end = getR11RoundEnd();
+    const end =
+      getR11RoundEnd();
 
-    r11Time = Math.max(
-      0,
-      Math.ceil(
-        (end - Date.now()) / 1000
-      )
-    );
+    r11Time =
+      Math.max(
+        0,
+        Math.ceil(
+          (end - Date.now()) / 1000
+        )
+      );
 
-    r11Open = r11Time > 4;
+    r11Open =
+      r11Time > 4;
 
     const timer =
       document.getElementById('r11timer');
 
-    timer.textContent = r11Time;
+    timer.textContent =
+      r11Time;
 
     if(r11Open){
       timer.classList.remove('closed');
@@ -1130,10 +1136,28 @@ function startR11(){
   });
 
 }
-function clearBets11(){bets11={};grid11.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
+
+
+function clearBets11(){
+
+  bets11 = {};
+
+  grid11
+    .querySelectorAll('.bet-number')
+    .forEach(b=>{
+      b.querySelector('.bet-count').textContent = '';
+      b.classList.remove('winner');
+    });
+
+}
+
+
 let r11LockedResult = null;
 
+
 function spin11(){
+
+  if(r11Spin) return;
 
   r11Spin = true;
   r11Open = false;
@@ -1143,18 +1167,20 @@ function spin11(){
 
   playSpinSound();
 
-const winner =
-  Number.isInteger(r11LockedResult) &&
-  r11LockedResult >= 0 &&
-  r11LockedResult <= 11
-    ? r11LockedResult
-    : (
-        Number.isInteger(globalResult11) &&
-        globalResult11 >= 0 &&
-        globalResult11 <= 11
-          ? globalResult11
-          : 0
-      );
+
+  const winner =
+    Number.isInteger(r11LockedResult) &&
+    r11LockedResult >= 0 &&
+    r11LockedResult <= 11
+      ? r11LockedResult
+      : (
+          Number.isInteger(globalResult11) &&
+          globalResult11 >= 0 &&
+          globalResult11 <= 11
+            ? globalResult11
+            : 0
+        );
+
 
   wheel11.animate(
     [
@@ -1162,62 +1188,148 @@ const winner =
       {transform:'rotate(1080deg)'}
     ],
     {
-      duration:1800,
+      duration:5900,
       easing:'cubic-bezier(.12,.72,.12,1)'
     }
   );
+
 
   setTimeout(()=>{
 
     stopSpinSound();
 
     document.getElementById('r11msg').textContent =
-      'WINNING NUMBER: '+winner;
+      'WINNING NUMBER: ' + winner;
+
 
     grid11
       .querySelectorAll('.bet-number')
       .forEach(b=>{
-        if(+b.dataset.n===winner){
+
+        b.classList.remove('winner');
+
+        if(+b.dataset.n === winner){
           b.classList.add('winner');
         }
+
       });
 
+
     let win =
-      (bets11[winner]||0)*10;
+      (bets11[winner] || 0) * 10;
 
     balance += win;
 
     window.saveUserBalance();
 
-    r11Last =
-      Array.isArray(globalLastWins11)
+
+    /*
+      R11 KA APNA LAST 4
+      Current winner sabse pehle.
+      R36 LAST 4 se koi connection nahi.
+    */
+
+    r11Last = [
+      winner,
+      ...(Array.isArray(globalLastWins11)
         ? globalLastWins11
-        : [];
+        : [])
+    ].slice(0,4);
+
 
     renderLast(
       'r11last',
       r11Last
     );
 
+
     syncBalance();
 
-    setTimeout(async ()=>{
 
-  clearBets11();
+    /*
+      Current R11 winner ko Firestore ke
+      global Last 4 mein save karo.
+      R36 data ko touch nahi karna.
+    */
 
-  await ensureGlobalR11Round();
+    const ref =
+      doc(db,"gameResults","roulette");
 
-  resetR11Round();
+    runTransaction(
+      db,
+      async(transaction)=>{
 
-  r11Spin = false;
-  r11LockedResult = null;
+        const snap =
+          await transaction.get(ref);
 
-  document.getElementById('r11msg').textContent =
-    'Press and hold a number to bet';
+        const data =
+          snap.exists()
+            ? snap.data()
+            : {};
 
-},700);
+        const oldLast =
+          Array.isArray(data.lastWins11)
+            ? data.lastWins11
+            : [];
 
-  },1900);
+        const newLast =
+          [
+            winner,
+            ...oldLast
+          ].slice(0,4);
+
+        transaction.set(
+          ref,
+          {
+            lastWins11: newLast
+          },
+          {merge:true}
+        );
+
+      }
+    ).catch(error=>{
+      console.error(
+        "R11 Last 4 save error:",
+        error
+      );
+    });
+
+
+    /*
+      R36 jaisa next round flow.
+      Current spin complete hone ke baad
+      thoda gap, phir new 30 sec round.
+    */
+
+    setTimeout(async()=>{
+
+      clearBets11();
+
+      /*
+        Purana locked result hatao.
+      */
+      r11LockedResult = null;
+
+      /*
+        Firestore mein next global R11 round
+        create/update karo.
+      */
+      await ensureGlobalR11Round();
+
+      /*
+        Next round ka timer.
+      */
+      resetR11Round();
+
+      r11Spin = false;
+
+      document.getElementById('r11msg').textContent =
+        'Press and hold a number to bet';
+
+    },4000);
+
+  },5900);
+
 }
 function renderLast(id,arr){
   const el = document.getElementById(id);
@@ -1655,69 +1767,106 @@ async function ensureGlobalR11Round(){
 
   try{
 
-    const ref = doc(db,"gameResults","roulette");
+    const ref =
+      doc(db,"gameResults","roulette");
 
-    await runTransaction(db, async(transaction)=>{
+    await runTransaction(
+      db,
+      async(transaction)=>{
 
-      const snap = await transaction.get(ref);
-      const data = snap.exists() ? snap.data() : {};
+        const snap =
+          await transaction.get(ref);
 
-      const now = Date.now();
+        const data =
+          snap.exists()
+            ? snap.data()
+            : {};
 
-      const start = Number(data.roundStart11 || 0);
+        const now =
+          Date.now();
 
-      const end =
-        start > 0
-          ? start + R11_ROUND_MS
-          : 0;
+        const start =
+          Number(data.roundStart11 || 0);
 
-      // Current round is still active — DO NOT change result
-      if(start > 0 && now < end){
-        return;
+        const end =
+          start > 0
+            ? start + R11_ROUND_MS
+            : 0;
+
+        /*
+          Current R11 round active hai.
+          Result/timer ko change nahi karna.
+        */
+        if(
+          start > 0 &&
+          now < end
+        ){
+          return;
+        }
+
+        /*
+          Naya R11 result.
+          Sirf 0–11.
+        */
+        const result =
+          Math.floor(
+            Math.random() * 12
+          );
+
+        /*
+          Last 4 yahan change nahi karenge.
+          Winner spin complete hone ke baad
+          spin11() usko add karega.
+        */
+        transaction.set(
+          ref,
+          {
+            roundId11: now,
+            roundStart11: now,
+            result11: result
+          },
+          {merge:true}
+        );
+
       }
+    );
 
-      const oldLast =
-        Array.isArray(data.lastWins11)
-          ? data.lastWins11
-          : [];
-
-      const result =
-        Math.floor(Math.random() * 12);
-
-      // New round starts only after previous round has finished
-      transaction.set(
-        ref,
-        {
-          roundId11: now,
-          roundStart11: now,
-          result11: result,
-          lastWins11: oldLast
-        },
-        {merge:true}
-      );
-
-    });
-
-    const freshSnap = await getDoc(ref);
+    const freshSnap =
+      await getDoc(ref);
 
     if(freshSnap.exists()){
 
-      const freshData = freshSnap.data();
+      const freshData =
+        freshSnap.data();
 
-      if(freshData.roundId11 !== undefined){
-        globalRound11 = freshData.roundId11;
+      if(
+        freshData.roundId11 !== undefined
+      ){
+        globalRound11 =
+          freshData.roundId11;
       }
 
-      if(freshData.roundStart11 !== undefined){
-        globalRoundStart11 = freshData.roundStart11;
+      if(
+        freshData.roundStart11 !== undefined
+      ){
+        globalRoundStart11 =
+          freshData.roundStart11;
       }
 
-      if(freshData.result11 !== undefined){
-        globalResult11 = freshData.result11;
+      if(
+        freshData.result11 !== undefined
+      ){
+        globalResult11 =
+          freshData.result11;
       }
 
-      if(Array.isArray(freshData.lastWins11)){
-        globalLastWins11 = freshData.lastWins11;
+      if(
+        Array.isArray(
+          freshData.lastWins11
+        )
+      ){
+        globalLastWins11 =
+          freshData.lastWins11;
       }
 
     }
@@ -1734,6 +1883,7 @@ async function ensureGlobalR11Round(){
     r11EnsuringRound = false;
 
   }
+
 }
 
 ensureGlobalR11Round();
