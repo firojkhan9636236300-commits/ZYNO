@@ -1185,7 +1185,11 @@ async function claimR11Spin(){
   try{
 
     const ref =
-      doc(db,"gameResults","roulette");
+  window.zynoDoc(
+    window.zynoDb,
+    "gameResults",
+    "roulette"
+  );
 
     let shouldSpin = false;
 
@@ -2102,175 +2106,56 @@ window.zynoDoc = doc;
 window.zynoGetDoc = getDoc;
 window.zynoRunTransaction = runTransaction;
 
-async function ensureGlobalR11Round(){
-
-  if(r11EnsuringRound) return;
-
-  r11EnsuringRound = true;
-
-  try{
-
-    const ref =
-      doc(db,"gameResults","roulette");
-
-    await runTransaction(
-      db,
-      async(transaction)=>{
-
-        const snap =
-          await transaction.get(ref);
-
-        const data =
-          snap.exists()
-            ? snap.data()
-            : {};
-
-        const now =
-          Date.now();
-
-        const start =
-          Number(data.roundStart11 || 0);
-
-        const end =
-          start > 0
-            ? start + R11_ROUND_MS
-            : 0;
-
-        /*
-          Current R11 round active hai.
-          Result/timer ko change nahi karna.
-        */
-        if(
-          start > 0 &&
-          now < end
-        ){
-          return;
-        }
-
-        /*
-          Naya R11 result.
-          Sirf 0–11.
-        */
-        const result =
-          Math.floor(
-            Math.random() * 12
-          );
-
-        /*
-          Last 4 yahan change nahi karenge.
-          Winner spin complete hone ke baad
-          spin11() usko add karega.
-        */
-        transaction.set(
-          ref,
-          {
-            roundId11: now,
-            roundStart11: now,
-            result11: result
-          },
-          {merge:true}
-        );
-
-      }
-    );
-
-    const freshSnap =
-      await getDoc(ref);
-
-    if(freshSnap.exists()){
-
-      const freshData =
-        freshSnap.data();
-
-      if(
-        freshData.roundId11 !== undefined
-      ){
-        globalRound11 =
-          freshData.roundId11;
-      }
-
-      if(
-        freshData.roundStart11 !== undefined
-      ){
-        globalRoundStart11 =
-          freshData.roundStart11;
-      }
-
-      if(
-        freshData.result11 !== undefined
-      ){
-        globalResult11 =
-          freshData.result11;
-      }
-
-      if(
-        Array.isArray(
-          freshData.lastWins11
-        )
-      ){
-        globalLastWins11 =
-          freshData.lastWins11;
-      }
-
-    }
-
-  }catch(error){
-
-    console.error(
-      "R11 global round error:",
-      error
-    );
-
-  }finally{
-
-    r11EnsuringRound = false;
-
-  }
-
-}
-
 onSnapshot(doc(db,"gameResults","roulette"), snap=>{
+
   if(!snap.exists()) return;
 
-  const data=snap.data();
+  const data = snap.data();
+
   if(data.roundId36 !== undefined){
-    globalRound36 = data.roundId36;
+    window.globalRound36 = data.roundId36;
   }
-if(data.roundId11 !== undefined){
-  globalRound11 = data.roundId11;
-}
-if(data.phase11 !== undefined){
-  window.r11GlobalPhase11 = data.phase11;
-}
-if(data.roundStart11 !== undefined){
-  globalRoundStart11 = data.roundStart11;
-}
+
+  if(data.roundId11 !== undefined){
+    window.globalRound11 = data.roundId11;
+  }
+
+  if(data.phase11 !== undefined){
+    window.r11GlobalPhase11 = data.phase11;
+  }
+
+  if(data.roundStart11 !== undefined){
+    window.globalRoundStart11 = data.roundStart11;
+  }
+
   if(data.roundStart36 !== undefined){
-    globalRoundStart36 = data.roundStart36;
+    window.globalRoundStart36 = data.roundStart36;
   }
 
   if(data.betClose36 !== undefined){
-    globalBetClose36 = data.betClose36;
+    window.globalBetClose36 = data.betClose36;
   }
 
   if(data.spinEnd36 !== undefined){
-    globalSpinEnd36 = data.spinEnd36;
+    window.globalSpinEnd36 = data.spinEnd36;
   }
+
   if(Array.isArray(data.lastWins36)){
-    globalLastWins36=data.lastWins36;
+    window.globalLastWins36 = data.lastWins36;
   }
 
   if(Array.isArray(data.lastWins11)){
-    globalLastWins11=data.lastWins11;
+    window.globalLastWins11 = data.lastWins11;
   }
 
-  if(data.result36!==undefined){
-    globalResult36=data.result36;
+  if(data.result36 !== undefined){
+    window.globalResult36 = data.result36;
   }
 
-  if(data.result11!==undefined){
-    globalResult11=data.result11;
+  if(data.result11 !== undefined){
+    window.globalResult11 = data.result11;
   }
+
 });
 window.openAdminUser = async function(uid){
 
