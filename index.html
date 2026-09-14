@@ -1016,14 +1016,16 @@ function getR11RoundEnd(){
 
 function resetR11Round(){
 
-  const end = getR11RoundEnd();
+  const end =
+    Number(globalRoundStart11 || 0) + R11_ROUND_MS;
 
-  r11Time = Math.max(
-    0,
-    Math.ceil(
-      (end - Date.now()) / 1000
-    )
-  );
+  r11Time =
+    Math.max(
+      0,
+      Math.ceil(
+        (end - Date.now()) / 1000
+      )
+    );
 
   r11Open = r11Time > 4;
 
@@ -1038,6 +1040,7 @@ function resetR11Round(){
     timer.classList.add('closed');
   }
 }
+
 
 function tickR11(){
 
@@ -1054,9 +1057,17 @@ function tickR11(){
     return;
   }
 
-  const end = getR11RoundEnd();
+  const start =
+    Number(globalRoundStart11 || 0);
 
-  r11Time =
+  if(start <= 0){
+    return;
+  }
+
+  const end =
+    start + R11_ROUND_MS;
+
+  const remaining =
     Math.max(
       0,
       Math.ceil(
@@ -1064,11 +1075,13 @@ function tickR11(){
       )
     );
 
-  v.textContent = r11Time;
+  r11Time = remaining;
+
+  v.textContent = remaining;
 
   if(
-    r11Time <= 4 &&
-    r11Time > 0
+    remaining <= 4 &&
+    remaining > 0
   ){
 
     r11Open = false;
@@ -1080,7 +1093,7 @@ function tickR11(){
   }
 
   if(
-    r11Time === 0 &&
+    remaining === 0 &&
     r11Spin === false
   ){
 
@@ -1107,53 +1120,13 @@ function startR11(){
 
     if(r11Spin) return;
 
-    const end =
-      getR11RoundEnd();
-
-    r11Time =
-      Math.max(
-        0,
-        Math.ceil(
-          (end - Date.now()) / 1000
-        )
-      );
-
-    r11Open =
-      r11Time > 4;
-
-    const timer =
-      document.getElementById('r11timer');
-
-    timer.textContent =
-      r11Time;
-
-    if(r11Open){
-      timer.classList.remove('closed');
-    }else{
-      timer.classList.add('closed');
-    }
+    resetR11Round();
 
   });
 
 }
 
-
-function clearBets11(){
-
-  bets11 = {};
-
-  grid11
-    .querySelectorAll('.bet-number')
-    .forEach(b=>{
-      b.querySelector('.bet-count').textContent = '';
-      b.classList.remove('winner');
-    });
-
-}
-
-
 let r11LockedResult = null;
-
 
 function spin11(){
 
