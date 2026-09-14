@@ -1014,10 +1014,140 @@ function getR11RoundEnd(){
   return Date.now() + R11_ROUND_MS;
 }
 
+let r11LockedResult = null;
+let r11ClaimingSpin = false;
+
+
+async function ensureGlobalR11Round(){
+
+  if(r11EnsuringRound) return;
+
+  r11EnsuringRound = true;
+
+  try{
+
+    const ref =
+      doc(db,"gameResults","roulette");
+
+    await runTransaction(
+      db,
+      async(transaction)=>{
+
+        const snap =
+          await transaction.get(ref);
+
+        const data =
+          snap.exists()
+            ? snap.data()
+            : {};
+
+        const now =
+          Date.now();
+
+        const start =
+          Number(data.roundStart11 || 0);
+
+        const phase =
+          data.phase11 || "betting";
+
+        /*
+          Agar current round abhi chal raha hai,
+          usko bilkul touch nahi karna.
+        */
+        if(
+          start > 0 &&
+          now < start + R11_ROUND_MS
+        ){
+          return;
+        }
+
+        /*
+          Agar round spinning phase mein hai,
+          naya result nahi banana.
+        */
+        if(phase === "spinning"){
+          return;
+        }
+
+        /*
+          Naya GLOBAL R11 round.
+        */
+        const result =
+          Math.floor(
+            Math.random() * 12
+          );
+
+        transaction.set(
+          ref,
+          {
+            roundId11: now,
+            roundStart11: now,
+            result11: result,
+            phase11: "betting"
+          },
+          {merge:true}
+        );
+
+      }
+    );
+
+    const freshSnap =
+      await getDoc(ref);
+
+    if(freshSnap.exists()){
+
+      const data =
+        freshSnap.data();
+
+      globalRound11 =
+        data.roundId11 !== undefined
+          ? data.roundId11
+          : globalRound11;
+
+      globalRoundStart11 =
+        data.roundStart11 !== undefined
+          ? data.roundStart11
+          : globalRoundStart11;
+
+      globalResult11 =
+        data.result11 !== undefined
+          ? data.result11
+          : globalResult11;
+
+      if(
+        Array.isArray(data.lastWins11)
+      ){
+        globalLastWins11 =
+          data.lastWins11;
+      }
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "R11 global round error:",
+      error
+    );
+
+  }finally{
+
+    r11EnsuringRound = false;
+
+  }
+
+}
+
+
 function resetR11Round(){
 
+  const start =
+    Number(globalRoundStart11 || 0);
+
+  if(start <= 0) return;
+
   const end =
-    Number(globalRoundStart11 || 0) + R11_ROUND_MS;
+    start + R11_ROUND_MS;
 
   r11Time =
     Math.max(
@@ -1027,18 +1157,168 @@ function resetR11Round(){
       )
     );
 
-  r11Open = r11Time > 4;
+  r11Open =
+    r11Time > 4;
 
   const timer =
     document.getElementById('r11timer');
 
-  timer.textContent = r11Time;
+  timer.textContent =
+    r11Time;
 
   if(r11Open){
     timer.classList.remove('closed');
   }else{
     timer.classList.add('closed');
   }
+
+}
+
+
+async function claimR11Spin(){
+
+  if(r11ClaimingSpin) return;
+
+  r11ClaimingSpin = true;
+
+  try{
+
+    const ref =
+      doc(db,"gameResults","roulette");
+
+    let shouldSpin = false;
+
+    await runTransaction(
+      db,
+      async(transaction)=>{
+
+        const snap =
+          await transaction.get(ref);
+
+        if(!snap.exists()) return;
+
+        const data =
+          snap.data();
+
+        const start =
+          Number(data.roundStart11 || 0);
+
+        const phase =
+          data.phase11 || "betting";
+
+        const now =
+          Date.now();
+
+        if(start <= 0) return;
+
+        /*
+          Kisi aur user ne spin claim kar liya
+          to dobara claim nahi karna.
+        */
+        if(phase === "spinning"){
+
+          shouldSpin = true;
+          return;
+
+        }
+
+        /*
+          Round abhi khatam nahi hua.
+        */
+        if(
+          now <
+          start + R11_ROUND_MS
+        ){
+          return;
+        }
+
+        /*
+          Current GLOBAL result ko preserve karo.
+        */
+        transaction.set(
+          ref,
+          {
+            phase11: "spinning",
+            spinStart11: now
+          },
+          {merge:true}
+        );
+
+        shouldSpin = true;
+
+      }
+    );
+
+    const freshSnap =
+      await getDoc(ref);
+
+    if(freshSnap.exists()){
+
+      const data =
+        freshSnap.data();
+
+      if(
+        data.result11 !== undefined
+      ){
+        globalResult11 =
+          data.result11;
+      }
+
+      if(
+        data.roundId11 !== undefined
+      ){
+        globalRound11 =
+          data.roundId11;
+      }
+
+      if(
+        data.roundStart11 !== undefined
+      ){
+        globalRoundStart11 =
+          data.roundStart11;
+      }
+
+      if(
+        Array.isArray(data.lastWins11)
+      ){
+        globalLastWins11 =
+          data.lastWins11;
+      }
+
+    }
+
+    if(
+      shouldSpin &&
+      !r11Spin
+    ){
+
+      r11Time = -1;
+      r11Open = false;
+
+      r11LockedResult =
+        Number.isInteger(globalResult11) &&
+        globalResult11 >= 0 &&
+        globalResult11 <= 11
+          ? globalResult11
+          : 0;
+
+      spin11();
+
+    }
+
+  }catch(error){
+
+    console.error(
+      "R11 spin claim error:",
+      error
+    );
+
+  }finally{
+
+    r11ClaimingSpin = false;
+
+  }
+
 }
 
 
@@ -1051,17 +1331,48 @@ function tickR11(){
     !document
       .getElementById('r11')
       .classList
-      .contains('active') ||
-    r11Spin
+      .contains('active')
   ){
     return;
   }
+
+  /*
+    Local spin chal raha hai to timer
+    dobara interfere nahi karega.
+  */
+  if(r11Spin) return;
 
   const start =
     Number(globalRoundStart11 || 0);
 
   if(start <= 0){
+
+    ensureGlobalR11Round();
+
     return;
+
+  }
+
+  /*
+    Agar Firestore already spinning hai,
+    sab users same winner spin karenge.
+  */
+  if(window.r11GlobalPhase11 === "spinning"){
+
+    r11Time = 0;
+    r11Open = false;
+
+    r11LockedResult =
+      Number.isInteger(globalResult11) &&
+      globalResult11 >= 0 &&
+      globalResult11 <= 11
+        ? globalResult11
+        : 0;
+
+    spin11();
+
+    return;
+
   }
 
   const end =
@@ -1075,9 +1386,11 @@ function tickR11(){
       )
     );
 
-  r11Time = remaining;
+  r11Time =
+    remaining;
 
-  v.textContent = remaining;
+  v.textContent =
+    remaining;
 
   if(
     remaining <= 4 &&
@@ -1090,25 +1403,27 @@ function tickR11(){
 
     document.getElementById('r11msg').textContent =
       'BETTING CLOSED — spinning...';
+
+  }else{
+
+    r11Open = true;
+
+    v.classList.remove('closed');
+
   }
 
   if(
     remaining === 0 &&
-    r11Spin === false
+    !r11Spin
   ){
 
     r11Time = -1;
     r11Open = false;
 
-    r11LockedResult =
-      Number.isInteger(globalResult11) &&
-      globalResult11 >= 0 &&
-      globalResult11 <= 11
-        ? globalResult11
-        : 0;
+    claimR11Spin();
 
-    spin11();
   }
+
 }
 
 
@@ -1126,7 +1441,248 @@ function startR11(){
 
 }
 
-let r11LockedResult = null;
+
+function spin11(){
+
+  if(r11Spin) return;
+
+  r11Spin = true;
+  r11Open = false;
+
+  document.getElementById('r11msg').textContent =
+    'Result spinning...';
+
+  playSpinSound();
+
+  const winner =
+    Number.isInteger(r11LockedResult) &&
+    r11LockedResult >= 0 &&
+    r11LockedResult <= 11
+      ? r11LockedResult
+      : (
+          Number.isInteger(globalResult11) &&
+          globalResult11 >= 0 &&
+          globalResult11 <= 11
+            ? globalResult11
+            : 0
+        );
+
+  wheel11.animate(
+    [
+      {transform:'rotate(0deg)'},
+      {transform:'rotate(1080deg)'}
+    ],
+    {
+      duration:5900,
+      easing:'cubic-bezier(.12,.72,.12,1)'
+    }
+  );
+
+  setTimeout(()=>{
+
+    stopSpinSound();
+
+    document.getElementById('r11msg').textContent =
+      'WINNING NUMBER: ' + winner;
+
+    grid11
+      .querySelectorAll('.bet-number')
+      .forEach(b=>{
+
+        b.classList.remove('winner');
+
+        if(
+          +b.dataset.n === winner
+        ){
+          b.classList.add('winner');
+        }
+
+      });
+
+    /*
+      WIN PAYOUT
+      R11 = 10x
+    */
+    const win =
+      (bets11[winner] || 0) * 10;
+
+    balance += win;
+
+    window.saveUserBalance();
+
+    /*
+      Local display immediately.
+      R11 ka Last 4 alag hai.
+    */
+    r11Last = [
+      winner,
+      ...(Array.isArray(globalLastWins11)
+        ? globalLastWins11
+        : [])
+    ].slice(0,4);
+
+    renderLast(
+      'r11last',
+      r11Last
+    );
+
+    syncBalance();
+
+    /*
+      4 sec winner display ke baad
+      Firestore mein NEXT GLOBAL ROUND.
+      
+      Last 4 + next result + next timer
+      ek hi transaction mein.
+    */
+    setTimeout(async()=>{
+
+      const ref =
+        doc(db,"gameResults","roulette");
+
+      try{
+
+        await runTransaction(
+          db,
+          async(transaction)=>{
+
+            const snap =
+              await transaction.get(ref);
+
+            const data =
+              snap.exists()
+                ? snap.data()
+                : {};
+
+            /*
+              Agar kisi aur client ne next round
+              already create kar diya hai,
+              current round ko dobara update
+              nahi karna.
+            */
+            const currentRound =
+              data.roundId11;
+
+            if(
+              currentRound !== globalRound11
+            ){
+              return;
+            }
+
+            const oldLast =
+              Array.isArray(data.lastWins11)
+                ? data.lastWins11
+                : [];
+
+            const newLast =
+              [
+                winner,
+                ...oldLast
+              ].slice(0,4);
+
+            const now =
+              Date.now();
+
+            const nextResult =
+              Math.floor(
+                Math.random() * 12
+              );
+
+            transaction.set(
+              ref,
+              {
+                lastWins11: newLast,
+                roundId11: now,
+                roundStart11: now,
+                result11: nextResult,
+                phase11: "betting",
+                spinStart11: null
+              },
+              {merge:true}
+            );
+
+          }
+        );
+
+        /*
+          Fresh Firestore state load.
+        */
+        const freshSnap =
+          await getDoc(ref);
+
+        if(freshSnap.exists()){
+
+          const data =
+            freshSnap.data();
+
+          if(
+            data.roundId11 !== undefined
+          ){
+            globalRound11 =
+              data.roundId11;
+          }
+
+          if(
+            data.roundStart11 !== undefined
+          ){
+            globalRoundStart11 =
+              data.roundStart11;
+          }
+
+          if(
+            data.result11 !== undefined
+          ){
+            globalResult11 =
+              data.result11;
+          }
+
+          if(
+            Array.isArray(data.lastWins11)
+          ){
+            globalLastWins11 =
+              data.lastWins11;
+
+            r11Last =
+              data.lastWins11.slice(0,4);
+
+            renderLast(
+              'r11last',
+              r11Last
+            );
+          }
+
+          window.r11GlobalPhase11 =
+            data.phase11 || "betting";
+
+        }
+
+      }catch(error){
+
+        console.error(
+          "R11 next round error:",
+          error
+        );
+
+      }finally{
+
+        clearBets11();
+
+        r11LockedResult = null;
+
+        r11Spin = false;
+
+        resetR11Round();
+
+        document.getElementById('r11msg').textContent =
+          'Press and hold a number to bet';
+
+      }
+
+    },4000);
+
+  },5900);
+
+}
 
 function spin11(){
 
@@ -1859,8 +2415,6 @@ async function ensureGlobalR11Round(){
 
 }
 
-ensureGlobalR11Round();
-
 onSnapshot(doc(db,"gameResults","roulette"), snap=>{
   if(!snap.exists()) return;
 
@@ -1871,7 +2425,9 @@ onSnapshot(doc(db,"gameResults","roulette"), snap=>{
 if(data.roundId11 !== undefined){
   globalRound11 = data.roundId11;
 }
-
+if(data.phase11 !== undefined){
+  window.r11GlobalPhase11 = data.phase11;
+}
 if(data.roundStart11 !== undefined){
   globalRoundStart11 = data.roundStart11;
 }
