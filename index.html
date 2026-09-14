@@ -1557,25 +1557,29 @@ function spin11(){
       });
 
     const win =
-      (bets11[winner] || 0) * 10;
+  (bets11[winner] || 0) * 10;
 
-    balance += win;
+balance += win;
 
-    window.saveUserBalance();
+window.saveUserBalance();
 
-    r11Last = [
-      winner,
-      ...(Array.isArray(globalLastWins11)
-        ? globalLastWins11
-        : [])
-    ].slice(0,4);
+const currentLast11 = [
+  winner,
+  ...(Array.isArray(globalLastWins11)
+    ? globalLastWins11
+    : [])
+].slice(0,4);
 
-    renderLast(
-      'r11last',
-      r11Last
-    );
+r11Last = currentLast11;
 
-    syncBalance();
+globalLastWins11 = currentLast11;
+
+renderLast(
+  'r11last',
+  r11Last
+);
+
+syncBalance();
 
     setTimeout(async()=>{
 
@@ -1611,36 +1615,36 @@ function spin11(){
             }
 
             const oldLast =
-              Array.isArray(data.lastWins11)
-                ? data.lastWins11
-                : [];
+  Array.isArray(data.lastWins11)
+    ? data.lastWins11
+    : [];
 
-            const newLast =
-              [
-                winner,
-                ...oldLast
-              ].slice(0,4);
+const newLast =
+  [
+    winner,
+    ...oldLast
+  ].slice(0,4);
 
-            const now =
-              Date.now();
+const now =
+  Date.now();
 
-            const nextResult =
-              Math.floor(
-                Math.random() * 12
-              );
+const nextResult =
+  Math.floor(
+    Math.random() * 12
+  );
 
-            transaction.set(
-              ref,
-              {
-                lastWins11: newLast,
-                roundId11: now,
-                roundStart11: now,
-                result11: nextResult,
-                phase11: "betting",
-                spinStart11: null
-              },
-              {merge:true}
-            );
+transaction.set(
+  ref,
+  {
+    lastWins11: newLast,
+    roundId11: now,
+    roundStart11: now,
+    result11: nextResult,
+    phase11: "betting",
+    spinStart11: null
+  },
+  {merge:true}
+);
 
           }
         );
@@ -1675,19 +1679,21 @@ function spin11(){
           }
 
           if(
-            Array.isArray(data.lastWins11)
-          ){
-            globalLastWins11 =
-              data.lastWins11;
+  Array.isArray(data.lastWins11)
+){
 
-            r11Last =
-              data.lastWins11.slice(0,4);
+  globalLastWins11 =
+    data.lastWins11.slice(0,4);
 
-            renderLast(
-              'r11last',
-              r11Last
-            );
-          }
+  r11Last =
+    globalLastWins11.slice(0,4);
+
+  renderLast(
+    'r11last',
+    r11Last
+  );
+
+}
 
           window.r11GlobalPhase11 =
             data.phase11 || "betting";
