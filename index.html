@@ -1028,11 +1028,15 @@ async function ensureGlobalR11Round(){
   try{
 
     const ref =
-      doc(db,"gameResults","roulette");
+  window.zynoDoc(
+    window.zynoDb,
+    "gameResults",
+    "roulette"
+  );
 
-    await runTransaction(
-      db,
-      async(transaction)=>{
+    await window.zynoRunTransaction(
+  window.zynoDb,
+  async(transaction)=>{
 
         const snap =
           await transaction.get(ref);
@@ -1093,7 +1097,7 @@ async function ensureGlobalR11Round(){
     );
 
     const freshSnap =
-      await getDoc(ref);
+  await window.zynoGetDoc(ref);
 
     if(freshSnap.exists()){
 
@@ -1193,8 +1197,8 @@ async function claimR11Spin(){
 
     let shouldSpin = false;
 
-    await runTransaction(
-      db,
+    await window.zynoRunTransaction(
+  window.zynoDb,
       async(transaction)=>{
 
         const snap =
@@ -1255,7 +1259,7 @@ async function claimR11Spin(){
     );
 
     const freshSnap =
-      await getDoc(ref);
+  await window.zynoGetDoc(ref);
 
     if(freshSnap.exists()){
 
@@ -2094,7 +2098,10 @@ onSnapshot
   const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
+window.zynoDb = db;
+window.zynoDoc = doc;
+window.zynoGetDoc = getDoc;
+window.zynoRunTransaction = runTransaction;
 window.zynoIsAdmin = false;
 
 /*
