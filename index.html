@@ -1633,18 +1633,24 @@ transaction.set(
 
       }finally{
 
-        clearBets11();
+  clearBets11();
 
-        r11LockedResult = null;
+  r11LockedResult = null;
 
-        r11Spin = false;
+  r11Spin = false;
 
-startR11();
+  /*
+    Firestore se next global round already
+    create ho chuka hai.
+    Ab current screen ko usi round par
+    turant timer sync karna hai.
+  */
+  resetR11Round();
 
-document.getElementById('r11msg').textContent =
-  'Press and hold a number to bet';
+  document.getElementById('r11msg').textContent =
+    'Press and hold a number to bet';
 
-      }
+}
 
     },4000);
 
