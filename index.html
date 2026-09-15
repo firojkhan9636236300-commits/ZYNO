@@ -323,7 +323,7 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 <section id="r11" class="view">
  <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">ROULETTE 0–11</div><div style="width:54px"></div></div>
  <div class="rule">30 SEC • MIN 10 • MAX 5500 PER NUMBER</div>
- <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r11bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><div class="last" id="r11last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r11timer">30</strong></div></div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r11bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><strong id="r11lastWin">-</strong><small style="margin-top:4px">LAST 4</small><div class="last" id="r11last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r11timer">30</strong></div></div>
  <div class="z11-wheel" id="wheel11"><div class="z11-center">0–11</div></div>
  <div class="message" id="r11msg">Press and hold a number to bet</div><div class="grid" id="grid11"></div>
 </section>
@@ -2162,8 +2162,15 @@ globalRound11 = data.roundId11;
   }
 
   if(Array.isArray(data.lastWins11)){
-    window.globalLastWins11 = data.lastWins11;
-  }
+    window.globalLastWins11 = data.lastWins11.slice(0,4);
+
+    r11Last = window.globalLastWins11.slice(0,4);
+
+    renderLast('r11last', r11Last);
+
+    document.getElementById('r11lastWin').textContent =
+      r11Last.length ? r11Last[0] : '-';
+}
 
   if(data.result36 !== undefined){
     window.globalResult36 = data.result36;
