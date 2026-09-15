@@ -2142,10 +2142,34 @@ onSnapshot(doc(db,"gameResults","roulette"), snap=>{
 }
 
   if(data.roundStart11 !== undefined){
-    window.globalRoundStart11 = data.roundStart11;
-    globalRoundStart11 = data.roundStart11;
-globalRound11 = data.roundId11;
+
+  window.globalRoundStart11 =
+    data.roundStart11;
+
+  globalRoundStart11 =
+    data.roundStart11;
+
+  globalRound11 =
+    data.roundId11;
+
+  /*
+    Naya global R11 round mil gaya.
+    Spin khatam ho chuka ho to timer
+    turant naye round par sync karo.
+  */
+  if(
+    !r11Spin &&
+    document
+      .getElementById('r11')
+      .classList
+      .contains('active')
+  ){
+
+    resetR11Round();
+
   }
+
+}
 
   if(data.roundStart36 !== undefined){
     window.globalRoundStart36 = data.roundStart36;
