@@ -1533,22 +1533,6 @@ balance += win;
 
 window.saveUserBalance();
 
-const currentLast11 = [
-  winner,
-  ...(Array.isArray(globalLastWins11)
-    ? globalLastWins11
-    : [])
-].slice(0,4);
-
-r11Last = currentLast11;
-
-globalLastWins11 = currentLast11;
-
-renderLast(
-  'r11last',
-  r11Last
-);
-
 syncBalance();
 
     setTimeout(async()=>{
