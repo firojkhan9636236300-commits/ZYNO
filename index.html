@@ -1337,11 +1337,16 @@ function tickR11(){
 
   const v =
     document.getElementById('r11timer');
+    
+      if(r11Spin){
+
+    return;
+
+  }
 
   /*
     Spin ke dauran timer 0 par rahega.
   */
-  
   const start =
     Number(globalRoundStart11 || 0);
 
