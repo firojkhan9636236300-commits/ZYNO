@@ -1457,36 +1457,6 @@ function tickR11(){
 
 }
 
-
-function startR11(){
-
-  if(r11Spin) return;
-
-  /*
-    Firebase module load hone ka wait.
-  */
-  if(
-    typeof window.ensureGlobalR11Round !== 'function'
-  ){
-
-    setTimeout(
-      startR11,
-      100
-    );
-
-    return;
-  }
-
-  window.ensureGlobalR11Round().then(()=>{
-
-    if(r11Spin) return;
-
-    resetR11Round();
-
-  });
-
-}
-
 function startR11(){
 
   if(r11Spin) return;
