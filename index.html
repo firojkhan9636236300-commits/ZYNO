@@ -1348,42 +1348,35 @@ function tickR11(){
   }
 
   /*
-    Local spin chal raha hai to timer
-    dobara interfere nahi karega.
+    Spin ke dauran timer screen par 0 rahega.
+    Spin khatam hote hi next global round
+    dobara calculate hoga.
   */
   if(r11Spin){
 
-  /*
-    Spin chal raha hai.
-    Spin ke beech global round update
-    local spin ko reset nahi karega.
-  */
+    return;
 
-  return;
-}
+  }
 
-  /*
-    Firestore se global round start
-    abhi nahi mila.
-  */
   const start =
     Number(globalRoundStart11 || 0);
 
+  /*
+    Firestore se round start abhi nahi mila.
+  */
   if(start <= 0){
 
     if(
       typeof window.ensureGlobalR11Round === 'function'
     ){
+
       window.ensureGlobalR11Round();
+
     }
 
     return;
   }
 
-  /*
-    Sab users ke liye same 30 second
-    global countdown.
-  */
   const end =
     start + R11_ROUND_MS;
 
@@ -1399,9 +1392,6 @@ function tickR11(){
 
   v.textContent = remaining;
 
-  /*
-    Last 4 seconds mein betting close.
-  */
   if(
     remaining <= 4 &&
     remaining > 0
@@ -1423,9 +1413,7 @@ function tickR11(){
   }
 
   /*
-    0 par ek hi user global spin claim karega.
-    Baaki users Firestore phase11 = spinning
-    dekhkar same result spin karenge.
+    0 par global spin claim.
   */
   if(
     remaining === 0 &&
@@ -1437,6 +1425,7 @@ function tickR11(){
     r11Open = false;
 
     claimR11Spin();
+
   }
 
 }
