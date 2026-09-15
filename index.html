@@ -1353,30 +1353,14 @@ function tickR11(){
   */
   if(r11Spin){
 
-    const currentStart =
-      Number(globalRoundStart11 || 0);
+  /*
+    Spin chal raha hai.
+    Spin ke beech global round update
+    local spin ko reset nahi karega.
+  */
 
-    /*
-      Naya global round aa gaya ho
-      to local spin state reset.
-    */
-    if(
-      currentStart > 0 &&
-      Date.now() >= currentStart &&
-      Date.now() < currentStart + R11_ROUND_MS
-    ){
-
-      r11Spin = false;
-      r11LockedResult = null;
-
-      resetR11Round();
-
-      document.getElementById('r11msg').textContent =
-        'Press and hold a number to bet';
-    }
-
-    return;
-  }
+  return;
+}
 
   /*
     Firestore se global round start
