@@ -1338,16 +1338,8 @@ function tickR11(){
   const v =
     document.getElementById('r11timer');
 
-  if(r11Spin){
-
-    return;
-
-  }
-
   /*
-    Spin ke dauran timer screen par 0 rahega.
-    Spin khatam hote hi next global round
-    dobara calculate hoga.
+    Spin ke dauran timer 0 par rahega.
   */
   if(r11Spin){
 
@@ -1387,30 +1379,43 @@ function tickR11(){
 
   r11Time = remaining;
 
-  v.textContent = remaining;
-
+  /*
+    R36 ki tarah timer ki internal calculation
+    active screen par depend nahi karegi.
+  */
   if(
-    remaining <= 4 &&
-    remaining > 0
+    document
+      .getElementById('r11')
+      .classList
+      .contains('active')
   ){
 
-    r11Open = false;
+    v.textContent = remaining;
 
-    v.classList.add('closed');
+    if(
+      remaining <= 4 &&
+      remaining > 0
+    ){
 
-    document.getElementById('r11msg').textContent =
-      'BETTING CLOSED — spinning...';
+      r11Open = false;
 
-  }else if(remaining > 4){
+      v.classList.add('closed');
 
-    r11Open = true;
+      document.getElementById('r11msg').textContent =
+        'BETTING CLOSED — spinning...';
 
-    v.classList.remove('closed');
+    }else if(remaining > 4){
+
+      r11Open = true;
+
+      v.classList.remove('closed');
+
+    }
 
   }
 
   /*
-    0 par global spin claim.
+    0 par sirf ek baar GLOBAL spin claim.
   */
   if(
     remaining === 0 &&
