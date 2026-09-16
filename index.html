@@ -1580,11 +1580,12 @@ syncBalance();
               Sirf spinning phase mein hi
               next global round create hoga.
             */
-            if(
-              data.phase11 !== "spinning"
-            ){
-              return;
-            }
+  if(
+  data.phase11 !== "spinning" &&
+  data.phase11 !== "betting"
+ ){
+  return;
+ }
 
             const oldLast =
   Array.isArray(data.lastWins11)
