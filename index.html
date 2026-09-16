@@ -1706,8 +1706,13 @@ try{
 
   if(nextSnap.exists()){
 
-    const nextData =
-      nextSnap.data();
+  const nextData =
+
+    nextSnap.data();
+
+  window.r11GlobalPhase11 =
+
+    nextData.phase11 || "betting";
 
     if(
       nextData.roundStart11 !== undefined
