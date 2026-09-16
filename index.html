@@ -1913,18 +1913,117 @@ function tickR11(){
   */
 
   if(
-    remaining === 0 &&
-    !r11Spin &&
-    !r11ClaimingSpin
-  ){
+  remaining === 0 &&
+  !r11Spin &&
+  !r11ClaimingSpin
+){
 
-    r11Open = false;
+  r11Open = false;
 
-    timer.textContent = 0;
+  timer.textContent = 0;
 
-    claimR11Spin();
+  /*
+    0 par pahunchte hi global spin claim karo.
+    Claim ke baad agar Firestore ne next round
+    already create kar diya ho to uska fresh
+    start timer turant sync ho jayega.
+  */
 
-  }
+  claimR11Spin()
+    .then(async()=>{
+
+      if(r11Spin){
+        return;
+      }
+
+      try{
+
+        const snap =
+          await window.zynoGetDoc(
+            getR11Ref()
+          );
+
+        if(
+          !snap.exists()
+        ){
+          return;
+        }
+
+        const data =
+          snap.data();
+
+        if(
+          data.roundStart11 !== undefined
+        ){
+
+          globalRoundStart11 =
+            Number(
+              data.roundStart11
+            );
+
+        }
+
+        if(
+          data.roundId11 !== undefined
+        ){
+
+          globalRound11 =
+            data.roundId11;
+
+        }
+
+        window.r11GlobalPhase11 =
+          data.phase11 ||
+          'betting';
+
+        /*
+          Agar next betting round aa chuka hai,
+          to 0 par screen ko chhodna nahi hai.
+        */
+
+        const nextStart =
+          Number(
+            globalRoundStart11 || 0
+          );
+
+        if(
+          nextStart > 0 &&
+          window.r11GlobalPhase11 === 'betting'
+        ){
+
+          const nextRemaining =
+            getR11TimerValue(
+              nextStart
+            );
+
+          r11Time =
+            nextRemaining;
+
+          r11Open =
+            nextRemaining > 4;
+
+          timer.textContent =
+            nextRemaining;
+
+          timer.classList.toggle(
+            'closed',
+            !r11Open
+          );
+
+        }
+
+      }catch(error){
+
+        console.error(
+          'R11 zero recovery error:',
+          error
+        );
+
+      }
+
+    });
+
+}
 
 }
 
