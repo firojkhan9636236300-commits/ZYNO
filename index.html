@@ -2297,36 +2297,38 @@ onSnapshot(doc(db,"gameResults","roulette"), snap=>{
   const newStart =
     Number(data.roundStart11 || 0);
 
+  if(newStart > Date.now()){
+
   globalRoundStart11 =
-  newStart;
+    newStart;
 
-r11Time =
-  Math.max(
-    0,
-    Math.ceil(
-      (
-        newStart +
-        R11_ROUND_MS -
-        Date.now()
-      ) / 1000
-    )
-  );
-
-    r11Open =
-      r11Time > 4;
-
-    const timer =
-      document.getElementById('r11timer');
-
-    timer.textContent =
-      r11Time;
-
-    timer.classList.toggle(
-      'closed',
-      !r11Open
+  r11Time =
+    Math.max(
+      0,
+      Math.ceil(
+        (
+          newStart +
+          R11_ROUND_MS -
+          Date.now()
+        ) / 1000
+      )
     );
 
-  }
+  r11Open =
+    r11Time > 4;
+
+  const timer =
+    document.getElementById('r11timer');
+
+  timer.textContent =
+    r11Time;
+
+  timer.classList.toggle(
+    'closed',
+    !r11Open
+  );
+
+}
 
 }
 
