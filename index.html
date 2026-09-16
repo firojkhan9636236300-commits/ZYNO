@@ -1353,18 +1353,59 @@ function tickR11(){
   /*
     Firestore se round start abhi nahi mila.
   */
+  
   if(start <= 0){
 
-    if(
-      typeof window.ensureGlobalR11Round === 'function'
-    ){
+  if(
+    typeof window.ensureGlobalR11Round === 'function'
+  ){
 
-      window.ensureGlobalR11Round();
+    window.ensureGlobalR11Round().then(()=>{
 
-    }
+      const newStart =
+        Number(globalRoundStart11 || 0);
 
-    return;
+      if(newStart > 0){
+
+        const newEnd =
+          newStart + R11_ROUND_MS;
+
+        r11Time =
+          Math.max(
+            0,
+            Math.ceil(
+              (newEnd - Date.now()) / 1000
+            )
+          );
+
+        r11Open =
+          r11Time > 4;
+
+        if(
+          document
+            .getElementById('r11')
+            .classList
+            .contains('active')
+        ){
+
+          v.textContent =
+            r11Time;
+
+          v.classList.toggle(
+            'closed',
+            !r11Open
+          );
+
+        }
+
+      }
+
+    });
+
   }
+
+  return;
+}
 
   const end =
     start + R11_ROUND_MS;
