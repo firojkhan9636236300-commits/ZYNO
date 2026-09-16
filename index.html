@@ -2102,15 +2102,12 @@ async function finalizeR11Round(
         */
 
         if(
-          spinStart <= 0 ||
-          now <
-            spinStart +
-            R11_TOTAL_SPIN_MS
-        ){
+  spinStart <= 0
+){
 
-          return;
+  return;
 
-        }
+}
 
 
         const winner =
