@@ -1640,36 +1640,77 @@ transaction.set(
 
   clearBets11();
 
-  r11LockedResult = null;
+r11LockedResult = null;
 
-  r11Spin = false;
+r11Spin = false;
 
-  /*
-    Firestore se next global round already
-    create ho chuka hai.
-    Ab current screen ko usi round par
-    turant timer sync karna hai.
-  */
-    const nextStart =
+/*
+  Firestore se fresh next round dobara read karo.
+  Isi round ke start se timer 30 sec chalega.
+*/
+try{
+
+  const freshRef =
+    window.zynoDoc(
+      window.zynoDb,
+      "gameResults",
+      "roulette"
+    );
+
+  const nextSnap =
+    await window.zynoGetDoc(freshRef);
+
+  if(nextSnap.exists()){
+
+    const nextData =
+      nextSnap.data();
+
+    if(
+      nextData.roundStart11 !== undefined
+    ){
+      globalRoundStart11 =
+        Number(nextData.roundStart11);
+    }
+
+    if(
+      nextData.roundId11 !== undefined
+    ){
+      globalRound11 =
+        Number(nextData.roundId11);
+    }
+
+    if(
+      nextData.result11 !== undefined
+    ){
+      globalResult11 =
+        Number(nextData.result11);
+    }
+
+  }
+
+}catch(error){
+
+  console.error(
+    "R11 timer resync error:",
+    error
+  );
+
+}
+
+const nextStart =
   Number(globalRoundStart11 || 0);
 
 if(nextStart > 0){
 
-  globalRoundStart11 =
-    nextStart;
-
-  globalRound11 =
-    Number(globalRound11 || Date.now());
+  const end =
+    nextStart +
+    R11_ROUND_MS;
 
   r11Time =
     Math.max(
       0,
       Math.ceil(
-        (
-          nextStart +
-          R11_ROUND_MS -
-          Date.now()
-        ) / 1000
+        (end - Date.now()) / 1000
       )
     );
 
@@ -1689,8 +1730,8 @@ if(nextStart > 0){
 
 }
 
-  tickR11();
-
+tickR11();
+  
   document.getElementById('r11msg').textContent =
     'Press and hold a number to bet';
 
