@@ -2609,52 +2609,51 @@ function spin11(
       */
 
       const nextStart =
-        Number(
-          globalRoundStart11 || 0
-        );
+  Number(
+    globalRoundStart11 || 0
+  );
 
 
-      if(
-        nextStart > 0
-      ){
+if(
+  nextStart > 0
+){
 
-        const remaining =
-          getR11TimerValue(
-            nextStart
-          );
+  r11Time =
+    getR11TimerValue(
+      nextStart
+    );
 
-        r11Time =
-          remaining;
+  r11Open =
+    r11Time > 4;
 
-        r11Open =
-          remaining > 4;
+  timer.textContent =
+    r11Time;
+
+  timer.classList.toggle(
+    'closed',
+    !r11Open
+  );
+
+}else{
+
+  r11Time = 30;
+  r11Open = true;
+
+  timer.textContent = 30;
+
+  timer.classList.remove(
+    'closed'
+  );
+
+}
 
 
-        timer.textContent =
-          remaining;
+/*
+  Next round ka timer turant
+  continuous tick par chalao.
+*/
 
-        timer.classList.toggle(
-          'closed',
-          !r11Open
-        );
-
-      }else{
-
-        /*
-          Agar fresh read abhi fail ho jaye,
-          next tick Firestore se recover karega.
-        */
-
-        r11Time = 30;
-        r11Open = true;
-
-        timer.textContent = 30;
-
-        timer.classList.remove(
-          'closed'
-        );
-
-      }
+tickR11();
 
 
       document
