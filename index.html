@@ -2663,21 +2663,36 @@ tickR11();
 
 
       /*
-        Kisi stale local round ko
-        dobara animate nahi karna.
-      */
+  Kisi stale local round ko
+  dobara animate nahi karna.
+*/
 
-      r11AnimatingRound =
-        null;
-        
-      /*
-        Agar finalize transaction kisi reason se
-        fail hua ho to turant recovery attempt.
-      */
+r11AnimatingRound =
+  null;
 
-      ensureGlobalR11Round();
 
-    },R11_RESULT_HOLD_MS);
+/*
+  Next round ka timer turant
+  continuous tick par chalao.
+*/
+
+tickR11();
+
+
+document
+  .getElementById('r11msg')
+  .textContent =
+    'Press and hold a number to bet';
+
+
+/*
+  Agar finalize transaction kisi reason se
+  fail hua ho to turant recovery attempt.
+*/
+
+ensureGlobalR11Round();
+
+},R11_RESULT_HOLD_MS);
 
   },R11_SPIN_MS);
 }
