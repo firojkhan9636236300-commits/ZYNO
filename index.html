@@ -1973,7 +1973,9 @@ function tickR11(){
 
 function startR11(){
 
-  r11Spin = false;
+  if(r11Spin){
+  return;
+}
 
   ensureGlobalR11Round()
     .then(async()=>{
