@@ -1017,7 +1017,7 @@ let r11ClaimingSpin = false;
 let r11FinalizingRound = false;
 let r11AnimatingRound = null;
 let r11Ready = false;
-
+let r11LockedResult = null;
 
 /* ---------- R11 WHEEL ---------- */
 
@@ -1061,7 +1061,29 @@ for(let n=0;n<=11;n++){
   grid11.appendChild(b);
 
 }
+function clearBets11(){
 
+  bets11 = {};
+
+  grid11
+    .querySelectorAll('.bet-number')
+    .forEach(btn=>{
+
+      btn.classList.remove(
+        'active',
+        'winner'
+      );
+
+      const count =
+        btn.querySelector('.bet-count');
+
+      if(count){
+        count.textContent = '';
+      }
+
+    });
+
+}
 
 /* ---------- R11 HOLD BET ---------- */
 
