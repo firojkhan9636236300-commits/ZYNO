@@ -1559,6 +1559,8 @@ async function claimR11Spin(){
 
     let spinRoundId = null;
 
+    let recoverRound = false;
+
     await window.zynoRunTransaction(
       window.zynoDb,
       async(transaction)=>{
@@ -1584,15 +1586,14 @@ async function claimR11Spin(){
         const now =
           Date.now();
 
-
         if(start <= 0){
           return;
         }
 
 
         /*
-          Kisi aur ne already spinning claim
-          kar liya hai.
+          Kisi aur client ne already
+          global spin claim kiya hai.
         */
 
         if(
@@ -1604,10 +1605,11 @@ async function claimR11Spin(){
               data.spinStart11 || 0
             );
 
+
           /*
-            Agar already spinning hai to
-            sirf tab local animation start karo
-            jab spin recent hai.
+            Global spin abhi chal raha hai.
+            Same round ko local screen par
+            animate karo.
           */
 
           if(
@@ -1622,7 +1624,20 @@ async function claimR11Spin(){
             spinRoundId =
               data.roundId11;
 
+            return;
+
           }
+
+
+          /*
+            Global spin ka fixed time khatam.
+            Purana spinning round stale hai.
+            Transaction ke andar recovery nahi,
+            transaction ke baad ensureGlobalR11Round()
+            karega.
+          */
+
+          recoverRound = true;
 
           return;
 
@@ -1644,7 +1659,7 @@ async function claimR11Spin(){
 
 
         /*
-          EXACTLY ONE client spinning claim karega.
+          EXACTLY ONE client global spin claim karega.
         */
 
         transaction.set(
@@ -1666,7 +1681,26 @@ async function claimR11Spin(){
 
 
     /*
-      Fresh result read.
+      Stale spinning round recovery.
+    */
+
+    if(
+      recoverRound
+    ){
+
+      await ensureGlobalR11Round();
+
+      resetR11Round();
+
+      tickR11();
+
+      return;
+
+    }
+
+
+    /*
+      Fresh result / round read.
     */
 
     const freshSnap =
@@ -1718,6 +1752,10 @@ async function claimR11Spin(){
 
     }
 
+
+    /*
+      Global spin start.
+    */
 
     if(
       shouldSpin &&
@@ -2453,11 +2491,6 @@ function spin11(
         R11 animation complete.
       */
 
-      r11Spin = false;
-
-      r11LockedResult = null;
-
-
       /*
         Global Firestore transaction
         next round create karegi.
@@ -2469,8 +2502,11 @@ function spin11(
       await finalizeR11Round(
         actualRoundId
       );
+    
+      r11Spin = false;
 
-
+      r11LockedResult = null;
+      
       /*
         Fresh round read.
       */
