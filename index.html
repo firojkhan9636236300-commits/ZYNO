@@ -2692,70 +2692,15 @@ onSnapshot(doc(db,"gameResults","roulette"), snap=>{
   }
 
   if(data.phase11 !== undefined){
-    window.r11GlobalPhase11 = data.phase11;
-  }
-  
-  if(data.roundStart11 !== undefined){
 
-  window.globalRoundStart11 =
-    data.roundStart11;
-
-  globalRoundStart11 =
-    data.roundStart11;
-
-  globalRound11 =
-    data.roundId11;
-
-  /*
-    Naya global R11 round mil gaya.
-    Spin khatam ho chuka ho to timer
-    turant naye round par sync karo.
-  */
-  if(
-  !r11Spin &&
-  document
-    .getElementById('r11')
-    .classList
-    .contains('active')
-){
-
-  const newStart =
-    Number(data.roundStart11 || 0);
-
-  if(newStart > Date.now()){
-
-  globalRoundStart11 =
-    newStart;
-
-  r11Time =
-    Math.max(
-      0,
-      Math.ceil(
-        (
-          newStart +
-          R11_ROUND_MS -
-          Date.now()
-        ) / 1000
-      )
-    );
-
-  r11Open =
-    r11Time > 4;
-
-  const timer =
-    document.getElementById('r11timer');
-
-  timer.textContent =
-    r11Time;
-
-  timer.classList.toggle(
-    'closed',
-    !r11Open
-  );
+  window.r11GlobalPhase11 =
+    data.phase11;
 
 }
 
-}
+if(window.r11ApplyFirestore){
+
+  window.r11ApplyFirestore(data);
 
 }
 
