@@ -1013,12 +1013,10 @@ const R11_RESULT_HOLD_MS = 2000;
 const R11_TOTAL_SPIN_MS =
   R11_SPIN_MS + R11_RESULT_HOLD_MS;
 
-let r11EnsuringRound = false;
 let r11ClaimingSpin = false;
-
-let r11LockedResult = null;
+let r11FinalizingRound = false;
 let r11AnimatingRound = null;
-let r11FinalizingRound = null;
+let r11Ready = false;
 
 
 /* ---------- R11 WHEEL ---------- */
@@ -1072,7 +1070,7 @@ function bindHold11(btn,n){
   disableLongPressMenu(btn);
 
   let start = 0;
-  let timer = null;
+  let frame = null;
   let holding = false;
 
   const begin = e => {
@@ -1097,9 +1095,15 @@ function bindHold11(btn,n){
 
     btn.classList.add('active');
 
-    const tick = () => {
+    const run = () => {
 
-      if(!holding) return;
+      if(
+        !holding ||
+        r11Spin ||
+        !r11Open
+      ){
+        return;
+      }
 
       const amt =
         Math.min(
@@ -1126,7 +1130,8 @@ function bindHold11(btn,n){
 
           btn
             .querySelector('.bet-count')
-            .textContent = money(amt);
+            .textContent =
+              money(amt);
 
           syncBalance();
 
@@ -1138,13 +1143,13 @@ function bindHold11(btn,n){
 
       }
 
-      timer =
-        requestAnimationFrame(tick);
+      frame =
+        requestAnimationFrame(run);
 
     };
 
-    timer =
-      requestAnimationFrame(tick);
+    frame =
+      requestAnimationFrame(run);
 
   };
 
@@ -1154,9 +1159,18 @@ function bindHold11(btn,n){
 
     btn.classList.remove('active');
 
-    if(timer){
-      cancelAnimationFrame(timer);
-      timer = null;
+    if(frame){
+
+      cancelAnimationFrame(frame);
+
+      frame = null;
+
+    }
+
+    if(window.saveUserBalance){
+
+      window.saveUserBalance();
+
     }
 
   };
@@ -1197,14 +1211,14 @@ function bindHold11(btn,n){
 }
 
 
-/* ---------- R11 FIRESTORE HELPERS ---------- */
+/* ---------- R11 FIRESTORE ---------- */
 
 function getR11Ref(){
 
   return window.zynoDoc(
     window.zynoDb,
-    "gameResults",
-    "roulette"
+    'gameResults',
+    'roulette'
   );
 
 }
@@ -1216,7 +1230,9 @@ function getR11TimerValue(start){
     Number(start || 0);
 
   if(s <= 0){
+
     return 30;
+
   }
 
   const end =
@@ -1232,320 +1248,206 @@ function getR11TimerValue(start){
 }
 
 
-/* ---------- CREATE / RECOVER GLOBAL ROUND ---------- */
+/* ---------- APPLY GLOBAL R11 DATA ---------- */
 
-async function ensureGlobalR11Round(){
+window.r11ApplyFirestore =
+function(data){
 
-  if(r11EnsuringRound){
+  if(!data){
     return;
   }
 
-  r11EnsuringRound = true;
 
-  try{
+  if(data.roundId11 !== undefined){
 
-    const ref =
-      getR11Ref();
-
-    await window.zynoRunTransaction(
-      window.zynoDb,
-      async(transaction)=>{
-
-        const snap =
-          await transaction.get(ref);
-
-        const data =
-          snap.exists()
-            ? snap.data()
-            : {};
-
-        const now =
-          Date.now();
-
-        const start =
-          Number(
-            data.roundStart11 || 0
-          );
-
-        const phase =
-          data.phase11 || 'betting';
-
-        const spinStart =
-          Number(
-            data.spinStart11 || 0
-          );
-
-
-        /* 
-          Agar normal betting round chal raha hai
-          to kuch nahi karna.
-        */
-
-        if(
-          phase === 'betting' &&
-          start > 0 &&
-          now < start + R11_ROUND_MS
-        ){
-
-          return;
-
-        }
-
-
-        /*
-          Agar spin chal raha hai aur spin ka
-          fixed global time abhi complete nahi hua,
-          to usko touch nahi karna.
-        */
-
-        if(
-          phase === 'spinning' &&
-          spinStart > 0 &&
-          now <
-            spinStart +
-            R11_TOTAL_SPIN_MS
-        ){
-
-          return;
-
-        }
-
-
-        /*
-          Agar spinning round stale ho gaya hai,
-          kisi bhi active client ke through
-          safely next round ban jayega.
-        */
-
-        if(
-          phase === 'spinning' &&
-          spinStart > 0 &&
-          now >=
-            spinStart +
-            R11_TOTAL_SPIN_MS
-        ){
-
-          const oldResult =
-            Number.isInteger(
-              Number(data.result11)
-            )
-              ? Number(data.result11)
-              : 0;
-
-          const oldLast =
-            Array.isArray(data.lastWins11)
-              ? data.lastWins11
-              : [];
-
-          const newLast =
-            [
-              oldResult,
-              ...oldLast
-            ].slice(0,4);
-
-          transaction.set(
-            ref,
-            {
-              lastWins11: newLast,
-              roundId11: now,
-              roundStart11: now,
-              result11:
-                Math.floor(
-                  Math.random() * 12
-                ),
-              phase11: 'betting',
-              spinStart11: null
-            },
-            {merge:true}
-          );
-
-          return;
-
-        }
-
-
-        /*
-          Agar document missing hai ya old round
-          expire ho gaya hai, naya betting round.
-        */
-
-        const newResult =
-          Math.floor(
-            Math.random() * 12
-          );
-
-        transaction.set(
-          ref,
-          {
-            roundId11: now,
-            roundStart11: now,
-            result11: newResult,
-            phase11: 'betting',
-            spinStart11: null
-          },
-          {merge:true}
-        );
-
-      }
-    );
-
-
-    /*
-      Transaction ke baad fresh Firestore data.
-    */
-
-    const freshSnap =
-      await window.zynoGetDoc(
-        getR11Ref()
-      );
-
-    if(
-      freshSnap.exists()
-    ){
-
-      const data =
-        freshSnap.data();
-
-      if(
-        data.roundId11 !== undefined
-      ){
-
-        globalRound11 =
-          data.roundId11;
-
-      }
-
-      if(
-        data.roundStart11 !== undefined
-      ){
-
-        globalRoundStart11 =
-          Number(
-            data.roundStart11
-          );
-
-      }
-
-      if(
-        data.result11 !== undefined
-      ){
-
-        globalResult11 =
-          Number(
-            data.result11
-          );
-
-      }
-
-      if(
-        Array.isArray(
-          data.lastWins11
-        )
-      ){
-
-        globalLastWins11 =
-          data.lastWins11
-            .slice(0,4);
-
-        r11Last =
-          globalLastWins11
-            .slice(0,4);
-
-        renderLast(
-          'r11last',
-          r11Last
-        );
-
-        document
-          .getElementById(
-            'r11lastWin'
-          )
-          .textContent =
-            r11Last.length
-              ? r11Last[0]
-              : '-';
-
-      }
-
-      window.r11GlobalPhase11 =
-        data.phase11 ||
-        'betting';
-
-    }
-
-  }catch(error){
-
-    console.error(
-      'R11 global round error:',
-      error
-    );
-
-  }finally{
-
-    r11EnsuringRound = false;
+    globalRound11 =
+      data.roundId11;
 
   }
 
-}
 
-window.ensureGlobalR11Round =
-  ensureGlobalR11Round;
+  if(data.roundStart11 !== undefined){
+
+    globalRoundStart11 =
+      Number(
+        data.roundStart11
+      );
+
+  }
 
 
-/* ---------- R11 TIMER DISPLAY ---------- */
+  if(data.result11 !== undefined){
 
-function resetR11Round(){
+    globalResult11 =
+      Number(
+        data.result11
+      );
 
-  const start =
-    Number(
-      globalRoundStart11 || 0
+  }
+
+
+  if(
+    Array.isArray(
+      data.lastWins11
+    )
+  ){
+
+    globalLastWins11 =
+      data.lastWins11
+        .slice(0,4);
+
+    r11Last =
+      globalLastWins11
+        .slice(0,4);
+
+    renderLast(
+      'r11last',
+      r11Last
     );
 
-  if(start <= 0){
+    document
+      .getElementById('r11lastWin')
+      .textContent =
+        r11Last.length
+          ? r11Last[0]
+          : '-';
 
-    r11Time = 30;
-    r11Open = true;
+  }
+
+
+  window.r11GlobalPhase11 =
+    data.phase11 ||
+    'betting';
+
+
+  /*
+    GLOBAL SPIN already claimed.
+    Har active client same result
+    ko animate karega.
+  */
+
+  if(
+    data.phase11 === 'spinning'
+  ){
+
+    r11Open = false;
+    r11Time = 0;
 
     const timer =
       document.getElementById(
         'r11timer'
       );
 
-    timer.textContent = 30;
-    timer.classList.remove('closed');
+    if(
+      document
+        .getElementById('r11')
+        .classList
+        .contains('active')
+    ){
+
+      timer.textContent = 0;
+
+      timer.classList.add(
+        'closed'
+      );
+
+    }
+
+
+    const roundId =
+      data.roundId11;
+
+    if(
+      roundId !== undefined &&
+      r11AnimatingRound !== roundId &&
+      !r11Spin
+    ){
+
+      r11LockedResult =
+        Number(data.result11);
+
+      spin11(
+        roundId,
+        r11LockedResult
+      );
+
+    }
 
     return;
 
   }
 
-  r11Time =
-    getR11TimerValue(start);
 
-  r11Open =
-    r11Time > 4;
+  /*
+    NORMAL BETTING ROUND
+  */
 
-  const timer =
-    document.getElementById(
-      'r11timer'
-    );
+  if(
+    data.phase11 === 'betting'
+  ){
 
-  timer.textContent =
-    r11Time;
+    r11Ready = true;
 
-  timer.classList.toggle(
-    'closed',
-    !r11Open
-  );
+    if(!r11Spin){
 
-}
+      const remaining =
+        getR11TimerValue(
+          globalRoundStart11
+        );
+
+      r11Time =
+        remaining;
+
+      r11Open =
+        remaining > 4;
+
+      const timer =
+        document.getElementById(
+          'r11timer'
+        );
+
+      if(
+        document
+          .getElementById('r11')
+          .classList
+          .contains('active')
+      ){
+
+        timer.textContent =
+          remaining;
+
+        timer.classList.toggle(
+          'closed',
+          !r11Open
+        );
+
+        document
+          .getElementById('r11msg')
+          .textContent =
+            remaining <= 4
+              ? 'BETTING CLOSED — spinning...'
+              : 'Press and hold a number to bet';
+
+      }
+
+    }
+
+  }
+
+};
 
 
-/* ---------- CLAIM GLOBAL R11 SPIN ---------- */
+/* ---------- CLAIM GLOBAL SPIN ---------- */
 
 async function claimR11Spin(){
 
-  if(r11ClaimingSpin){
+  if(
+    r11ClaimingSpin ||
+    r11Spin
+  ){
+
     return;
+
   }
 
   r11ClaimingSpin = true;
@@ -1555,11 +1457,9 @@ async function claimR11Spin(){
     const ref =
       getR11Ref();
 
-    let shouldSpin = false;
-
+    let spinNow = false;
     let spinRoundId = null;
-
-    let recoverRound = false;
+    let spinResult = null;
 
     await window.zynoRunTransaction(
       window.zynoDb,
@@ -1569,31 +1469,39 @@ async function claimR11Spin(){
           await transaction.get(ref);
 
         if(!snap.exists()){
+
           return;
+
         }
 
         const data =
           snap.data();
+
+        const phase =
+          data.phase11 ||
+          'betting';
+
+        const roundId =
+          data.roundId11;
 
         const start =
           Number(
             data.roundStart11 || 0
           );
 
-        const phase =
-          data.phase11 || 'betting';
+        const result =
+          Number(
+            data.result11
+          );
 
         const now =
           Date.now();
 
-        if(start <= 0){
-          return;
-        }
-
 
         /*
-          Kisi aur client ne already
-          global spin claim kiya hai.
+          Already spinning.
+          Is client ko bhi same global
+          spin dikhana hai.
         */
 
         if(
@@ -1605,13 +1513,6 @@ async function claimR11Spin(){
               data.spinStart11 || 0
             );
 
-
-          /*
-            Global spin abhi chal raha hai.
-            Same round ko local screen par
-            animate karo.
-          */
-
           if(
             spinStart > 0 &&
             now <
@@ -1619,25 +1520,15 @@ async function claimR11Spin(){
               R11_TOTAL_SPIN_MS
           ){
 
-            shouldSpin = true;
+            spinNow = true;
 
             spinRoundId =
-              data.roundId11;
+              roundId;
 
-            return;
+            spinResult =
+              result;
 
           }
-
-
-          /*
-            Global spin ka fixed time khatam.
-            Purana spinning round stale hai.
-            Transaction ke andar recovery nahi,
-            transaction ke baad ensureGlobalR11Round()
-            karega.
-          */
-
-          recoverRound = true;
 
           return;
 
@@ -1645,10 +1536,12 @@ async function claimR11Spin(){
 
 
         /*
-          Betting round abhi khatam nahi hua.
+          Round abhi betting me hai.
+          Expire nahi hua to kuch nahi.
         */
 
         if(
+          start <= 0 ||
           now <
           start + R11_ROUND_MS
         ){
@@ -1659,7 +1552,8 @@ async function claimR11Spin(){
 
 
         /*
-          EXACTLY ONE client global spin claim karega.
+          EXACTLY ONE CLIENT
+          global spin claim karega.
         */
 
         transaction.set(
@@ -1668,112 +1562,41 @@ async function claimR11Spin(){
             phase11: 'spinning',
             spinStart11: now
           },
-          {merge:true}
+          {
+            merge:true
+          }
         );
 
-        shouldSpin = true;
+        spinNow = true;
 
         spinRoundId =
-          data.roundId11;
+          roundId;
+
+        spinResult =
+          result;
 
       }
     );
 
 
-    /*
-      Stale spinning round recovery.
-    */
-
     if(
-      recoverRound
-    ){
-
-      await ensureGlobalR11Round();
-
-      resetR11Round();
-
-      tickR11();
-
-      return;
-
-    }
-
-
-    /*
-      Fresh result / round read.
-    */
-
-    const freshSnap =
-      await window.zynoGetDoc(
-        ref
-      );
-
-    if(
-      freshSnap.exists()
-    ){
-
-      const data =
-        freshSnap.data();
-
-      if(
-        data.result11 !== undefined
-      ){
-
-        globalResult11 =
-          Number(
-            data.result11
-          );
-
-      }
-
-      if(
-        data.roundId11 !== undefined
-      ){
-
-        globalRound11 =
-          data.roundId11;
-
-      }
-
-      if(
-        data.roundStart11 !== undefined
-      ){
-
-        globalRoundStart11 =
-          Number(
-            data.roundStart11
-          );
-
-      }
-
-      window.r11GlobalPhase11 =
-        data.phase11 ||
-        'betting';
-
-    }
-
-
-    /*
-      Global spin start.
-    */
-
-    if(
-      shouldSpin &&
-      !r11Spin &&
-      spinRoundId !== null
+      spinNow &&
+      spinRoundId !== null &&
+      !r11Spin
     ){
 
       r11LockedResult =
         Number.isInteger(
-          Number(globalResult11)
+          Number(spinResult)
         ) &&
-        Number(globalResult11) >= 0 &&
-        Number(globalResult11) <= 11
-          ? Number(globalResult11)
+        Number(spinResult) >= 0 &&
+        Number(spinResult) <= 11
+          ? Number(spinResult)
           : 0;
 
       spin11(
-        spinRoundId
+        spinRoundId,
+        r11LockedResult
       );
 
     }
@@ -1781,7 +1604,7 @@ async function claimR11Spin(){
   }catch(error){
 
     console.error(
-      'R11 spin claim error:',
+      'R11 claim error:',
       error
     );
 
@@ -1809,7 +1632,20 @@ function tickR11(){
 
 
   /*
-    Animation ke dauran timer 0 rahega.
+    Spin ke dauran timer 0 hi rahega.
+  */
+
+  if(r11Spin){
+
+    timer.textContent = 0;
+
+    return;
+
+  }
+
+
+  /*
+    Firestore round abhi available nahi.
   */
 
   const start =
@@ -1817,82 +1653,51 @@ function tickR11(){
       globalRoundStart11 || 0
     );
 
-
-  /*
-    Firestore round abhi load nahi hua.
-  */
-
-  if(start <= 0){
-
-    if(
-      typeof window.ensureGlobalR11Round ===
-      'function'
-    ){
-
-      window
-        .ensureGlobalR11Round()
-        .then(()=>{
-
-          if(r11Spin){
-            return;
-          }
-
-          const newStart =
-            Number(
-              globalRoundStart11 || 0
-            );
-
-          if(newStart <= 0){
-            return;
-          }
-
-          const remaining =
-            getR11TimerValue(
-              newStart
-            );
-
-          r11Time =
-            remaining;
-
-          r11Open =
-            remaining > 4;
-
-          if(
-            document
-              .getElementById('r11')
-              .classList
-              .contains('active')
-          ){
-
-            timer.textContent =
-              remaining;
-
-            timer.classList.toggle(
-              'closed',
-              !r11Open
-            );
-
-          }
-
-        });
-
-    }
+  if(
+    start <= 0 ||
+    !r11Ready
+  ){
 
     return;
 
   }
 
 
+  const phase =
+    window.r11GlobalPhase11 ||
+    'betting';
+
+
+  /*
+    Global spin kisi ne claim kar liya.
+  */
+
+  if(
+    phase === 'spinning'
+  ){
+
+    r11Open = false;
+
+    timer.textContent = 0;
+
+    timer.classList.add(
+      'closed'
+    );
+
+    return;
+
+  }
+
+
+  /*
+    NORMAL 30 SEC TIMER
+  */
+
   const remaining =
     getR11TimerValue(start);
 
   r11Time =
     remaining;
-
-
-  /*
-    Normal betting.
-  */
 
   if(
     document
@@ -1904,39 +1709,38 @@ function tickR11(){
     timer.textContent =
       remaining;
 
+  }
 
-    if(
-      remaining <= 4 &&
-      remaining > 0
-    ){
 
-      r11Open = false;
+  if(
+    remaining > 4
+  ){
 
-      timer.classList.add(
-        'closed'
-      );
+    r11Open = true;
 
-      document
-        .getElementById('r11msg')
-        .textContent =
-          'BETTING CLOSED — spinning...';
+    timer.classList.remove(
+      'closed'
+    );
 
-    }else if(
-      remaining > 4
-    ){
+    document
+      .getElementById('r11msg')
+      .textContent =
+        'Press and hold a number to bet';
 
-      r11Open = true;
+  }else if(
+    remaining > 0
+  ){
 
-      timer.classList.remove(
-        'closed'
-      );
+    r11Open = false;
 
-      document
-        .getElementById('r11msg')
-        .textContent =
-          'Press and hold a number to bet';
+    timer.classList.add(
+      'closed'
+    );
 
-    }
+    document
+      .getElementById('r11msg')
+      .textContent =
+        'BETTING CLOSED — spinning...';
 
   }
 
@@ -1945,130 +1749,95 @@ function tickR11(){
     0 par global spin claim.
   */
 
-   if(
-  remaining === 0 &&
-  !r11Spin
-){
+  if(
+    remaining === 0 &&
+    !r11ClaimingSpin
+  ){
 
-  r11Open = false;
+    r11Open = false;
 
-  timer.textContent = 0;
-
-  if(!r11ClaimingSpin){
+    timer.textContent = 0;
 
     claimR11Spin();
 
   }
 
- }
-
 }
+
 
 /* ---------- START R11 ---------- */
 
-function startR11(){
+async function startR11(){
 
   if(r11Spin){
-  return;
-}
+    return;
+  }
 
-  ensureGlobalR11Round()
-    .then(async()=>{
 
-      if(r11Spin){
-        return;
-      }
+  try{
 
-      /*
-        Firestore phase check.
-      */
+    const ref =
+      getR11Ref();
 
-      try{
+    const snap =
+      await window.zynoGetDoc(
+        ref
+      );
 
-        const snap =
-          await window.zynoGetDoc(
-            getR11Ref()
-          );
+    if(
+      !snap.exists()
+    ){
 
-        if(
-          snap.exists()
-        ){
+      return;
 
-          const data =
-            snap.data();
+    }
 
-          if(
-            data.roundStart11 !== undefined
-          ){
+    const data =
+      snap.data();
 
-            globalRoundStart11 =
-              Number(
-                data.roundStart11
-              );
 
-          }
+    /*
+      Directly Firestore ka current
+      global state screen par lagao.
+    */
 
-          if(
-            data.roundId11 !== undefined
-          ){
+    window.r11ApplyFirestore(
+      data
+    );
 
-            globalRound11 =
-              data.roundId11;
 
-          }
+    /*
+      Agar round expired hai,
+      timer 0 par claim karega.
+    */
 
-          if(
-            data.result11 !== undefined
-          ){
+    r11Ready = true;
 
-            globalResult11 =
-              Number(
-                data.result11
-              );
+    tickR11();
 
-          }
+  }catch(error){
 
-          window.r11GlobalPhase11 =
-            data.phase11 ||
-            'betting';
+    console.error(
+      'R11 start error:',
+      error
+    );
 
-        }
-
-      }catch(error){
-
-        console.error(
-          'R11 start sync error:',
-          error
-        );
-
-      }
-
-      resetR11Round();
-
-      tickR11();
-
-    });
+  }
 
 }
 
 
-/* ---------- FINALIZE GLOBAL R11 ROUND ---------- */
+/* ---------- FINALIZE R11 ROUND ---------- */
 
 async function finalizeR11Round(
   spinRoundId
 ){
 
-  if(
-    r11FinalizingRound ===
-    spinRoundId
-  ){
-
+  if(r11FinalizingRound){
     return;
-
   }
 
-  r11FinalizingRound =
-    spinRoundId;
+  r11FinalizingRound = true;
 
   try{
 
@@ -2089,28 +1858,14 @@ async function finalizeR11Round(
         const data =
           snap.data();
 
-        const phase =
-          data.phase11 ||
-          'betting';
-
-        const currentRound =
-          data.roundId11;
-
-        const spinStart =
-          Number(
-            data.spinStart11 || 0
-          );
-
-        const now =
-          Date.now();
-
 
         /*
-          Kisi naye round par pahunch chuke hain.
+          Agar koi naya round already
+          create ho chuka hai to kuch nahi.
         */
 
         if(
-          String(currentRound) !==
+          String(data.roundId11) !==
           String(spinRoundId)
         ){
 
@@ -2119,30 +1874,13 @@ async function finalizeR11Round(
         }
 
 
-        /*
-          Sirf spinning round finalize hoga.
-        */
-
         if(
-          phase !== 'spinning'
+          data.phase11 !== 'spinning'
         ){
 
           return;
 
         }
-
-
-        /*
-          Global spin ka fixed 9.9 sec period.
-        */
-
-        if(
-  spinStart <= 0
-){
-
-  return;
-
-}
 
 
         const winner =
@@ -2161,11 +1899,6 @@ async function finalizeR11Round(
             : [];
 
 
-        /*
-          Last 4 mein current winner
-          sirf ek baar add hoga.
-        */
-
         const newLast =
           [
             winner,
@@ -2174,11 +1907,10 @@ async function finalizeR11Round(
 
 
         const nextStart =
-          now;
+          Date.now();
 
         const nextRoundId =
-          now;
-
+          nextStart;
 
         const nextResult =
           Math.floor(
@@ -2189,7 +1921,8 @@ async function finalizeR11Round(
         transaction.set(
           ref,
           {
-            lastWins11: newLast,
+            lastWins11:
+              newLast,
 
             roundId11:
               nextRoundId,
@@ -2207,95 +1940,13 @@ async function finalizeR11Round(
               null
 
           },
-          {merge:true}
+          {
+            merge:true
+          }
         );
 
       }
     );
-
-
-    /*
-      Fresh next round.
-    */
-
-    const freshSnap =
-      await window.zynoGetDoc(
-        ref
-      );
-
-    if(
-      freshSnap.exists()
-    ){
-
-      const data =
-        freshSnap.data();
-
-      if(
-        data.roundId11 !== undefined
-      ){
-
-        globalRound11 =
-          data.roundId11;
-
-      }
-
-      if(
-        data.roundStart11 !== undefined
-      ){
-
-        globalRoundStart11 =
-          Number(
-            data.roundStart11
-          );
-
-      }
-
-      if(
-        data.result11 !== undefined
-      ){
-
-        globalResult11 =
-          Number(
-            data.result11
-          );
-
-      }
-
-      if(
-        Array.isArray(
-          data.lastWins11
-        )
-      ){
-
-        globalLastWins11 =
-          data.lastWins11
-            .slice(0,4);
-
-        r11Last =
-          globalLastWins11
-            .slice(0,4);
-
-        renderLast(
-          'r11last',
-          r11Last
-        );
-
-        document
-          .getElementById(
-            'r11lastWin'
-          )
-          .textContent =
-            r11Last.length
-              ? r11Last[0]
-              : '-';
-
-      }
-
-      window.r11GlobalPhase11 =
-        data.phase11 ||
-        'betting';
-
-    }
 
   }catch(error){
 
@@ -2306,15 +1957,7 @@ async function finalizeR11Round(
 
   }finally{
 
-    if(
-      r11FinalizingRound ===
-      spinRoundId
-    ){
-
-      r11FinalizingRound =
-        null;
-
-    }
+    r11FinalizingRound = false;
 
   }
 
@@ -2324,7 +1967,8 @@ async function finalizeR11Round(
 /* ---------- R11 SPIN ---------- */
 
 function spin11(
-  spinRoundId = null
+  spinRoundId,
+  lockedResult
 ){
 
   if(r11Spin){
@@ -2332,19 +1976,24 @@ function spin11(
   }
 
 
-  const actualRoundId =
-    spinRoundId !== null
-      ? spinRoundId
-      : globalRound11;
+  if(
+    spinRoundId === undefined ||
+    spinRoundId === null
+  ){
+
+    return;
+
+  }
 
 
   /*
-    Same round ko dobara animate nahi karna.
+    Same global round ko
+    dobara animate nahi karna.
   */
 
   if(
     r11AnimatingRound ===
-    actualRoundId
+    spinRoundId
   ){
 
     return;
@@ -2353,7 +2002,7 @@ function spin11(
 
 
   r11AnimatingRound =
-    actualRoundId;
+    spinRoundId;
 
   r11Spin = true;
   r11Open = false;
@@ -2380,23 +2029,30 @@ function spin11(
 
   const winner =
     Number.isInteger(
-      Number(r11LockedResult)
+      Number(lockedResult)
     ) &&
-    Number(r11LockedResult) >= 0 &&
-    Number(r11LockedResult) <= 11
-      ? Number(r11LockedResult)
-      : (
-          Number.isInteger(
-            Number(globalResult11)
-          ) &&
-          Number(globalResult11) >= 0 &&
-          Number(globalResult11) <= 11
-            ? Number(globalResult11)
-            : 0
-        );
+    Number(lockedResult) >= 0 &&
+    Number(lockedResult) <= 11
+      ? Number(lockedResult)
+      : 0;
+
+
+  r11LockedResult =
+    winner;
 
 
   playSpinSound();
+
+
+  /*
+    Fresh animation every spin.
+  */
+
+  wheel11.style.transform =
+    'rotate(0deg)';
+
+
+  void wheel11.offsetWidth;
 
 
   wheel11.animate(
@@ -2459,138 +2115,68 @@ function spin11(
       10;
 
 
-    balance += win;
+    if(win > 0){
 
+      balance += win;
 
-    window.saveUserBalance();
+      if(window.saveUserBalance){
 
+        window.saveUserBalance();
 
-    syncBalance();
+      }
+
+      syncBalance();
+
+    }
 
 
     /*
-      Result ko 4 sec screen par
-      visible rakho.
+      Winner screen hold.
     */
 
     setTimeout(async()=>{
-
-      /*
-        Local bet clear.
-      */
 
       clearBets11();
 
 
       /*
-        R11 animation complete.
-      */
-
-      /*
-        Global Firestore transaction
-        next round create karegi.
-        Agar ye browser fail bhi ho,
-        ensureGlobalR11Round()
-        stale spinning round recover kar sakta hai.
+        Global next round create.
+        Sirf current round finalize hoga.
       */
 
       await finalizeR11Round(
-        actualRoundId
+        spinRoundId
       );
-    
-      r11Spin = false;
 
-      r11LockedResult = null;
-      
+
       /*
-        Fresh round read.
+        Fresh Firestore read.
       */
 
       try{
 
-        const freshSnap =
+        const snap =
           await window.zynoGetDoc(
             getR11Ref()
           );
 
         if(
-          freshSnap.exists()
+          snap.exists()
         ){
 
           const data =
-            freshSnap.data();
+            snap.data();
 
-          if(
-            data.roundId11 !== undefined
-          ){
-
-            globalRound11 =
-              data.roundId11;
-
-          }
-
-          if(
-            data.roundStart11 !== undefined
-          ){
-
-            globalRoundStart11 =
-              Number(
-                data.roundStart11
-              );
-
-          }
-
-          if(
-            data.result11 !== undefined
-          ){
-
-            globalResult11 =
-              Number(
-                data.result11
-              );
-
-          }
-
-          if(
-            Array.isArray(
-              data.lastWins11
-            )
-          ){
-
-            globalLastWins11 =
-              data.lastWins11
-                .slice(0,4);
-
-            r11Last =
-              globalLastWins11
-                .slice(0,4);
-
-            renderLast(
-              'r11last',
-              r11Last
-            );
-
-            document
-              .getElementById(
-                'r11lastWin'
-              )
-              .textContent =
-                r11Last.length
-                  ? r11Last[0]
-                  : '-';
-
-          }
-
-          window.r11GlobalPhase11 =
-            data.phase11 ||
-            'betting';
+          window.r11ApplyFirestore(
+            data
+          );
 
         }
 
       }catch(error){
 
         console.error(
-          'R11 next round sync error:',
+          'R11 next round read error:',
           error
         );
 
@@ -2598,57 +2184,28 @@ function spin11(
 
 
       /*
-        IMPORTANT:
-        Naye Firestore round ka actual
-        start use hoga.
+        Local spin complete.
       */
 
-      const nextStart =
-  Number(
-    globalRoundStart11 || 0
-  );
+      r11Spin = false;
+
+      r11LockedResult = null;
+
+      /*
+        New round ko animate nahi karna.
+      */
+
+      r11AnimatingRound = null;
 
 
-if(
-  nextStart > 0
-){
+      /*
+        New global 30 sec round ka
+        actual Firestore timer.
+      */
 
-  r11Time =
-    getR11TimerValue(
-      nextStart
-    );
+      r11Ready = true;
 
-  r11Open =
-    r11Time > 4;
-
-  timer.textContent =
-    r11Time;
-
-  timer.classList.toggle(
-    'closed',
-    !r11Open
-  );
-
-}else{
-
-  r11Time = 30;
-  r11Open = true;
-
-  timer.textContent = 30;
-
-  timer.classList.remove(
-    'closed'
-  );
-
-}
-
-
-/*
-  Next round ka timer turant
-  continuous tick par chalao.
-*/
-
-tickR11();
+      tickR11();
 
 
       document
@@ -2657,39 +2214,11 @@ tickR11();
           'Press and hold a number to bet';
 
 
-      /*
-  Kisi stale local round ko
-  dobara animate nahi karna.
-*/
+    },R11_RESULT_HOLD_MS);
 
-r11AnimatingRound =
-  null;
-
-
-/*
-  Next round ka timer turant
-  continuous tick par chalao.
-*/
-
-tickR11();
-
-
-document
-  .getElementById('r11msg')
-  .textContent =
-    'Press and hold a number to bet';
-
-
-/*
-  Agar finalize transaction kisi reason se
-  fail hua ho to turant recovery attempt.
-*/
-
-startR11();
-
-},R11_RESULT_HOLD_MS);
 
   },R11_SPIN_MS);
+
 }
 
 function renderLast(id,arr){
