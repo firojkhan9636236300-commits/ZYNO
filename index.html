@@ -2695,19 +2695,6 @@ onSnapshot(doc(db,"gameResults","roulette"), snap=>{
     window.r11GlobalPhase11 = data.phase11;
   }
   
-  if(
-  data.phase11 === "spinning" &&
-  !r11Spin &&
-  !r11ClaimingSpin &&
-  document.getElementById('r11').classList.contains('active')
-){
-  globalResult11 = data.result11;
-  r11LockedResult = Number(data.result11);
-  r11Time = -1;
-  r11Open = false;
-  spin11();
-}
-
   if(data.roundStart11 !== undefined){
 
   window.globalRoundStart11 =
