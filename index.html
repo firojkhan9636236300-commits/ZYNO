@@ -1231,7 +1231,31 @@ function bindHold11(btn,n){
   );
 
 }
+}
 
+function clearBets11(){
+
+  bets11 = {};
+
+  grid11
+    .querySelectorAll('.bet-number')
+    .forEach(btn=>{
+
+      btn.classList.remove(
+        'active',
+        'winner'
+      );
+
+      const count =
+        btn.querySelector('.bet-count');
+
+      if(count){
+        count.textContent = '';
+      }
+
+    });
+
+}
 
 /* ---------- R11 FIRESTORE ---------- */
 
