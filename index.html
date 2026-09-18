@@ -2374,7 +2374,42 @@ function playGemsLoss(){
     o.stop(now+.45);
   }catch(e){}
 }
-function playSpinSound(){try{ensureAudio();spinOsc=audioCtx.createOscillator();spinGain=audioCtx.createGain();spinFilter=audioCtx.createBiquadFilter();spinOsc.type='triangle';spinFilter.type='lowpass';spinFilter.frequency.value=1200;spinFilter.Q.value=1.1;spinGain.gain.setValueAtTime(.001,audioCtx.currentTime);spinGain.gain.linearRampToValueAtTime(.045,audioCtx.currentTime+.18);spinOsc.frequency.setValueAtTime(115,audioCtx.currentTime);spinOsc.frequency.exponentialRampToValueAtTime(62,audioCtx.currentTime+4.8);spinOsc.connect(spinFilter).connect(spinGain).connect(audioCtx.destination);spinOsc.start()}catch(e){}}
+function playSpinSound(){
+  try{
+    ensureAudio();
+
+    if(!audioCtx) return;
+
+    stopSpinSound();
+
+    const now = audioCtx.currentTime;
+
+    spinOsc = audioCtx.createOscillator();
+    spinGain = audioCtx.createGain();
+    spinFilter = audioCtx.createBiquadFilter();
+
+    spinOsc.type = 'sawtooth';
+
+    spinFilter.type = 'lowpass';
+    spinFilter.frequency.setValueAtTime(900, now);
+    spinFilter.Q.setValueAtTime(0.7, now);
+
+    spinGain.gain.setValueAtTime(0.001, now);
+    spinGain.gain.linearRampToValueAtTime(0.028, now + 0.12);
+    spinGain.gain.linearRampToValueAtTime(0.018, now + 2.5);
+    spinGain.gain.linearRampToValueAtTime(0.010, now + 5.2);
+
+    spinOsc.frequency.setValueAtTime(145, now);
+    spinOsc.frequency.exponentialRampToValueAtTime(72, now + 5.2);
+
+    spinOsc.connect(spinFilter)
+      .connect(spinGain)
+      .connect(audioCtx.destination);
+
+    spinOsc.start(now);
+
+  }catch(e){}
+}
 function stopSpinSound(){try{if(!spinOsc)return;spinGain.gain.cancelScheduledValues(audioCtx.currentTime);spinGain.gain.setValueAtTime(spinGain.gain.value,audioCtx.currentTime);spinGain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.22);spinOsc.stop(audioCtx.currentTime+.25);spinOsc=null}catch(e){}}
 setInterval(()=>{
 
