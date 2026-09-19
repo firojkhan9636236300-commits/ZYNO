@@ -2382,59 +2382,53 @@ function playSpinSound(){
     const now = audioCtx.currentTime;
 
     /*
-      MAIN ROULETTE WHEEL SOUND
-      Mechanical / casino-style rolling feel
+      MAIN ROULETTE ROLL
     */
 
     spinOsc = audioCtx.createOscillator();
     spinGain = audioCtx.createGain();
     spinFilter = audioCtx.createBiquadFilter();
 
-    spinOsc.type = 'sawtooth';
+    spinOsc.type = 'triangle';
 
     spinFilter.type = 'lowpass';
-    spinFilter.frequency.setValueAtTime(1200, now);
-    spinFilter.Q.setValueAtTime(0.8, now);
+    spinFilter.frequency.setValueAtTime(1100, now);
+    spinFilter.Q.setValueAtTime(1.1, now);
 
     spinGain.gain.setValueAtTime(0.001, now);
 
-    /*
-      Smooth start
-    */
     spinGain.gain.linearRampToValueAtTime(
-      0.032,
-      now + 0.10
+      0.024,
+      now + 0.08
+    );
+
+    spinGain.gain.linearRampToValueAtTime(
+      0.018,
+      now + 1.5
+    );
+
+    spinGain.gain.linearRampToValueAtTime(
+      0.013,
+      now + 3.5
+    );
+
+    spinGain.gain.linearRampToValueAtTime(
+      0.006,
+      now + 5.6
     );
 
     /*
-      Natural wheel roll
+      Wheel slowing down
     */
-    spinGain.gain.linearRampToValueAtTime(
-      0.022,
-      now + 1.8
-    );
 
-    spinGain.gain.linearRampToValueAtTime(
-      0.016,
-      now + 3.6
-    );
-
-    spinGain.gain.linearRampToValueAtTime(
-      0.009,
-      now + 5.2
-    );
-
-    /*
-      Wheel speed decreases
-    */
     spinOsc.frequency.setValueAtTime(
-      190,
+      175,
       now
     );
 
     spinOsc.frequency.exponentialRampToValueAtTime(
-      82,
-      now + 5.2
+      65,
+      now + 5.6
     );
 
     spinOsc.connect(spinFilter)
@@ -2442,6 +2436,72 @@ function playSpinSound(){
       .connect(audioCtx.destination);
 
     spinOsc.start(now);
+
+    /*
+      SMALL MECHANICAL TICKS
+    */
+
+    let tickTime = now + 0.08;
+    let tickDelay = 0.055;
+
+    for(let i = 0; i < 70; i++){
+
+      if(tickTime > now + 5.65) break;
+
+      const osc =
+        audioCtx.createOscillator();
+
+      const gain =
+        audioCtx.createGain();
+
+      const filter =
+        audioCtx.createBiquadFilter();
+
+      osc.type = 'square';
+
+      filter.type = 'bandpass';
+
+      filter.frequency.setValueAtTime(
+        1500 + Math.random() * 500,
+        tickTime
+      );
+
+      filter.Q.setValueAtTime(
+        2.5,
+        tickTime
+      );
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        tickTime
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.012,
+        tickTime + 0.003
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        tickTime + 0.025
+      );
+
+      osc.connect(filter)
+        .connect(gain)
+        .connect(audioCtx.destination);
+
+      osc.start(tickTime);
+      osc.stop(tickTime + 0.03);
+
+      /*
+        Dheere dheere wheel slow
+        isliye ticks bhi slow
+      */
+
+      tickDelay += 0.0017;
+
+      tickTime += tickDelay;
+    }
 
   }catch(e){
 
@@ -2475,11 +2535,11 @@ function stopSpinSound(){
 
     spinGain.gain.exponentialRampToValueAtTime(
       0.001,
-      now + 0.22
+      now + 0.18
     );
 
     spinOsc.stop(
-      now + 0.25
+      now + 0.20
     );
 
     spinOsc = null;
