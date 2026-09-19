@@ -2325,20 +2325,18 @@ function ensureAudio(){
   }catch(e){}
 }
 document.addEventListener(
-  'pointerdown',
+  'touchstart',
   function unlockAudio(){
     try{
-      ensureAudio();
-
-      if(audioCtx && audioCtx.state === 'suspended'){
-        audioCtx.resume();
+      if(!audioCtx){
+        audioCtx =
+          new (window.AudioContext ||
+          window.webkitAudioContext)();
       }
 
-      document.removeEventListener(
-        'pointerdown',
-        unlockAudio
-      );
-
+      if(audioCtx.state === 'suspended'){
+        audioCtx.resume();
+      }
     }catch(e){}
   },
   {once:true}
