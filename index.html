@@ -334,7 +334,7 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
     <div class="wheel-wrap">
       <div class="pointer"></div>
       <div class="wheel" id="wheel36">
-        <div class="wheel-center-win" id="wheel36Winner"></div>
+        <div class="wheel-center-win" id="wheel36Winner">ZYNO</div>
       </div>
     </div>
   </div>
@@ -986,6 +986,8 @@ async function spin36(){
     stopSpinSound();
     document.getElementById('r36msg').textContent =
       'WINNING NUMBER: ' + winner;
+      document.getElementById('wheel36Winner').textContent =
+  winner;
     // Sirf winning number highlight
     grid36
       .querySelectorAll('.bet-number')
