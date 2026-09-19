@@ -948,7 +948,7 @@ async function spin36(){
   r36Open = false;
   document.getElementById('r36msg').textContent =
     'Wheel spinning...';
-     await playSpinSound();
+     playSpinSound();
   // Firebase global result mile to wahi use hoga.
   // Agar result available nahi hai to 0-36 ke beech result generate hoga.
   const winner =
@@ -2311,9 +2311,8 @@ function renderLast(id,arr){
 }
 /* ---------- AUDIO ---------- */
 let audioCtx=null,spinOsc=null,spinGain=null,spinFilter=null;
-async function ensureAudio(){
+function ensureAudio(){
   try{
-
     if(!audioCtx){
       audioCtx =
         new (window.AudioContext ||
@@ -2321,17 +2320,9 @@ async function ensureAudio(){
     }
 
     if(audioCtx.state === 'suspended'){
-      await audioCtx.resume();
+      audioCtx.resume();
     }
-
-  }catch(e){
-
-    console.log(
-      'AUDIO RESUME ERROR:',
-      e
-    );
-
-  }
+  }catch(e){}
 }
 function playTick(){try{ensureAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=740;g.gain.setValueAtTime(.025,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.055);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.06)}catch(e){}}
 function playGemsWinSmall(){
