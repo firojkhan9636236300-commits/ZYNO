@@ -2328,15 +2328,31 @@ document.addEventListener(
   'touchstart',
   function unlockAudio(){
     try{
-      if(!audioCtx){
-        audioCtx =
-          new (window.AudioContext ||
-          window.webkitAudioContext)();
-      }
+
+      ensureAudio();
+
+      if(!audioCtx) return;
+
+      const o =
+        audioCtx.createOscillator();
+
+      const g =
+        audioCtx.createGain();
+
+      g.gain.value = 0.00001;
+
+      o.connect(g)
+       .connect(audioCtx.destination);
+
+      o.start();
+      o.stop(
+        audioCtx.currentTime + 0.01
+      );
 
       if(audioCtx.state === 'suspended'){
         audioCtx.resume();
       }
+
     }catch(e){}
   },
   {capture:true}
