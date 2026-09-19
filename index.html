@@ -1016,11 +1016,14 @@ async function spin36(){
     r36Spin = false;
     // Next round
     setTimeout(()=>{
-      resetR36Round();
-      clearBets36();
-      document.getElementById('r36msg').textContent =
-        'Press and hold a number to bet';
-    },4000);
+  document.getElementById('wheel36Winner').textContent =
+    'ZYNO';
+
+  resetR36Round();
+  clearBets36();
+  document.getElementById('r36msg').textContent =
+    'Press and hold a number to bet';
+},4000);
   },5900);
 }
 /* ---------- ROULETTE 0-11 ---------- */
