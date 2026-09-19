@@ -2372,180 +2372,79 @@ function playGemsLoss(){
 }
 function playSpinSound(){
   try{
-
     ensureAudio();
-
     if(!audioCtx) return;
-
     stopSpinSound();
-
     const now = audioCtx.currentTime;
-
     /*
-      MAIN ROULETTE ROLL
+      ONLY MECHANICAL ROULETTE TICKS
     */
-
-    spinOsc = audioCtx.createOscillator();
-    spinGain = audioCtx.createGain();
-    spinFilter = audioCtx.createBiquadFilter();
-
-    spinOsc.type = 'triangle';
-
-    spinFilter.type = 'lowpass';
-    spinFilter.frequency.setValueAtTime(1100, now);
-    spinFilter.Q.setValueAtTime(1.1, now);
-
-    spinGain.gain.setValueAtTime(0.001, now);
-
-    spinGain.gain.linearRampToValueAtTime(
-      0.024,
-      now + 0.08
-    );
-
-    spinGain.gain.linearRampToValueAtTime(
-      0.018,
-      now + 1.5
-    );
-
-    spinGain.gain.linearRampToValueAtTime(
-      0.013,
-      now + 3.5
-    );
-
-    spinGain.gain.linearRampToValueAtTime(
-      0.006,
-      now + 5.6
-    );
-
-    /*
-      Wheel slowing down
-    */
-
-    spinOsc.frequency.setValueAtTime(
-      175,
-      now
-    );
-
-    spinOsc.frequency.exponentialRampToValueAtTime(
-      65,
-      now + 5.6
-    );
-
-    spinOsc.connect(spinFilter)
-      .connect(spinGain)
-      .connect(audioCtx.destination);
-
-    spinOsc.start(now);
-
-    /*
-      SMALL MECHANICAL TICKS
-    */
-
-    let tickTime = now + 0.08;
-    let tickDelay = 0.055;
-
-    for(let i = 0; i < 70; i++){
-
-      if(tickTime > now + 5.65) break;
-
+    let tickTime = now + 0.05;
+    let tickDelay = 0.045;
+    for(let i = 0; i < 105; i++){
+      if(tickTime > now + 5.75) break;
       const osc =
         audioCtx.createOscillator();
-
       const gain =
         audioCtx.createGain();
-
       const filter =
         audioCtx.createBiquadFilter();
-
       osc.type = 'square';
-
       filter.type = 'bandpass';
-
       filter.frequency.setValueAtTime(
-        1500 + Math.random() * 500,
+        1250 + Math.random() * 650,
         tickTime
       );
-
       filter.Q.setValueAtTime(
-        2.5,
+        3.2,
         tickTime
       );
-
       gain.gain.setValueAtTime(
         0.0001,
         tickTime
       );
-
       gain.gain.exponentialRampToValueAtTime(
-        0.012,
-        tickTime + 0.003
+        0.14,
+        tickTime + 0.002
       );
-
       gain.gain.exponentialRampToValueAtTime(
         0.0001,
-        tickTime + 0.025
+        tickTime + 0.045
       );
-
       osc.connect(filter)
         .connect(gain)
         .connect(audioCtx.destination);
-
       osc.start(tickTime);
-      osc.stop(tickTime + 0.03);
-
+      osc.stop(tickTime + 0.026);
       /*
-        Dheere dheere wheel slow
-        isliye ticks bhi slow
+        Start fast
+        End slow
       */
-
-      tickDelay += 0.0017;
-
+      tickDelay += 0.0019;
       tickTime += tickDelay;
     }
-
   }catch(e){
-
     console.log(
       'SPIN SOUND ERROR:',
       e
     );
-
   }
 }
-
-
 function stopSpinSound(){
-
   try{
-
-    if(!spinOsc) return;
-
-    const now =
-      audioCtx.currentTime;
-
-    spinGain.gain.cancelScheduledValues(now);
-
-    spinGain.gain.setValueAtTime(
-      Math.max(
-        spinGain.gain.value,
-        0.001
-      ),
-      now
-    );
-
-    spinGain.gain.exponentialRampToValueAtTime(
-      0.001,
-      now + 0.18
-    );
-
-    spinOsc.stop(
-      now + 0.20
-    );
-
-    spinOsc = null;
-
+    /*
+      Mechanical ticks automatically
+      finish with their scheduled time.
+    */
+    if(spinOsc){
+      const now =
+        audioCtx.currentTime;
+      spinOsc.stop(
+        now + 0.05
+      );
+      spinOsc = null;
+    }
   }catch(e){}
-
 }
 setInterval(()=>{
 
