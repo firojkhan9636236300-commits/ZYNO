@@ -327,7 +327,15 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   <div class="game-name"></div>
   <button class="back" onclick="goHome()">LOGIN</button>
 </div>
- <div class="rule">30 SEC • MAX 5500 PER NUMBER • PAYOUT 35:1</div>
+ <div class="rule" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+  <span>30 SEC • MAX 5500 PER NUMBER • PAYOUT 35:1</span>
+  <button
+    onclick="showLogin()"
+    style="padding:10px 15px;border-radius:10px;background:#071525;border:1px solid rgba(0,229,255,.35);font-size:11px;font-weight:1000;color:#00e5ff;white-space:nowrap;margin-top:5px;"
+  >
+    LOGIN
+  </button>
+</div>
  <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r36bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><div class="last" id="r36last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r36timer">30</strong></div></div>
  <div>
   <div class="wheel-area">
