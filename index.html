@@ -1117,7 +1117,7 @@ document.getElementById('wheel36Winner').textContent =
 },3500);
       });
     // LAST 4 WIN update
-    r36Last.unshift(winner);
+    r36Last.push(winner);
     localStorage.setItem('zynoR36LastWins', JSON.stringify(r36Last));
     r36Last = r36Last.slice(0,4);
     renderLast('r36last', r36Last);
