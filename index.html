@@ -390,6 +390,11 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
     <small>TIME</small>
     <strong class="timer" id="r36timer">30</strong>
   </div>
+
+  <div class="ibox">
+    <small>BALANCE</small>
+    <strong id="r36TopBalance">1,000,000,000</strong>
+  </div>
 </div>
  <div>
   <div class="wheel-area">
@@ -666,6 +671,7 @@ function showLogin(){
 const topBalance=document.getElementById('topBalance');
 function syncBalance(){
   topBalance.textContent=money(balance);
+  document.getElementById('r36TopBalance').textContent=money(balance);
   document.getElementById('r11bal').textContent=money(balance);
   document.getElementById('gemsBal').textContent=money(balance);
 }
@@ -683,6 +689,9 @@ function openGame(id){
   const globalBrand = document.querySelector('.brand');
   if(globalBrand) globalBrand.style.display = (id === 'r36') ? 'none' : '';
   
+  const globalBalance = document.querySelector('.balance');
+  if(globalBalance) globalBalance.style.display = (id === 'r36') ? 'none' : '';
+
   document.getElementById(id).classList.add('active');
   localStorage.setItem('zynoActiveView', id);
   if(id === 'r36') startR36();
@@ -693,6 +702,9 @@ function goHome(){
   
   const globalBrand = document.querySelector('.brand');
   if(globalBrand) globalBrand.style.display = '';
+  
+  const globalBalance = document.querySelector('.balance');
+  if(globalBalance) globalBalance.style.display = '';
 
   document.getElementById('home').classList.add('active');
   localStorage.setItem('zynoActiveView','home');
