@@ -1,3 +1,5 @@
+Bhai me yha tak cut kar ke ye lga rha hu 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -352,7 +354,7 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   <div class="brand">ZYNO</div>
 
   <div style="display:flex;align-items:center;gap:7px">
-    <div class="balance" id="globalBalanceBox">
+    <div class="balance">
       <small>BALANCE</small>
       <strong id="topBalance">1,000,000,000</strong>
     </div>
@@ -380,10 +382,7 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
     LOGIN
   </button>
 </div>
- <div class="balance">
-  <small>BALANCE</small>
-  <strong id="r36bal">1,000,000,000</strong>
-</div><div class="ibox"><small>LAST WIN</small><div class="last" id="r36last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r36timer">30</strong></div></div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r36bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><div class="last" id="r36last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r36timer">30</strong></div></div>
  <div>
   <div class="wheel-area">
     <div class="wheel-wrap">
@@ -672,9 +671,6 @@ function openGame(id){
   const globalBrand = document.querySelector('.brand');
   if(globalBrand) globalBrand.style.display = (id === 'r36') ? 'none' : '';
   
-  const globalBalanceBox = document.getElementById('globalBalanceBox');
-  if(globalBalanceBox) globalBalanceBox.style.display = (id === 'r36') ? 'none' : '';
-
   document.getElementById(id).classList.add('active');
   localStorage.setItem('zynoActiveView', id);
   if(id === 'r36') startR36();
@@ -685,9 +681,6 @@ function goHome(){
   
   const globalBrand = document.querySelector('.brand');
   if(globalBrand) globalBrand.style.display = '';
-  
-  const globalBalanceBox = document.getElementById('globalBalanceBox');
-  if(globalBalanceBox) globalBalanceBox.style.display = '';
 
   document.getElementById('home').classList.add('active');
   localStorage.setItem('zynoActiveView','home');
@@ -812,7 +805,6 @@ function bindHold36(btn,n){
     btn.classList.add('active');
     updateCount36(btn,newBet);
     syncBalance();
-
 
     setTimeout(()=>{
       btn.classList.remove('active');
