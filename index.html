@@ -325,9 +325,9 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:8px;
-  margin-top:-4px;
-  margin-left:95px;
+  gap:6px;
+  margin:0;
+  flex-shrink:0;
 }
 
 .bet-control36 button{
@@ -336,6 +336,11 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   font-size:22px;
   font-weight:bold;
   border-radius:8px;
+  color:#ffd34e;
+  border:1px solid rgba(255,211,78,.35);
+  background:linear-gradient(145deg,#3a3a36,#171715);
+  box-shadow:0 0 7px rgba(255,211,78,.12);
+  touch-action:manipulation;
 }
 
 #selectedBet36{
@@ -343,6 +348,8 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   text-align:center;
   font-size:18px;
   font-weight:bold;
+  color:#fff4d0;
+  touch-action:manipulation;
 }
 </style>
 </head>
@@ -407,7 +414,17 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
     </div>
   </div>
 </div>
- <div class="message" id="r36msg">Press and hold a number to bet</div><div class="grid" id="grid36"></div><div class="bet-control36">
+ <div style="display:flex;align-items:center;justify-content:center;gap:18px;margin-bottom:4px;">
+  <div class="message" id="r36msg">Press and hold a number to bet</div>
+
+  <div class="bet-control36">
+    <button type="button" id="betMinus36">−</button>
+    <span id="selectedBet36">1</span>
+    <button type="button" id="betPlus36">+</button>
+  </div>
+</div>
+
+<div class="grid" id="grid36"></div>
   <button type="button" id="betMinus36">−</button>
   <span id="selectedBet36">1</span>
   <button type="button" id="betPlus36">+</button>
