@@ -1025,8 +1025,11 @@ async function spin36(){
     stopSpinSound();
     document.getElementById('r36msg').textContent =
       'WINNING NUMBER: ' + winner;
-      document.getElementById('wheel36Winner').textContent =
-  winner;
+      
+document.querySelector('.r36-brand-center').style.display = 'none';
+      
+document.getElementById('wheel36Winner').textContent =
+     winner;
     // Sirf winning number highlight
     grid36
       .querySelectorAll('.bet-number')
@@ -1057,7 +1060,9 @@ async function spin36(){
     setTimeout(()=>{
   document.getElementById('wheel36Winner').textContent =
     'ZYNO';
-
+    
+  document.querySelector('.r36-brand-center').style.display = '';
+  
   resetR36Round();
   clearBets36();
   document.getElementById('r36msg').textContent =
