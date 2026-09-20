@@ -73,11 +73,16 @@ button{font:inherit;border:0;cursor:pointer;color:#fff}.hidden{display:none!impo
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  z-index:9;
+  z-index:20;
+  width:60px;
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   color:var(--blue);
   font-weight:1000;
-  letter-spacing:2px;
-  font-size:20px;
+  letter-spacing:1px;
+  font-size:16px;
   text-shadow:0 0 10px rgba(0,229,255,.55);
   pointer-events:none;
 }
@@ -641,7 +646,9 @@ function openGame(id){
   document.querySelectorAll('.view').forEach(v =>
     v.classList.remove('active')
   );
-
+  const globalBrand = document.querySelector('.brand');
+  if(globalBrand) globalBrand.style.display = (id === 'r36') ? 'none' : '';
+  
   document.getElementById(id).classList.add('active');
   localStorage.setItem('zynoActiveView', id);
   if(id === 'r36') startR36();
@@ -649,6 +656,10 @@ function openGame(id){
 }
 function goHome(){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  
+  const globalBrand = document.querySelector('.brand');
+  if(globalBrand) globalBrand.style.display = '';
+
   document.getElementById('home').classList.add('active');
   localStorage.setItem('zynoActiveView','home');
 }
