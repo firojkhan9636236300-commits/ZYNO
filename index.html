@@ -2241,8 +2241,10 @@ function spin11(
 
   void wheel11.offsetWidth;
 
-  playSpinSound();
-  
+setTimeout(() => {
+  playR11SpinSound();
+}, 50);
+
   wheel11.animate(
     [
       {
@@ -2598,6 +2600,85 @@ async function playSpinSound(){
       'SPIN SOUND ERROR:',
       e
     );
+  }
+}
+async function playR11SpinSound(){
+  try{
+    ensureAudio();
+
+    if(!audioCtx) return;
+
+    stopSpinSound();
+
+    const now = audioCtx.currentTime;
+
+    let tickTime = now + 0.05;
+    let tickDelay = 0.045;
+
+    for(let i = 0; i < 110; i++){
+
+      if(tickTime > now + 6.0) break;
+
+      const osc =
+        audioCtx.createOscillator();
+
+      const gain =
+        audioCtx.createGain();
+
+      const filter =
+        audioCtx.createBiquadFilter();
+
+      osc.type = 'square';
+
+      filter.type = 'bandpass';
+
+      filter.frequency.setValueAtTime(
+        1250 + Math.random() * 650,
+        tickTime
+      );
+
+      filter.Q.setValueAtTime(
+        3.2,
+        tickTime
+      );
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        tickTime
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.14,
+        tickTime + 0.002
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        tickTime + 0.045
+      );
+
+      osc.connect(filter)
+        .connect(gain)
+        .connect(audioCtx.destination);
+
+      osc.start(tickTime);
+
+      osc.stop(
+        tickTime + 0.026
+      );
+
+      tickDelay += 0.0018;
+
+      tickTime += tickDelay;
+    }
+
+  }catch(e){
+
+    console.log(
+      'R11 SPIN SOUND ERROR:',
+      e
+    );
+
   }
 }
 function stopSpinSound(){
