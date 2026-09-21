@@ -2363,17 +2363,15 @@ wheel11.style.transform =
 
     if(win > 0){
 
-      balance += win;
+  balance += win;
 
-      if(window.saveUserBalance){
+  syncBalance();
 
-        window.saveUserBalance();
+  if(window.saveUserBalance){
+    await window.saveUserBalance();
+  }
 
-      }
-
-      syncBalance();
-
-    }
+}
 
 
     /*
@@ -3308,15 +3306,15 @@ onAuthStateChanged(auth, async (user)=>{
 
     // Firestore se balance change ho to screen bhi update ho
     balanceUnsubscribe = onSnapshot(
-      userRef,
-      snap=>{
-        if(!snap.exists()) return;
+  userRef,
+  snap=>{
+    if(!snap.exists()) return;
 
-        const data = snap.data();
+    const data = snap.data();
 
-        applyFirestoreBalance(data.points);
-      }
-    );
+    applyFirestoreBalance(data.points);
+  }
+);
 
   }catch(error){
 
@@ -3328,35 +3326,71 @@ onAuthStateChanged(auth, async (user)=>{
   }
 
 });
-window.saveUserBalance = async function(){
+let balanceSaveQueue = Promise.resolve();
 
-  try{
+window.saveUserBalance = function(){
 
-    const user = auth.currentUser;
+  const save = async()=>{
 
-    if(!user) return;
+    try{
 
-    if(user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332'){
+      const user = auth.currentUser;
 
-      return;
+      if(!user) return;
+
+      if(
+        user.uid ===
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+      ){
+
+        return;
+
+      }
+
+      const userRef =
+        doc(db, 'users', user.uid);
+
+      const savedBalance =
+  Math.max(
+    0,
+    Math.floor(balance)
+  );
+
+await updateDoc(
+  userRef,
+  {
+    points: savedBalance
+  }
+);
+
+balance = savedBalance;
+syncBalance();
+
+      console.log(
+        'User balance saved:',
+        balance
+      );
+
+    }catch(error){
+
+      console.error(
+        'Balance save error:',
+        error
+      );
 
     }
 
-    const userRef = doc(db, 'users', user.uid);
+  };
 
-    await updateDoc(userRef, {
+  balanceSaveQueue =
+    balanceSaveQueue.then(
+      save,
+      save
+    );
 
-      points: Math.max(0, Math.floor(balance))
+  return balanceSaveQueue;
 
-    });
-
-    console.log('User balance saved:', balance);
-
-  }catch(error){
-
-    console.error('Balance save error:', error);
-
-  }
+};
 
 };
 window.sendPoints = async function(){
