@@ -1062,7 +1062,16 @@ async function spin36(){
   document.getElementById('r36msg').textContent =
     'Wheel spinning...';
      setTimeout(() => {
-  playSpinSound();
+
+  if(
+    document
+      .getElementById('r36')
+      .classList
+      .contains('active')
+  ){
+    playSpinSound();
+  }
+
 }, 50);
   // Firebase global result mile to wahi use hoga.
   // Agar result available nahi hai to 0-36 ke beech result generate hoga.
@@ -2242,7 +2251,16 @@ function spin11(
   void wheel11.offsetWidth;
 
 setTimeout(() => {
-  playR11SpinSound();
+
+  if(
+    document
+      .getElementById('r11')
+      .classList
+      .contains('active')
+  ){
+    playR11SpinSound();
+  }
+
 }, 50);
 
   wheel11.animate(
