@@ -2268,7 +2268,7 @@ setTimeout(() => {
 
   setTimeout(()=>{
 
-    stopSpinSound();
+    stopR11SpinSound();
 
 
     document
@@ -2608,8 +2608,6 @@ async function playR11SpinSound(){
 
     if(!audioCtx) return;
 
-    stopSpinSound();
-
     const now = audioCtx.currentTime;
 
     let tickTime = now + 0.05;
@@ -2625,8 +2623,14 @@ async function playR11SpinSound(){
       const gain =
         audioCtx.createGain();
 
-      const filter =
-        audioCtx.createBiquadFilter();
+  const filter =
+    audioCtx.createBiquadFilter();
+        
+    if(!window.r11SoundNodes){
+      window.r11SoundNodes = [];
+     }
+
+      window.r11SoundNodes.push(osc);
 
       osc.type = 'square';
 
@@ -2680,6 +2684,19 @@ async function playR11SpinSound(){
     );
 
   }
+}
+function stopR11SpinSound(){
+  try{
+    if(window.r11SoundNodes){
+      window.r11SoundNodes.forEach(node=>{
+        try{
+          node.stop();
+        }catch(e){}
+      });
+
+      window.r11SoundNodes = [];
+    }
+  }catch(e){}
 }
 function stopSpinSound(){
   try{
