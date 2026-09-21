@@ -1319,13 +1319,14 @@ function bindHold11(btn,n){
       }
 
       const amt =
-        Math.min(
-          MAX_BET,
-          Math.floor(
-            (performance.now() - start) /
-            POINT_TIME
-          ) + 1
-        );
+  Math.min(
+    MAX_BET,
+    10 +
+    Math.floor(
+      (performance.now() - start) /
+      POINT_TIME
+    ) * 10
+  );
 
       const current =
         bets11[n] || 0;
