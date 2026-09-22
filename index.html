@@ -3368,7 +3368,10 @@ onAuthStateChanged(auth, async (user)=>{
 
     const data = snap.data();
 
-    applyFirestoreBalance(data.points);
+    if (typeof data.points === 'number' && data.points !== balance) {
+  balance = data.points;
+  syncBalance();
+}
   }
 );
 
