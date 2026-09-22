@@ -2356,20 +2356,25 @@ wheel11.style.transform =
       });
 
 
-    const win =
-      (bets11[winner] || 0) *
-      11;
+    const winningBet =
+  Number(bets11[winner] || 0);
+
+const win =
+  winningBet * 11;
 
 
-    if(win > 0){
+if(win > 0){
 
-  balance += win;
-
-  if(window.saveUserBalance){
-    await window.saveUserBalance();
-  }
+  balance =
+    Number(balance || 0) + win;
 
   syncBalance();
+
+  if(window.saveUserBalance){
+
+    await window.saveUserBalance();
+
+  }
 
 }
 
