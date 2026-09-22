@@ -3368,7 +3368,11 @@ onAuthStateChanged(auth, async (user)=>{
 
     const data = snap.data();
 
-    if (typeof data.points === 'number' && data.points !== balance) {
+    if (
+  typeof data.points === 'number' &&
+  !r36Spin &&
+  data.points !== balance
+) {
   balance = data.points;
   syncBalance();
 }
