@@ -1162,26 +1162,26 @@ document.getElementById('wheel36Winner').textContent =
       });
       
           // R36 WINNING PAYOUT
-    const winningBet36 =
-      Number(bets36[winner] || 0);
+const winningBet36 =
+  Number(bets36[winner] || 0);
 
-    const win36 =
-      winningBet36 * 35;
+const win36 =
+  winningBet36 * 35;
 
-    if(win36 > 0){
+if(win36 > 0){
 
-      balance =
-        Number(balance || 0) + win36;
+  balance =
+    Number(balance || 0) + win36;
 
-      syncBalance();
+  syncBalance();
 
-      if(window.saveUserBalance){
+  if(window.saveUserBalance){
 
-        await window.saveUserBalance();
+    window.saveUserBalance();
 
-      }
+  }
 
-    }
+}
     
     // LAST 4 WIN update
     r36Last.push(winner);
