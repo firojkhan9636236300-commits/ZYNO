@@ -2372,10 +2372,23 @@ console.log(
 
 if(win > 0){
 
-  balance =
-    Number(balance || 0) + win;
+  const currentBalance =
+    Number(balance || 0);
+
+  const newBalance =
+    currentBalance + win;
+
+  balance = newBalance;
 
   syncBalance();
+
+  console.log(
+    'R11 WIN BALANCE',
+    'before=', currentBalance,
+    'winningBet=', winningBet,
+    'win=', win,
+    'after=', balance
+  );
 
   if(window.saveUserBalance){
 
