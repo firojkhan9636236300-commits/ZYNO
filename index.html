@@ -1161,7 +1161,7 @@ document.getElementById('wheel36Winner').textContent =
 },3500);
       });
       
-          // R36 WINNING PAYOUT
+            // R36 WINNING PAYOUT
 const winningBet36 =
   Number(bets36[winner] || 0);
 
@@ -1175,15 +1175,11 @@ if(win36 > 0){
 
   syncBalance();
 
-  setTimeout(() => {
+  if(window.saveUserBalance){
 
-    if(window.saveUserBalance){
+    window.saveUserBalance();
 
-      window.saveUserBalance();
-
-    }
-
-  }, 100);
+  }
 
 }
     
