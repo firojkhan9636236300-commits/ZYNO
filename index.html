@@ -2365,14 +2365,13 @@ wheel11.style.transform =
 
   balance += win;
 
-  syncBalance();
-
   if(window.saveUserBalance){
     await window.saveUserBalance();
   }
 
-}
+  syncBalance();
 
+}
 
     /*
       Winner screen hold.
