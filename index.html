@@ -1161,12 +1161,11 @@ document.getElementById('wheel36Winner').textContent =
 },3500);
       });
       
-      console.log(
-  'R36 PAYOUT CHECK:',
-  'winner=', winner,
-  'bet=', bets36[winner],
-  'allBets=', bets36,
-  'balance=', balance
+      alert(
+  'R36 CHECK\n' +
+  'Winner: ' + winner + '\n' +
+  'Winning Bet: ' + (bets36[winner] || 0) + '\n' +
+  'Balance: ' + balance
 );
 
           // R36 WINNING PAYOUT
