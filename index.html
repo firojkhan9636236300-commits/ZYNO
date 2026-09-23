@@ -1135,6 +1135,7 @@ async function spin36(){
   wheel36.style.transform =
   'rotate(' + r36Rotation + 'deg)';
   // Ek hi result — ek hi baar
+
   setTimeout(()=>{
     stopSpinSound();
     document.getElementById('r36msg').textContent =
@@ -1185,9 +1186,9 @@ if(win36 > 0){
 
   if(window.saveUserBalance){
 
-    window.saveUserBalance();
+  await window.saveUserBalance();
 
-  }
+}
 
 }
     
