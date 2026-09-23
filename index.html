@@ -390,6 +390,32 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   box-shadow:0 0 7px rgba(255,211,78,.12);
   touch-action:manipulation;
 }
+.gems-bet-control{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:8px 0 6px;
+}
+
+.gems-bet-control button{
+  width:32px;
+  height:30px;
+  border-radius:7px;
+  border:1px solid rgba(183,155,79,.35);
+  background:linear-gradient(145deg,#303538,#101214);
+  color:#d7c58a;
+  font-size:20px;
+  font-weight:900;
+}
+
+.gems-bet-control span{
+  min-width:35px;
+  text-align:center;
+  color:#fff4d0;
+  font-size:13px;
+  font-weight:900;
+}
 .gems-bet-title{
   text-align:center;
   color:#c9b36a;
@@ -546,13 +572,13 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   <span id="gemsBetLabel">BET 10</span>
 </div>
 
+<div class="gem-grid" id="gemGrid"></div>
 <div class="gems-bet-control">
   <button type="button" id="gemsBetMinus">−</button>
   <span id="gemsBetValue">10</span>
   <button type="button" id="gemsBetPlus">+</button>
 </div>
-<div class="gem-grid" id="gemGrid"></div>
-<div class="gem-grid" id="gemGrid"></div><div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
+<div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
 </section>
 <section id="adminPanel" class="view">
 
