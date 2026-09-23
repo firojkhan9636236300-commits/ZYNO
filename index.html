@@ -1136,7 +1136,7 @@ async function spin36(){
   'rotate(' + r36Rotation + 'deg)';
   // Ek hi result — ek hi baar
 
-  setTimeout(()=>{
+  setTimeout(async ()=>{
     stopSpinSound();
     document.getElementById('r36msg').textContent =
       'WINNING NUMBER: ' + winner;
@@ -1186,9 +1186,9 @@ if(win36 > 0){
 
   if(window.saveUserBalance){
 
-  await window.saveUserBalance();
+    window.saveUserBalance();
 
-}
+ }
 
 }
     
