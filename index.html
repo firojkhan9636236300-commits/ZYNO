@@ -546,34 +546,10 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   <span id="gemsBetLabel">BET 10</span>
 </div>
 
-<div class="gems-bet-title">BET</div>
-
-<div class="gems-bet-list" id="gemsBetList">
-  <button type="button" data-bet="1">1</button>
-  <button type="button" data-bet="2">2</button>
-  <button type="button" data-bet="3">3</button>
-  <button type="button" data-bet="4">4</button>
-  <button type="button" data-bet="5">5</button>
-  <button type="button" data-bet="8">8</button>
-  <button type="button" data-bet="10" class="active">10</button>
-  <button type="button" data-bet="12">12</button>
-  <button type="button" data-bet="15">15</button>
-  <button type="button" data-bet="20">20</button>
-  <button type="button" data-bet="25">25</button>
-  <button type="button" data-bet="30">30</button>
-  <button type="button" data-bet="35">35</button>
-  <button type="button" data-bet="40">40</button>
-  <button type="button" data-bet="50">50</button>
-  <button type="button" data-bet="60">60</button>
-  <button type="button" data-bet="80">80</button>
-  <button type="button" data-bet="100">100</button>
-  <button type="button" data-bet="150">150</button>
-  <button type="button" data-bet="200">200</button>
-  <button type="button" data-bet="250">250</button>
-  <button type="button" data-bet="300">300</button>
-  <button type="button" data-bet="400">400</button>
-  <button type="button" data-bet="500">500</button>
-  <button type="button" data-bet="1000">1000</button>
+<div class="gems-bet-control">
+  <button type="button" id="gemsBetMinus">−</button>
+  <span id="gemsBetValue">10</span>
+  <button type="button" id="gemsBetPlus">+</button>
 </div>
 <div class="gem-grid" id="gemGrid"></div>
 <div class="gem-grid" id="gemGrid"></div><div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
@@ -2984,20 +2960,22 @@ let gemsRound=0,
 gemsBusy=false,
 gemsBet=10;
 
-document.querySelectorAll('#gemsBetList button').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    if(gemsBusy) return;
+document.getElementById('gemsBetMinus').addEventListener('click',()=>{
+  if(gemsBusy) return;
 
-    gemsBet=Number(btn.dataset.bet);
+  gemsBet=Math.max(1,gemsBet-1);
 
-    document.getElementById('gemsBetLabel').textContent=
-      'BET '+gemsBet;
+  document.getElementById('gemsBetValue').textContent=gemsBet;
+  document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
+});
 
-    document.querySelectorAll('#gemsBetList button')
-      .forEach(b=>b.classList.remove('active'));
+document.getElementById('gemsBetPlus').addEventListener('click',()=>{
+  if(gemsBusy) return;
 
-    btn.classList.add('active');
-  });
+  gemsBet=Math.min(1000,gemsBet+1);
+
+  document.getElementById('gemsBetValue').textContent=gemsBet;
+  document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
 });
 
 function makeGem(){
