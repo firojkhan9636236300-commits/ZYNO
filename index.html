@@ -802,7 +802,85 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
       CREATE NEW ACCOUNT
     </button>
      </div>
-    
+<section id="signup" class="view">
+  <div class="panel">
+
+    <h2 style="text-align:center;color:#00e5ff;margin-bottom:6px;">
+      CREATE NEW ACCOUNT
+    </h2>
+
+    <div style="text-align:center;color:#7890aa;font-size:10px;margin-bottom:18px;">
+      Create your ZYNO account
+    </div>
+
+    <input
+      id="signupEmail"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
+      style="width:100%;height:45px;margin-bottom:10px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <input
+      id="signupPassword"
+      type="password"
+      placeholder="Password"
+      autocomplete="new-password"
+      style="width:100%;height:45px;margin-bottom:12px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <div style="color:#ffd34e;font-size:11px;font-weight:900;margin-bottom:8px;">
+      REFERRAL TYPE
+    </div>
+
+    <button
+      type="button"
+      onclick="selectReferralType('system')"
+      id="systemReferralBtn"
+      style="width:100%;height:42px;margin-bottom:8px;border-radius:10px;background:rgba(0,229,255,.12);border:1px solid #00e5ff;color:#00e5ff;font-weight:900;"
+    >
+      SYSTEM REFERRAL
+    </button>
+
+    <button
+      type="button"
+      onclick="selectReferralType('upline')"
+      id="uplineReferralBtn"
+      style="width:100%;height:42px;margin-bottom:10px;border-radius:10px;background:transparent;border:1px solid rgba(0,229,255,.25);color:#7890aa;font-weight:900;"
+    >
+      UPLINE REFERRAL
+    </button>
+
+    <input
+      id="signupReferralCode"
+      type="text"
+      placeholder="Upline Referral Code"
+      style="display:none;width:100%;height:45px;margin-bottom:12px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <button
+      type="button"
+      onclick="createAccount()"
+      style="width:100%;height:45px;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);font-weight:1000;color:#fff;"
+    >
+      CREATE ACCOUNT
+    </button>
+
+    <div
+      id="signupMsg"
+      style="text-align:center;min-height:20px;margin-top:10px;color:#7890aa;font-size:9px;"
+    ></div>
+
+    <button
+      type="button"
+      onclick="showLogin()"
+      style="width:100%;height:38px;margin-top:4px;border-radius:10px;background:transparent;border:0;color:#00e5ff;font-weight:900;"
+    >
+      BACK TO LOGIN
+    </button>
+
+  </div>
+</section>
 </section>
 </div>
 <script>
