@@ -390,7 +390,37 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   box-shadow:0 0 7px rgba(255,211,78,.12);
   touch-action:manipulation;
 }
+.gems-bet-title{
+  text-align:center;
+  color:#c9b36a;
+  font-size:9px;
+  font-weight:900;
+  margin:4px 0 5px;
+}
 
+.gems-bet-list{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:5px;
+  margin-bottom:8px;
+}
+
+.gems-bet-list button{
+  min-height:32px;
+  border-radius:7px;
+  border:1px solid rgba(183,155,79,.35);
+  background:linear-gradient(145deg,#303538,#101214);
+  color:#d7c58a;
+  font-size:11px;
+  font-weight:900;
+  touch-action:manipulation;
+}
+
+.gems-bet-list button.active{
+  border-color:#e5c878;
+  color:#fff4d0;
+  box-shadow:0 0 8px rgba(229,200,120,.25);
+}
 #selectedBet36{
   min-width:35px;
   text-align:center;
@@ -509,7 +539,44 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
  <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">GEMS FORTUNE</div><div style="width:54px"></div></div>
  <div class="rule">VIDEO-INSPIRED CLUSTER / FALLING-GEMS GAME</div>
  <div class="info"><div class="ibox"><small>BALANCE</small><strong id="gemsBal">1,000,000,000</strong></div><div class="ibox"><small>WIN</small><strong id="gemsWin">0</strong></div><div class="ibox"><small>ROUND</small><strong id="gemsRound">READY</strong></div></div>
- <div class="gems-panel"><div class="gems-top"><strong>GEMS FORTUNE</strong><span id="gemsBetLabel">BET 10</span></div><div class="gem-grid" id="gemGrid"></div><div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
+ <div class="gems-panel">
+
+<div class="gems-top">
+  <strong>GEMS FORTUNE</strong>
+  <span id="gemsBetLabel">BET 10</span>
+</div>
+
+<div class="gems-bet-title">BET</div>
+
+<div class="gems-bet-list" id="gemsBetList">
+  <button type="button" data-bet="1">1</button>
+  <button type="button" data-bet="2">2</button>
+  <button type="button" data-bet="3">3</button>
+  <button type="button" data-bet="4">4</button>
+  <button type="button" data-bet="5">5</button>
+  <button type="button" data-bet="8">8</button>
+  <button type="button" data-bet="10" class="active">10</button>
+  <button type="button" data-bet="12">12</button>
+  <button type="button" data-bet="15">15</button>
+  <button type="button" data-bet="20">20</button>
+  <button type="button" data-bet="25">25</button>
+  <button type="button" data-bet="30">30</button>
+  <button type="button" data-bet="35">35</button>
+  <button type="button" data-bet="40">40</button>
+  <button type="button" data-bet="50">50</button>
+  <button type="button" data-bet="60">60</button>
+  <button type="button" data-bet="80">80</button>
+  <button type="button" data-bet="100">100</button>
+  <button type="button" data-bet="150">150</button>
+  <button type="button" data-bet="200">200</button>
+  <button type="button" data-bet="250">250</button>
+  <button type="button" data-bet="300">300</button>
+  <button type="button" data-bet="400">400</button>
+  <button type="button" data-bet="500">500</button>
+  <button type="button" data-bet="1000">1000</button>
+</div>
+<div class="gem-grid" id="gemGrid"></div>
+<div class="gem-grid" id="gemGrid"></div><div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
 </section>
 <section id="adminPanel" class="view">
 
@@ -2916,6 +2983,22 @@ gemGrid=document.getElementById('gemGrid');
 let gemsRound=0,
 gemsBusy=false,
 gemsBet=10;
+
+document.querySelectorAll('#gemsBetList button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(gemsBusy) return;
+
+    gemsBet=Number(btn.dataset.bet);
+
+    document.getElementById('gemsBetLabel').textContent=
+      'BET '+gemsBet;
+
+    document.querySelectorAll('#gemsBetList button')
+      .forEach(b=>b.classList.remove('active'));
+
+    btn.classList.add('active');
+  });
+});
 
 function makeGem(){
  return Math.floor(Math.random()*symbols.length);
