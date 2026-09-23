@@ -37,6 +37,27 @@ button{font:inherit;border:0;cursor:pointer;color:#fff}.hidden{display:none!impo
 .info{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:5px;margin:6px 0}.ibox{padding:7px;border-radius:10px;background:rgba(5,17,31,.82);border:1px solid rgba(0,229,255,.16)}.ibox small{display:block;color:var(--muted);font-size:7px;letter-spacing:1px}.ibox strong{display:block;margin-top:2px;font-size:14px}.timer{font-size:22px!important;color:var(--gold)}.timer.closed{color:var(--red)}.last{display:flex;gap:3px;margin-top:3px}.last span{width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:1000;border:1px solid rgba(255,255,255,.2)}
 /* premium roulette */
 .wheel-area{display:flex;justify-content:center;position:relative;padding:5px 0 9px}
+
+.remove-bet36{
+  position:absolute;
+  left:calc(50% + 135px);
+  top:50%;
+  transform:translateY(-50%);
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:1px solid rgba(255,211,78,.7);
+  background:#101820;
+  color:#ffd34e;
+  font-size:18px;
+  font-weight:900;
+  line-height:36px;
+  padding:0;
+  text-align:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.45);
+  z-index:30;
+  -webkit-tap-highlight-color:transparent;
+}
   .wheel-wrap{
   .wheel-wrap .brand{
   position:absolute;
@@ -439,6 +460,8 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 </div>
  <div>
   <div class="wheel-area">
+    <button type="button" id="removeBet36" class="remove-bet36">X</button>
+    
     <div class="wheel-wrap">
       <div class="pointer"></div>
       <div class="wheel" id="wheel36">
@@ -798,7 +821,7 @@ document.getElementById('betMinus36').addEventListener('click',()=>{
 });
 const redNums=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
 const wheelNums=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
-const wheel36=document.getElementById('wheel36'),grid36=document.getElementById('grid36');let bets36={},r36Open=true,r36Time=30,r36Spin=false,r36Rotation=0,r36Last=[];
+const wheel36=document.getElementById('wheel36'),grid36=document.getElementById('grid36');let bets36={},r36Open=true,r36Time=30,r36Spin=false,r36Rotation=0,r36Last=[];let selectedNumber36 = null;
 
 const R36_ROUND_MS = 30000;
 const R36_ROUND_KEY = 'zynoR36RoundEnd';
@@ -864,6 +887,10 @@ function disableLongPressMenu(btn){
 function bindHold36(btn,n){
   disableLongPressMenu(btn);
 
+  btn.addEventListener('pointerdown',()=>{
+    selectedNumber36 = n;
+  });
+
   let holdTimer=null;
   let holding=false;
 
@@ -874,8 +901,19 @@ function bindHold36(btn,n){
     const current=bets36[n]||0;
 
     if(current>=MAX_BET)return;
+    
+const maxAdd =
+  Math.min(
+    betAmount,
+    MAX_BET - current
+  );
+    
 
-    const newBet=Math.min(MAX_BET,current+betAmount);
+    const newBet =
+  Math.min(
+    MAX_BET,
+    current + maxAdd
+  );
     const add=newBet-current;
 
     if(balance<add){
@@ -953,6 +991,38 @@ function bindHold36(btn,n){
   btn.addEventListener('pointerleave',stopHold);
 }
 function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?money(n):''}
+
+document.getElementById('removeBet36').addEventListener('click',()=>{
+  if(r36Spin)return;
+
+  if(selectedNumber36 === null)return;
+
+  const amount = Number(bets36[selectedNumber36] || 0);
+
+  if(amount <= 0)return;
+
+  balance += amount;
+
+  bets36[selectedNumber36] = 0;
+
+  const btn = grid36.querySelector(
+    '.bet-number[data-n="' + selectedNumber36 + '"]'
+  );
+
+  if(btn){
+    updateCount36(btn,0);
+    btn.classList.remove('active');
+  }
+
+  syncBalance();
+
+  if(window.saveUserBalance){
+    window.saveUserBalance();
+  }
+
+  selectedNumber36 = null;
+});
+
 function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
 function tickR36(){
 
