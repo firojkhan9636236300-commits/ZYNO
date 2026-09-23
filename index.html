@@ -1173,6 +1173,9 @@ if(win36 > 0){
 
   balance =
     Number(balance || 0) + win36;
+    
+  window.r36SavingWin = true;
+  window.r36WinBalance = balance;
 
   syncBalance();
 
@@ -3373,11 +3376,13 @@ onAuthStateChanged(auth, async (user)=>{
 
     const data = snap.data();
 
-    if (
+     if (
   typeof data.points === 'number' &&
   !r36Spin &&
-  data.points !== balance
-) {
+  data.points !== balance &&
+  !window.r36SavingWin
+)
+    {
   balance = data.points;
   syncBalance();
 }
@@ -3398,6 +3403,11 @@ let balanceSaveQueue = Promise.resolve();
 
 window.saveUserBalance = function(){
 
+  const balanceToSave =
+  Math.max(
+    0,
+    Math.floor(balance)
+  );
   const save = async()=>{
 
     try{
@@ -3418,11 +3428,7 @@ window.saveUserBalance = function(){
       const userRef =
         doc(db, 'users', user.uid);
 
-      const savedBalance =
-  Math.max(
-    0,
-    Math.floor(balance)
-  );
+      const savedBalance = balanceToSave;
 
 await updateDoc(
   userRef,
@@ -3431,8 +3437,14 @@ await updateDoc(
   }
 );
 
-balance = savedBalance;
-syncBalance();
+if(Math.floor(balance) === savedBalance){
+  syncBalance();
+}
+
+if(window.r36SavingWin){
+   window.r36SavingWin = false;
+   window.r36WinBalance = null;
+ }
 
       console.log(
         'User balance saved:',
