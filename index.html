@@ -885,7 +885,59 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 </div>
 <script>
 'use strict';
+let signupReferralType = 'system';
 
+window.selectReferralType = function(type){
+
+  signupReferralType = type;
+
+  const systemBtn =
+    document.getElementById('systemReferralBtn');
+
+  const uplineBtn =
+    document.getElementById('uplineReferralBtn');
+
+  const referralInput =
+    document.getElementById('signupReferralCode');
+
+  if(type === 'system'){
+
+    systemBtn.style.background =
+      'rgba(0,229,255,.12)';
+    systemBtn.style.border =
+      '1px solid #00e5ff';
+    systemBtn.style.color =
+      '#00e5ff';
+
+    uplineBtn.style.background =
+      'transparent';
+    uplineBtn.style.border =
+      '1px solid rgba(0,229,255,.25)';
+    uplineBtn.style.color =
+      '#7890aa';
+
+    referralInput.style.display = 'none';
+    referralInput.value = '';
+
+  }else{
+
+    uplineBtn.style.background =
+      'rgba(0,229,255,.12)';
+    uplineBtn.style.border =
+      '1px solid #00e5ff';
+    uplineBtn.style.color =
+      '#00e5ff';
+
+    systemBtn.style.background =
+      'transparent';
+    systemBtn.style.border =
+      '1px solid rgba(0,229,255,.25)';
+    systemBtn.style.color =
+      '#7890aa';
+
+    referralInput.style.display = 'block';
+  }
+};
 const START_BALANCE=1000000000,MAX_BET=5500,POINT_TIME=100;
 var globalLastWins36=[];
 var globalLastWins11=[];
