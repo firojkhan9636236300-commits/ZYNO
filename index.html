@@ -4097,18 +4097,18 @@ window.createAccount = async function(){
 };
 window.showSignup = function(){
 
-  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('login').classList.remove('active');
 
-  document.getElementById('signupScreen').style.display = 'block';
+  document.getElementById('signup').classList.add('active');
 
 };
 
 
 window.showLogin = function(){
 
-  document.getElementById('signupScreen').style.display = 'none';
+  document.getElementById('signup').classList.remove('active');
 
-  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('login').classList.add('active');
 
 };
 
