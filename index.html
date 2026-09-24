@@ -479,7 +479,23 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 
 <section id="home" class="view active">
  <div class="home-title"><h1>ZYNO GAMES</h1><p>3 games • clean standalone build</p></div>
- <div class="cards">
+ <div style="display:flex;gap:10px;margin:0 0 15px 0;">
+  <button
+    onclick="showLogin()"
+    style="flex:1;height:42px;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);border:1px solid rgba(0,229,255,.35);font-weight:1000;color:#fff;"
+  >
+    LOGIN
+  </button>
+
+  <button
+    onclick="showSignup()"
+    style="flex:1;height:42px;border-radius:10px;background:transparent;border:1px solid rgba(0,229,255,.35);font-weight:1000;color:#00e5ff;"
+  >
+    CREATE ACCOUNT
+  </button>
+</div>
+
+<div class="cards">
   <button class="game-card gold" onclick="openGame('r36')"><div class="game-icon">🎰</div><h2>ROULETTE 0–36</h2><p>Premium 3D roulette • 30 sec betting • 35:1</p><span class="play">PLAY</span></button>
   <button class="game-card" onclick="openGame('r11')"><div class="game-icon">🎯</div><h2>ROULETTE 0–11</h2><p>Fast 0–11 number roulette • 30 sec betting</p><span class="play">PLAY</span></button>
   <button class="game-card purple" onclick="openGame('gems')"><div class="game-icon">💎</div><h2>GEMS FORTUNE</h2><p>Video-inspired falling gems / cluster game</p><span class="play">PLAY</span></button>
@@ -3428,13 +3444,7 @@ try{
 try{
   const savedView = localStorage.getItem('zynoActiveView');
 
-  if(
-    savedView &&
-    savedView !== 'home' &&
-    document.getElementById(savedView)
-  ){
-    openGame(savedView);
-  }
+localStorage.removeItem('zynoActiveView');
 }catch(e){}
 </script>
 <script type="module">
