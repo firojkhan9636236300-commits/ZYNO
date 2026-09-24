@@ -3635,9 +3635,16 @@ onAuthStateChanged(auth, async (user)=>{
   balanceLoadedFromFirestore = false;
 
   if(!user){
-    window.zynoIsAdmin = false;
-    return;
-  }
+  window.zynoIsAdmin = false;
+
+  document.querySelectorAll('.view').forEach(v =>
+    v.classList.remove('active')
+  );
+
+  document.getElementById('home').classList.add('active');
+
+  return;
+}
 
   try{
 
