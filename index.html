@@ -4085,6 +4085,23 @@ window.createAccount = async function(){
     msg.style.color = '#ff5360';
   }
 };
+window.showSignup = function(){
+
+  document.getElementById('loginScreen').style.display = 'none';
+
+  document.getElementById('signupScreen').style.display = 'block';
+
+};
+
+
+window.showLogin = function(){
+
+  document.getElementById('signupScreen').style.display = 'none';
+
+  document.getElementById('loginScreen').style.display = 'block';
+
+};
+
 async function loadAdminUsers(){
 
   const usersBox = document.getElementById('adminUsers');
