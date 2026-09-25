@@ -482,7 +482,7 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
  <div style="display:flex;gap:10px;margin:0 0 15px 0;">
 
   <button
-    onclick="showSignup()"
+    onclick="document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('signup').classList.add('active');"
     style="flex:1;height:42px;border-radius:10px;background:transparent;border:1px solid rgba(0,229,255,.35);font-weight:1000;color:#00e5ff;"
   >
     CREATE ACCOUNT
