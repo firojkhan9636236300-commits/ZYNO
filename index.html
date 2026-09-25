@@ -4167,33 +4167,87 @@ async function loadAdminUsers(){
   }
 }
 
-Is poore current block ko hatao aur upar wala poora block paste karo.
-Uske baad Commit Changes karo. फिर CREATE ACCOUNT test karenge.
+async function loadAdminUsers(){
+
+  const usersBox =
+    document.getElementById('adminUsers');
+
+  if(!usersBox) return;
+
+  usersBox.innerHTML = `
+    <div style="
+      text-align:center;
+      color:#ffd34e;
+      font-size:10px;
+      padding:15px;
+    ">
+      Users loading...
+    </div>
+  `;
+
+  try{
+
+    const usersSnap =
+      await getDocs(
+        collection(db, 'users')
+      );
+
+    if(usersSnap.empty){
+
+      usersBox.innerHTML = `
+        <div style="
+          text-align:center;
+          color:#7890aa;
+          font-size:10px;
+          padding:15px;
+        ">
+          कोई user नहीं मिला
+        </div>
+      `;
+
+      return;
+    }
 
     let html = '';
-    const shownUids = new Set();
 
-    usersSnap.forEach((userDoc) => {
+    const shownUids =
+      new Set();
 
-      const data = userDoc.data();
+    usersSnap.forEach((userDoc)=>{
 
-      const currentUid = data.uid || userDoc.id;
+      const data =
+        userDoc.data();
 
-      if(shownUids.has(currentUid)){
+      const currentUid =
+        data.uid || userDoc.id;
+
+      if(
+        shownUids.has(currentUid)
+      ){
         return;
       }
 
       shownUids.add(currentUid);
 
-      let email = data.email || 'No Email';
+      let email =
+        data.email || 'No Email';
 
-      if(currentUid === 'nPAn3k3fFmZWAqskELhEtW8sk332'){
-        email = 'Firojkhan9636236300@gmail.com';
+      if(
+        currentUid ===
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+      ){
+
+        email =
+          'Firojkhan9636236300@gmail.com';
+
       }
 
-      const points = money(data.points || 0);
-      const role = data.role || 'user';
-      
+      const points =
+        money(data.points || 0);
+
+      const role =
+        data.role || 'user';
+
 
       html += `
         <div style="
@@ -4229,18 +4283,18 @@ Uske baad Commit Changes karo. फिर CREATE ACCOUNT test karenge.
           </div>
 
           <div
-  onclick="openAdminUser('${currentUid}')"
-  style="
-    color:#00e5ff;
-    font-size:8px;
-    margin-top:4px;
-    word-break:break-all;
-    cursor:pointer;
-    text-decoration:underline;
-  "
->
-  UID: ${currentUid}
-</div>
+            onclick="openAdminUser('${currentUid}')"
+            style="
+              color:#00e5ff;
+              font-size:8px;
+              margin-top:4px;
+              word-break:break-all;
+              cursor:pointer;
+              text-decoration:underline;
+            "
+          >
+            UID: ${currentUid}
+          </div>
 
           ${
             role !== 'admin'
@@ -4307,11 +4361,14 @@ Uske baad Commit Changes karo. फिर CREATE ACCOUNT test karenge.
       `;
     });
 
-    usersBox.innerHTML = html;
+    usersBox.innerHTML =
+      html;
 
   }catch(error){
 
-    console.error(error);
+    console.error(
+      error
+    );
 
     usersBox.innerHTML = `
       <div style="
@@ -4323,123 +4380,285 @@ Uske baad Commit Changes karo. फिर CREATE ACCOUNT test karenge.
         Users load नहीं हुए
       </div>
     `;
+
   }
+
 }
 
-loadAdminUsers();
-window.adminAddPoints = async function(userUid){
+
+window.adminAddPoints =
+  async function(userUid){
 
   try{
 
-    if(!auth.currentUser ||
-       auth.currentUser.uid !== 'nPAn3k3fFmZWAqskELhEtW8sk332'){
-      alert('Admin access नहीं है');
+    if(
+      !auth.currentUser ||
+      auth.currentUser.uid !==
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+    ){
+
+      alert(
+        'Admin access नहीं है'
+      );
+
       return;
     }
 
-    const input = document.getElementById(`points_${userUid}`);
-    const amount = Number(input?.value);
 
-    if(!Number.isFinite(amount) || amount <= 0){
-      alert('Valid points amount डालें');
+    const input =
+      document.getElementById(
+        `points_${userUid}`
+      );
+
+    const amount =
+      Number(
+        input?.value
+      );
+
+
+    if(
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ){
+
+      alert(
+        'Valid points amount डालें'
+      );
+
       return;
     }
 
-    const userRef = doc(db, 'users', userUid);
-    const userSnap = await getDoc(userRef);
 
-    if(!userSnap.exists()){
-      alert('User नहीं मिला');
+    const userRef =
+      doc(
+        db,
+        'users',
+        userUid
+      );
+
+    const userSnap =
+      await getDoc(
+        userRef
+      );
+
+
+    if(
+      !userSnap.exists()
+    ){
+
+      alert(
+        'User नहीं मिला'
+      );
+
       return;
     }
 
-    const data = userSnap.data();
 
-    if(data.role === 'admin'){
-      alert('Admin points change नहीं कर सकते');
+    const data =
+      userSnap.data();
+
+
+    if(
+      data.role === 'admin'
+    ){
+
+      alert(
+        'Admin points change नहीं कर सकते'
+      );
+
       return;
     }
 
-    const oldPoints = Number(data.points || 0);
-    const newPoints = oldPoints + amount;
 
-    await updateDoc(userRef, {
-      points: newPoints
-    });
+    const oldPoints =
+      Number(
+        data.points || 0
+      );
+
+    const newPoints =
+      oldPoints + amount;
+
+
+    await updateDoc(
+      userRef,
+      {
+        points:
+          newPoints
+      }
+    );
+
 
     input.value = '';
 
-    alert(`${money(amount)} points ADD हो गए`);
+
+    alert(
+      `${money(amount)} points ADD हो गए`
+    );
+
 
     await loadAdminUsers();
 
+
   }catch(error){
 
-    console.error(error);
-    alert('Points ADD नहीं हुए');
+    console.error(
+      error
+    );
+
+    alert(
+      'Points ADD नहीं हुए'
+    );
+
   }
+
 };
 
 
-window.adminRemovePoints = async function(userUid){
+window.adminRemovePoints =
+  async function(userUid){
 
   try{
 
-    if(!auth.currentUser ||
-       auth.currentUser.uid !== 'nPAn3k3fFmZWAqskELhEtW8sk332'){
-      alert('Admin access नहीं है');
+    if(
+      !auth.currentUser ||
+      auth.currentUser.uid !==
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+    ){
+
+      alert(
+        'Admin access नहीं है'
+      );
+
       return;
     }
 
-    const input = document.getElementById(`points_${userUid}`);
-    const amount = Number(input?.value);
 
-    if(!Number.isFinite(amount) || amount <= 0){
-      alert('Valid points amount डालें');
+    const input =
+      document.getElementById(
+        `points_${userUid}`
+      );
+
+    const amount =
+      Number(
+        input?.value
+      );
+
+
+    if(
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ){
+
+      alert(
+        'Valid points amount डालें'
+      );
+
       return;
     }
 
-    const userRef = doc(db, 'users', userUid);
-    const userSnap = await getDoc(userRef);
 
-    if(!userSnap.exists()){
-      alert('User नहीं मिला');
+    const userRef =
+      doc(
+        db,
+        'users',
+        userUid
+      );
+
+    const userSnap =
+      await getDoc(
+        userRef
+      );
+
+
+    if(
+      !userSnap.exists()
+    ){
+
+      alert(
+        'User नहीं मिला'
+      );
+
       return;
     }
 
-    const data = userSnap.data();
 
-    if(data.role === 'admin'){
-      alert('Admin points change नहीं कर सकते');
+    const data =
+      userSnap.data();
+
+
+    if(
+      data.role === 'admin'
+    ){
+
+      alert(
+        'Admin points change नहीं कर सकते'
+      );
+
       return;
     }
 
-    const oldPoints = Number(data.points || 0);
 
-    if(amount > oldPoints){
-      alert(`User के पास सिर्फ ${money(oldPoints)} points हैं`);
+    const oldPoints =
+      Number(
+        data.points || 0
+      );
+
+
+    if(
+      amount > oldPoints
+    ){
+
+      alert(
+        `User के पास सिर्फ ${money(oldPoints)} points हैं`
+      );
+
       return;
     }
 
-    const newPoints = oldPoints - amount;
 
-    await updateDoc(userRef, {
-      points: newPoints
-    });
+    const newPoints =
+      oldPoints - amount;
+
+
+    await updateDoc(
+      userRef,
+      {
+        points:
+          newPoints
+      }
+    );
+
 
     input.value = '';
 
-    alert(`${money(amount)} points REMOVE हो गए`);
+
+    alert(
+      `${money(amount)} points REMOVE हो गए`
+    );
+
 
     await loadAdminUsers();
 
+
   }catch(error){
 
-    console.error(error);
-    alert('Points REMOVE नहीं हुए');
+    console.error(
+      error
+    );
+
+    alert(
+      'Points REMOVE नहीं हुए'
+    );
+
   }
+
 };
-  console.log("ZYNO Firebase Connected");
+
+
+console.log(
+  "ZYNO Firebase Connected"
+);
+
 </script>
 </body>
 </html>
