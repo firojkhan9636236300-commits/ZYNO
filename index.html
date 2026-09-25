@@ -4000,6 +4000,15 @@ window.createAccount = async function(){
   }
 };
 window.showSignup = function(){
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('signupScreen').style.display = 'block';
+};
+
+window.showLogin = function(){
+  document.getElementById('signupScreen').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'block';
+};
+window.showSignup = function(){
 
   document.getElementById('login').classList.remove('active');
 
