@@ -4000,12 +4000,32 @@ window.createAccount = async function(){
   }
 };
 window.showSignup = function(){
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('signupScreen').style.display = 'block';
+
+  document
+    .querySelectorAll('.view')
+    .forEach(v =>
+      v.classList.remove('active')
+    );
+
+  document
+    .getElementById('signup')
+    .classList.add('active');
+
 };
+
+
 window.showLogin = function(){
-  document.getElementById('signupScreen').style.display = 'none';
-  document.getElementById('loginScreen').style.display = 'block';
+
+  document
+    .querySelectorAll('.view')
+    .forEach(v =>
+      v.classList.remove('active')
+    );
+
+  document
+    .getElementById('login')
+    .classList.add('active');
+
 };
 async function loadAdminUsers(){
   const usersBox = document.getElementById('adminUsers');
