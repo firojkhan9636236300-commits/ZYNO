@@ -3988,6 +3988,14 @@ window.createAccount = async function(){
     msg.textContent =
       'Account successfully created ✓';
     msg.style.color = '#55f0b4';
+    
+    setTimeout(()=>{
+  document.querySelectorAll('.view').forEach(v =>
+    v.classList.remove('active')
+  );
+
+  document.getElementById('home').classList.add('active');
+},1000);
 
   }catch(error){
 
