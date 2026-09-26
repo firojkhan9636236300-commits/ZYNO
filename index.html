@@ -4121,6 +4121,9 @@ if(signupReferralType==='upline'){
         email: user.email,
         points: 0,
         role: 'user',
+        myReferralCode:
+           'ZYNO-' +
+          user.uid.slice(0,6).toUpperCase(),
         referralType: signupReferralType,
         referralCode:
           signupReferralType === 'upline'
