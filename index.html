@@ -4071,7 +4071,38 @@ window.createAccount = async function(){
   msg.style.color = '#ffd34e';
 
   try{
+    
+if(signupReferralType==='upline'){
 
+  const usersSnap=await getDocs(
+    collection(db,'users')
+  );
+
+  const enteredCode=referralCode.trim().toUpperCase();
+
+  let uplineUser=null;
+
+  usersSnap.forEach(userDoc=>{
+    const data=userDoc.data();
+
+    if(
+      String(data.myReferralCode||'').toUpperCase() === enteredCode
+    ){
+      uplineUser={
+        uid:userDoc.id,
+        data:data
+      };
+    }
+  });
+
+  if(!uplineUser){
+    msg.textContent='Invalid Upline Referral Code';
+    return;
+  }
+
+  window.signupUplineUid=uplineUser.uid;
+  window.signupUplineCode=enteredCode;
+}
     const credential =
       await createUserWithEmailAndPassword(
         auth,
