@@ -4129,6 +4129,13 @@ if(signupReferralType==='upline'){
           signupReferralType === 'upline'
             ? referralCode
             : 'ZYNO-SYSTEM',
+referralType:signupReferralType,
+referralCode:signupReferralType==='upline'?referralCode:'ZYNO-SYSTEM',
+uplineUid:
+  signupReferralType==='upline'
+    ? window.signupUplineUid
+    : null,
+createdAt:new Date()
         createdAt: new Date()
       }
     );
