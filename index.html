@@ -1021,6 +1021,41 @@ function syncBalance(){
   document.getElementById('r11bal').textContent=money(balance);
   document.getElementById('gemsBal').textContent=money(balance);
 }
+
+async function loadMyReferralCode(){
+
+  const user = auth.currentUser;
+
+  if(!user) return;
+
+  try{
+
+    const userRef = doc(db,'users',user.uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()) return;
+
+    const data = snap.data();
+
+    const code = data.myReferralCode || '—';
+
+    const box = document.getElementById('myReferCode');
+
+    if(box){
+      box.textContent = code;
+    }
+
+  }catch(error){
+
+    console.error(
+      'Referral code load error:',
+      error
+    );
+
+  }
+
+}
+
 function openGame(id){
 
   // ADMIN PANEL — ADMIN ONLY
@@ -3969,8 +4004,8 @@ window.loginUser = async function(){
     }
 
     // NORMAL USER LOGIN
-    if(data.role === 'user')
-    {
+    if(data.role === 'user'){
+      loadMyReferralCode();
       window.zynoIsAdmin = false;
       
       balance = Number(data.points || 0);
