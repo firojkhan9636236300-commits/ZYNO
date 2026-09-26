@@ -1,0 +1,4449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="theme-color" content="#030913">
+<title>ZYNO — Games</title>
+<style>
+.win-points-text{
+  color:#e5c878;
+  font-weight:900;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+
+.win-amount-text{
+  color:#fff4d0;
+  font-weight:900;
+  text-shadow:0 1px 4px rgba(0,0,0,.7);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--bg:#030913;--panel:#071426;--panel2:#0b1d34;--blue:#00e5ff;--gold:#ffd34e;--red:#e53945;--green:#16c784;--muted:#7890aa}
+html,body{min-height:100%;background:radial-gradient(circle at 50% -10%,#12345a 0,#061120 35%,#02070e 75%);color:#fff;font-family:Arial,Helvetica,sans-serif}
+body{overflow-x:hidden}.app{width:min(100%,560px);min-height:100vh;margin:auto;padding:max(10px,env(safe-area-inset-top)) 10px max(28px,env(safe-area-inset-bottom))}
+button{font:inherit;border:0;cursor:pointer;color:#fff}.hidden{display:none!important}
+.brand{
+  font-weight:1000;
+  letter-spacing:3px;
+  font-size:20px;
+  color:var(--blue);
+  text-shadow:0 0 12px rgba(0,229,255,.65);
+}
+.balance{padding:8px 11px;border:1px solid rgba(255,211,78,.35);border-radius:12px;background:rgba(5,17,31,.86);text-align:right}.balance small{display:block;color:var(--muted);font-size:7px;letter-spacing:1px}.balance strong{color:var(--gold);font-size:14px}
+.view{display:none}.view.active{display:block}.home-title{text-align:center;padding:8px 0 12px}.home-title h1{font-size:28px;letter-spacing:2px}.home-title p{color:var(--muted);font-size:10px;margin-top:4px}
+.cards{display:grid;gap:10px}.game-card{width:100%;min-height:125px;text-align:left;border-radius:18px;padding:15px;border:1px solid rgba(0,229,255,.25);background:linear-gradient(145deg,#0d2846,#05101e);box-shadow:inset 0 0 22px rgba(0,0,0,.45),0 7px 20px rgba(0,0,0,.25);position:relative;overflow:hidden}.game-card:active{transform:scale(.985)}
+.game-card.gold{border-color:rgba(255,211,78,.4)}.game-card.purple{border-color:rgba(166,104,255,.42)}.game-icon{font-size:36px}.game-card h2{margin-top:5px;font-size:18px}.game-card p{color:var(--muted);font-size:10px;margin-top:3px}.play{position:absolute;right:14px;bottom:13px;padding:8px 13px;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);font-size:10px;font-weight:1000;box-shadow:0 0 12px rgba(0,229,255,.18)}
+.game-head{display:flex;align-items:center;justify-content:space-between;margin:3px 0 7px}.back{padding:8px 11px;border-radius:10px;background:#071525;border:1px solid rgba(0,229,255,.2);font-size:10px}.game-name{font-weight:1000;letter-spacing:1px;color:var(--gold);font-size:15px}.rule{color:var(--muted);font-size:8px;text-align:center;margin-bottom:5px}
+.info{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:5px;margin:6px 0}.ibox{padding:7px;border-radius:10px;background:rgba(5,17,31,.82);border:1px solid rgba(0,229,255,.16)}.ibox small{display:block;color:var(--muted);font-size:7px;letter-spacing:1px}.ibox strong{display:block;margin-top:2px;font-size:14px}.timer{font-size:22px!important;color:var(--gold)}.timer.closed{color:var(--red)}.last{display:flex;gap:3px;margin-top:3px}.last span{width:21px;height:21px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:1000;border:1px solid rgba(255,255,255,.2)}
+/* premium roulette */
+.wheel-area{display:flex;justify-content:center;position:relative;padding:5px 0 9px}
+
+.remove-bet36{
+  position:absolute;
+  left:calc(50% + 135px);
+  top:90%;
+  transform:translateY(-50%);
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  border:1px solid rgba(255,211,78,.7);
+  background:#101820;
+  color:#ffd34e;
+  font-size:18px;
+  font-weight:900;
+  line-height:36px;
+  padding:0;
+  text-align:center;
+  box-shadow:0 3px 10px rgba(0,0,0,.45);
+  z-index:30;
+  -webkit-tap-highlight-color:transparent;
+}
+  .wheel-wrap{
+  .wheel-wrap .brand{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:20;
+  margin:0;
+}
+  width:250px;
+  height:250px;
+  min-width:250px;
+  min-height:250px;
+  border-radius:50%;
+  padding:15px;
+  background:
+    radial-gradient(
+      circle,
+      #171a1d 0 63%,
+      #cda73c 64% 66%,
+      #3b321b 67% 70%,
+      #d8b95a 71% 73%,
+      #171a1d 74% 100%
+    );
+  border:1px solid #8f7430;
+  box-shadow:
+    0 0 12px rgba(255,211,78,.25),
+    inset 0 0 10px rgba(255,255,255,.08),
+    0 8px 22px rgba(0,0,0,.45);
+  position:relative;
+}.wheel{width:100%;height:100%;border-radius:50%;position:relative;overflow:hidden;border:8px solid #cda73c;background:repeating-conic-gradient(#b71f2c 0 9.73deg,#0b1118 9.73deg 19.46deg);transition:transform 5.8s cubic-bezier(.12,.72,.12,1);box-shadow:inset 0 0 18px #000}.wheel:before{content:"";position:absolute;inset:0;border-radius:50%;border:0;box-shadow:inset 0 0 25px #000;z-index:3}
+.r36-brand-center{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  z-index:20;
+  width:60px;
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--blue);
+  font-weight:1000;
+  letter-spacing:1px;
+  font-size:16px;
+  text-shadow:0 0 10px rgba(0,229,255,.55);
+  pointer-events:none;
+}
+.wheel-center-win{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  background:
+  radial-gradient(
+    circle at 35% 28%,
+    text-shadow:
+  0 1px 1px #000;
+    #d94a55 18%,
+    #8f1f29 48%,
+    #3b0b10 72%,
+    #090405 100%
+  );
+
+border:2px solid #ff6b73;
+
+  box-shadow:
+  inset 3px 3px 5px rgba(255,255,255,.25),
+  inset -5px -6px 8px rgba(0,0,0,.75);
+
+  color:#00e5ff;
+  font-size:18px;
+  font-weight:1000;
+
+    text-shadow:
+    0 1px 1px #000,
+    0 0 6px rgba(255,255,255,.65);
+
+  z-index:10;
+  pointer-events:none;
+}
+ .pointer{position:absolute;top:-2px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:11px solid transparent;border-right:11px solid transparent;border-top:24px solid #fff;filter:drop-shadow(0 0 5px #ffd34e);z-index:20} .number{position:absolute;left:50%;top:50%;font-size:13px;font-weight:1000;transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-84px)rotate(calc(-1 * var(--angle)));z-index:5;color:#fff;text-shadow:0 1px 2px #000}.number.zero{color:#55f0b4}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding-bottom:10px}.bet-number{
+  min-height:43px;
+  -webkit-user-select:none !important;
+  user-select:none !important;
+  -webkit-touch-callout:none !important;
+  -webkit-user-drag:none !important;
+  border-radius:8px;background:linear-gradient(145deg,#102945,#071322);border:1px solid rgba(255,255,255,.12);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:15px;font-weight:1000;touch-action:none;user-select:none}.bet-number.red{color:#ff5360}.bet-number.black{color:#fff}.bet-number.zero{color:#55f0b4;border-color:rgba(22,199,132,.4)}.bet-number.active{border-color:var(--blue);box-shadow:0 0 10px rgba(0,229,255,.35);transform:scale(.96)}.bet-count{color:#ff9f1c;font-size:8px;min-height:10px}.bet-number.winner{border-color:var(--gold);box-shadow:0 0 17px rgba(255,211,78,.7)}
+.action{width:100%;min-height:44px;border-radius:12px;background:linear-gradient(145deg,#3a3a36,#171715);font-weight:1000;letter-spacing:.6px;margin-top:3px}.message{text-align:center;min-height:22px;color:var(--muted);font-size:9px;padding:5px}
+/* 0-11 */
+.z11-wheel-wrap{
+  position:relative;
+  width:220px;
+  height:220px;
+  margin:5px auto 10px;
+}
+
+.z11-wheel-wrap .z11-wheel{
+  width:100%;
+  height:100%;
+  margin:0;
+}
+
+.z11-pointer{
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:9px solid transparent;
+  border-right:9px solid transparent;
+  border-top:18px solid #ffd34e;
+  z-index:20;
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,.7));
+  pointer-events:none;
+}
+.z11-wheel{width:220px;height:220px;margin:5px auto 10px;border-radius:50%;border:8px solid #cda73c;background:repeating-conic-gradient(#b71f2c 0 30deg,#0b1118 30deg 60deg);position:relative;box-shadow:0 0 25px rgba(255,211,78,.2),inset 0 0 25px #000}.z11-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:78px;height:78px;border-radius:50%;background:radial-gradient(circle,#164d69,#06101b 70%);border:2px solid #ffd34e;display:flex;align-items:center;justify-content:center;font-weight:1000;color:#ffd34e}.z11n{position:absolute;left:50%;top:50%;font-size:13px;font-weight:1000;transform:translate(-50%,-50%) rotate(var(--a)) translateY(-84px) rotate(calc(-1 * var(--a)))}
+/* Gems Fortune */
+.gems-panel{position:relative;border-radius:18px;padding:10px;background:linear-gradient(145deg,#10161a,#050708);border:1px solid rgba(183,155,79,.35);box-shadow:inset 0 0 25px rgba(0,0,0,.6)}.gems-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.gems-top strong{color:#e5c878;font-size:13px}.gems-top span{font-size:10px;color:#c9b36a}.gem-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;min-height:320px}.gem{aspect-ratio:1;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:22px;background:linear-gradient(145deg,#15304b,#081321);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 -6px 10px rgba(0,0,0,.35);transition:.18s}.gem.pop{transform:scale(.5);opacity:0}.gem.g1{color:#62e6ff}.gem.g2{color:#ff70a6}.gem.g3{color:#ffd34e}.gem.g4{color:#a984ff}.gem.g5{color:#54e39a}.gem.g6{color:#ff945e}.gem-note{text-align:center;color:#7f8587;font-size:8px;margin:8px 0}.gem-win{text-align:center;min-height:25px;color:#d7c58a;font-weight:1000;font-size:12px}
+.gem-big-win{
+ position:absolute;
+ left:50%;
+ top:50%;
+ transform:translate(-50%,-50%);
+ z-index:20;
+ pointer-events:none;
+ font-size:30px;
+ font-weight:1000;
+ color:#fff;
+ text-shadow:0 1px 4px rgba(0,0,0,.8);
+ opacity:0;
+ white-space:nowrap;
+}
+
+.gem-big-win.show{
+ animation:gemWinShow .9s ease-out forwards;
+}
+
+@keyframes gemWinShow{
+ 0%{opacity:0;transform:translate(-50%,-35%) scale(.6)}
+ 25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
+ 70%{opacity:1;transform:translate(-50%,-55%) scale(1)}
+ 100%{opacity:0;transform:translate(-50%,-70%) scale(1.05)}
+}
+.gem-trophy{
+  position:absolute;
+  left:50%;
+  top:38%;
+  transform:translate(-50%,-50%) scale(.5);
+  z-index:25;
+  pointer-events:none;
+  font-size:58px;
+  opacity:0;
+}
+
+.gem-trophy.show{
+  animation:trophyShow 1.1s ease-out forwards;
+}
+
+@keyframes trophyShow{
+  0%{
+    opacity:0;
+    transform:translate(-50%,-50%) scale(.4) rotate(-12deg);
+  }
+  25%{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1.2) rotate(6deg);
+  }
+  55%{
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1) rotate(0);
+  }
+  100%{
+    opacity:0;
+    transform:translate(-50%,-70%) scale(1.05);
+  }
+}
+.gem.pop{
+ animation:gemPop .35s ease forwards;
+}
+
+.gem.drop{
+animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
+}
+
+.gem.new{
+ animation:gemNew .18s cubic-bezier(.2,.9,.3,1) both;
+}
+
+@keyframes gemPop{
+ 0%{transform:scale(1);opacity:1}
+ 45%{transform:scale(1.22);opacity:1}
+ 100%{transform:scale(.05);opacity:0}
+}
+
+@keyframes gemDrop{
+ 0%{transform:translateY(-18px);opacity:.2}
+ 100%{transform:translateY(0);opacity:1}
+}
+
+@keyframes gemNew{
+ 0%{transform:translateY(-90px) scale(.7);opacity:0}
+ 70%{transform:translateY(8px) scale(1.05);opacity:1}
+ 100%{transform:translateY(0) scale(1);opacity:1}
+}
+.gem{
+ position:relative;
+ font-size:27px;
+ font-weight:1000;
+ border-radius:11px;
+ background:linear-gradient(145deg,#303538,#101214);
+ box-shadow:
+   inset 0 2px 4px rgba(255,255,255,.18),
+   inset 0 -7px 12px rgba(0,0,0,.45),
+   0 0 8px rgba(0,229,255,.08);
+ text-shadow:0 1px 2px rgba(0,0,0,.8);
+}
+
+.gem::after{
+ content:"";
+ position:absolute;
+ width:7px;
+ height:7px;
+ border-radius:50%;
+ top:8px;
+ left:10px;
+ background:rgba(255,255,255,.7);
+ filter:blur(1px);
+ pointer-events:none;
+}
+
+.gem.g1{
+ color:#d8e3e8;
+ border:1px solid #aebdc4;
+ background:radial-gradient(circle at 30% 20%,#ffffff 0%,#d8e3e8 18%,#65757d 55%,#172126 100%);
+ box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 0 10px rgba(255,255,255,.18);
+}
+
+.gem.g2{
+ color:#d9a0a5;
+ border:1px solid #a8757a;
+ background:radial-gradient(circle at 30% 20%,#fff0f0 0%,#d9a0a5 18%,#704348 55%,#211114 100%);
+ box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 0 10px rgba(255,220,220,.15);
+}
+
+.gem.g3{
+ color:#e5c878;
+ border:1px solid #b79b4f;
+ background:radial-gradient(circle at 30% 20%,#fff6d0 0%,#e5c878 18%,#76602b 55%,#211b08 100%);
+ box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 0 10px rgba(255,235,170,.16);
+}
+
+.gem.g4{
+ color:#b9a9c9;
+ border:1px solid #8d7e9d;
+ background:radial-gradient(circle at 30% 20%,#f3edfa 0%,#b9a9c9 18%,#5c5068 55%,#1c1720 100%);
+ box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 0 10px rgba(235,225,250,.15);
+}
+
+.gem.g5{
+ color:#8fc2a8;
+ border:1px solid #65977d;
+ background:radial-gradient(circle at 30% 20%,#eafff2 0%,#8fc2a8 18%,#3f6d55 55%,#101c15 100%);
+ box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 0 10px rgba(215,255,230,.15);
+}
+
+.gem.g6{
+ color:#d09a70;
+ border:1px solid #a16f4b;
+ background:radial-gradient(circle at 30% 20%,#fff0df 0%,#d09a70 18%,#70482e 55%,#211207 100%);
+ box-shadow:0 3px 8px rgba(0,0,0,.55),inset 0 0 10px rgba(255,220,190,.15);
+}
+
+.gem.pop{
+ animation:gemBlast .42s ease forwards;
+}
+
+@keyframes gemBlast{
+ 0%{
+   transform:scale(1);
+   opacity:1;
+   filter:brightness(1);
+ }
+ 35%{
+   transform:scale(1.28);
+   opacity:1;
+   filter:brightness(2);
+ }
+ 70%{
+   transform:scale(1.08);
+   opacity:.75;
+   filter:brightness(2.5);
+ }
+ 100%{
+   transform:scale(.05);
+   opacity:0;
+   filter:brightness(3);
+ }
+}
+@media(max-width:380px){.app{padding-left:8px;padding-right:8px}.wheel-wrap{width:220px;height:220px;min-width:220px;min-height:220px}.number{transform:translate(-50%,-50%) rotate(var(--angle)) translateY(-91px) rotate(calc(-1 * var(--angle)))}.bet-number{min-height:41px;font-size:14px}.gem-grid{min-height:290px}}
+
+.bet-control36{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin:0 0 8px 35px;
+  flex-shrink:0;
+}
+
+.bet-control36 button{
+  width:32px;
+  height:32px;
+  font-size:22px;
+  font-weight:bold;
+  border-radius:8px;
+  color:#ffd34e;
+  border:1px solid rgba(255,211,78,.35);
+  background:linear-gradient(145deg,#3a3a36,#171715);
+  box-shadow:0 0 7px rgba(255,211,78,.12);
+  touch-action:manipulation;
+}
+.gems-bet-control{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  margin:8px 0 6px;
+}
+
+.gems-bet-control button{
+  width:32px;
+  height:30px;
+  border-radius:7px;
+  border:1px solid rgba(183,155,79,.35);
+  background:linear-gradient(145deg,#303538,#101214);
+  color:#d7c58a;
+  font-size:20px;
+  font-weight:900;
+}
+
+.gems-bet-control span{
+  min-width:35px;
+  text-align:center;
+  color:#fff4d0;
+  font-size:13px;
+  font-weight:900;
+}
+.gems-bet-title{
+  text-align:center;
+  color:#c9b36a;
+  font-size:9px;
+  font-weight:900;
+  margin:4px 0 5px;
+}
+
+.gems-bet-list{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:5px;
+  margin-bottom:8px;
+}
+
+.gems-bet-list button{
+  min-height:32px;
+  border-radius:7px;
+  border:1px solid rgba(183,155,79,.35);
+  background:linear-gradient(145deg,#303538,#101214);
+  color:#d7c58a;
+  font-size:11px;
+  font-weight:900;
+  touch-action:manipulation;
+}
+
+.gems-bet-list button.active{
+  border-color:#e5c878;
+  color:#fff4d0;
+  box-shadow:0 0 8px rgba(229,200,120,.25);
+}
+#selectedBet36{
+  min-width:35px;
+  text-align:center;
+  font-size:18px;
+  font-weight:bold;
+  color:#fff4d0;
+  touch-action:manipulation;
+}
+.bet-control36,
+.bet-control36 button,
+#selectedBet36{
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="header">
+  <div class="brand">ZYNO</div>
+
+  <div style="display:flex;align-items:center;gap:7px">
+    <div class="balance">
+      <small>BALANCE</small>
+      <strong id="topBalance">1,000,000,000</strong>
+    </div>
+  </div>
+</header>
+
+<section id="home" class="view active">
+ <div class="home-title"><h1>ZYNO GAMES</h1><p>3 games • clean standalone build</p></div>
+ <div style="display:flex;gap:10px;margin:0 0 15px 0;">
+
+  <button
+    onclick="document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('signup').classList.add('active');"
+    style="flex:1;height:42px;border-radius:10px;background:transparent;border:1px solid rgba(0,229,255,.35);font-weight:1000;color:#00e5ff;"
+  >
+    CREATE ACCOUNT
+  </button>
+</div>
+
+<div class="cards">
+  <button class="game-card gold" onclick="openGame('r36')"><div class="game-icon">🎰</div><h2>ROULETTE 0–36</h2><p>Premium 3D roulette • 30 sec betting • 35:1</p><span class="play">PLAY</span></button>
+  <button class="game-card" onclick="openGame('r11')"><div class="game-icon">🎯</div><h2>ROULETTE 0–11</h2><p>Fast 0–11 number roulette • 30 sec betting</p><span class="play">PLAY</span></button>
+  <button class="game-card purple" onclick="openGame('gems')"><div class="game-icon">💎</div><h2>GEMS FORTUNE</h2><p>Video-inspired falling gems / cluster game</p><span class="play">PLAY</span></button>
+ </div>
+</section>
+
+<section id="r36" class="view">
+ <div class="rule" style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+  <span>30 SEC • MAX 5500 PER NUMBER • PAYOUT 35:1</span>
+
+  
+</div>
+ <div class="info">
+  <div class="ibox">
+    <small>LAST WIN</small>
+    <div class="last" id="r36last"></div>
+  </div>
+
+  <div class="ibox">
+    <small>TIME</small>
+    <strong class="timer" id="r36timer">30</strong>
+  </div>
+
+  <div class="ibox">
+    <small>BALANCE</small>
+    <strong id="r36TopBalance">1,000,000,000</strong>
+  </div>
+</div>
+
+<div style="display:flex;justify-content:flex-start;margin:6px 0 4px 0;">
+  <button
+    type="button"
+    onclick="goHome()"
+    style="padding:6px 12px;border-radius:9px;background:#071525;border:1px solid rgba(0,229,255,.35);color:#00e5ff;font-size:10px;font-weight:1000;"
+  >
+    ← HOME
+  </button>
+</div>
+
+<div>
+  <div class="wheel-area">
+    <button type="button" id="removeBet36" class="remove-bet36">X</button>
+    
+    <div class="wheel-wrap">
+      <div class="pointer"></div>
+      <div class="wheel" id="wheel36">
+        <div class="r36-brand-center">ZYNO</div>
+        <div class="wheel-center-win" id="wheel36Winner"></div>
+      </div>
+    </div>
+  </div>
+</div>
+ <div style="display:flex;align-items:center;justify-content:center;gap:35px;margin-bottom:4px;">
+  <div class="message" id="r36msg">Press and hold a number to bet</div>
+
+  <div class="bet-control36">
+  <small style="display:block;font-size:9px;font-weight:900;color:#ffd34e;letter-spacing:1px;margin-bottom:3px;">
+    BET CHOICE
+  </small>
+  <div style="display:flex;align-items:center;justify-content:center;gap:6px;">
+    <button type="button" id="betMinus36">−</button>
+    <span id="selectedBet36">1</span>
+    <button type="button" id="betPlus36">+</button>
+  </div>
+</div>
+</div>
+
+<div class="grid" id="grid36"></div>
+</section>
+
+<section id="r11" class="view">
+ <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">ROULETTE 0–11</div><div style="width:54px"></div></div>
+ <div class="rule">30 SEC • MIN 10 • MAX 5500 PER NUMBER</div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="r11bal">1,000,000,000</strong></div><div class="ibox"><small>LAST WIN</small><strong id="r11lastWin">-</strong><small style="margin-top:4px">LAST 4</small><div class="last" id="r11last"></div></div><div class="ibox"><small>TIME</small><strong class="timer" id="r11timer">30</strong></div></div>
+ <div class="z11-wheel-wrap">
+
+  <div class="z11-pointer"></div>
+
+  <div class="z11-wheel" id="wheel11">
+    <div class="z11-center">0–11</div>
+  </div>
+
+</div>
+ <div class="message" id="r11msg">Press and hold a number to bet</div><div class="grid" id="grid11"></div>
+</section>
+
+<section id="gems" class="view">
+ <div class="game-head"><button class="back" onclick="goHome()">← HOME</button><div class="game-name">GEMS FORTUNE</div><div style="width:54px"></div></div>
+ <div class="rule">VIDEO-INSPIRED CLUSTER / FALLING-GEMS GAME</div>
+ <div class="info"><div class="ibox"><small>BALANCE</small><strong id="gemsBal">1,000,000,000</strong></div><div class="ibox"><small>WIN</small><strong id="gemsWin">0</strong></div><div class="ibox"><small>ROUND</small><strong id="gemsRound">READY</strong></div></div>
+ <div class="gems-panel">
+
+<div class="gems-top">
+  <strong>GEMS FORTUNE</strong>
+  <span id="gemsBetLabel">BET 10</span>
+</div>
+
+<div class="gem-grid" id="gemGrid"></div>
+<div class="gems-bet-control">
+  <button type="button" id="gemsBetMinus">−</button>
+  <span id="gemsBetValue">10</span>
+  <button type="button" id="gemsBetPlus">+</button>
+</div>
+<div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
+</section>
+<section id="adminPanel" class="view">
+
+  <div class="game-head">
+    <button class="back" onclick="goHome()">← HOME</button>
+    <div class="game-name">ADMIN PANEL</div>
+    <div style="width:54px"></div>
+  </div>
+
+  <div style="
+    margin-top:20px;
+    padding:18px;
+    border-radius:18px;
+    background:linear-gradient(145deg,#0d2846,#05101e);
+    border:1px solid rgba(255,211,78,.35);
+  ">
+
+    <div style="text-align:center;margin-bottom:18px">
+      <div style="
+        font-size:24px;
+        color:#ffd34e;
+        font-weight:1000;
+      ">
+        ADMIN ✓
+      </div>
+
+      <div style="
+        color:#7890aa;
+        font-size:10px;
+        margin-top:5px;
+      ">
+        ZYNO ADMIN CONTROL
+      </div>
+    </div>
+
+    <div class="ibox" style="margin-bottom:10px">
+      <small>ADMIN BALANCE</small>
+      <strong id="adminBalance">1,000,000,000</strong>
+    </div>
+
+    <div id="adminMsg"
+      style="
+        text-align:center;
+        min-height:20px;
+        color:#7890aa;
+        font-size:9px;
+      ">
+      Admin access verified
+    </div>
+
+  </div>
+<div style="
+  margin-top:15px;
+  padding:12px;
+  border-radius:14px;
+  background:#071827;
+  border:1px solid rgba(0,229,255,.25);
+">
+
+  <div style="
+    color:#00e5ff;
+    font-size:14px;
+    font-weight:900;
+    margin-bottom:10px;
+  ">
+    USERS
+  </div>
+
+  <div id="adminUsers">
+    <div style="
+      text-align:center;
+      color:#7890aa;
+      font-size:10px;
+      padding:15px;
+    ">
+      Users loading...
+    </div>
+  </div>
+
+</div>
+</section>
+<section id="transfer" class="view">
+
+  <div class="game-head">
+    <button class="back" onclick="goHome()">← HOME</button>
+    <div class="game-name">SEND POINTS</div>
+    <div style="width:54px"></div>
+  </div>
+
+  <div style="
+    margin-top:20px;
+    padding:20px;
+    border-radius:18px;
+    background:linear-gradient(145deg,#0d2846,#05101e);
+    border:1px solid rgba(0,229,255,.25);
+  ">
+
+    <div style="
+      text-align:center;
+      color:#00e5ff;
+      font-size:20px;
+      font-weight:1000;
+      margin-bottom:18px;
+    ">
+      SEND POINTS
+    </div>
+
+    <div class="ibox" style="margin-bottom:12px">
+      <small>YOUR BALANCE</small>
+      <strong id="transferBalance">0</strong>
+    </div>
+
+    <input
+      id="transferEmail"
+      type="email"
+      placeholder="Receiver Email"
+      autocomplete="off"
+      style="
+        width:100%;
+        height:45px;
+        margin-bottom:10px;
+        padding:0 12px;
+        border-radius:10px;
+        background:#030913;
+        border:1px solid rgba(0,229,255,.2);
+        color:#fff;
+        outline:none;
+      "
+    >
+
+    <input
+      id="transferAmount"
+      type="number"
+      min="1"
+      placeholder="Points Amount"
+      style="
+        width:100%;
+        height:45px;
+        margin-bottom:12px;
+        padding:0 12px;
+        border-radius:10px;
+        background:#030913;
+        border:1px solid rgba(0,229,255,.2);
+        color:#fff;
+        outline:none;
+      "
+    >
+
+    <button
+      onclick="sendPoints()"
+      style="
+        width:100%;
+        height:45px;
+        border:0;
+        border-radius:10px;
+        background:linear-gradient(145deg,#0d8fb5,#00536e);
+        font-weight:1000;
+        color:#fff;
+      "
+    >
+      SEND POINTS
+    </button>
+
+    <div id="transferMsg"
+      style="
+        text-align:center;
+        min-height:20px;
+        margin-top:10px;
+        color:#7890aa;
+        font-size:9px;
+      ">
+    </div>
+
+  </div>
+
+</section>
+<section id="signup" class="view">
+  <div class="panel">
+
+    <h2 style="text-align:center;color:#00e5ff;margin-bottom:6px;">
+      CREATE NEW ACCOUNT
+    </h2>
+
+    <div style="text-align:center;color:#7890aa;font-size:10px;margin-bottom:18px;">
+      Create your ZYNO account
+    </div>
+
+    <div style="color:#ffd34e;font-size:11px;font-weight:900;margin-bottom:8px;">
+      REFERRAL TYPE
+    </div>
+
+    <button
+      type="button"
+      onclick="selectReferralType('system')"
+      id="systemReferralBtn"
+      style="width:100%;height:42px;margin-bottom:8px;border-radius:10px;background:rgba(0,229,255,.12);border:1px solid #00e5ff;color:#00e5ff;font-weight:900;"
+    >
+      SYSTEM REFERRAL
+    </button>
+
+    <button
+      type="button"
+      onclick="selectReferralType('upline')"
+      id="uplineReferralBtn"
+      style="width:100%;height:42px;margin-bottom:10px;border-radius:10px;background:transparent;border:1px solid rgba(0,229,255,.25);color:#7890aa;font-weight:900;"
+    >
+      UPLINE REFERRAL
+    </button>
+
+    <input
+      id="signupReferralCode"
+      type="text"
+      placeholder="Upline Referral Code"
+      style="display:none;width:100%;height:45px;margin-bottom:12px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <input
+      id="signupEmail"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
+      style="width:100%;height:45px;margin-bottom:10px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+    <input
+  id="signupPassword"
+  type="password"
+  placeholder="Password"
+  autocomplete="new-password"
+  style="width:100%;height:45px;margin-bottom:10px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+ >
+
+    <button
+      type="button"
+      onclick="createAccount()"
+      style="width:100%;height:45px;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);font-weight:1000;color:#fff;"
+    >
+      CREATE ACCOUNT
+    </button>
+
+    <div
+      id="signupMsg"
+      style="text-align:center;min-height:20px;margin-top:10px;color:#7890aa;font-size:9px;"
+    ></div>
+
+    <button
+      type="button"
+      onclick="showLogin()"
+      style="width:100%;height:38px;margin-top:4px;border-radius:10px;background:transparent;border:0;color:#00e5ff;font-weight:900;"
+    >
+      BACK TO LOGIN
+    </button>
+
+  </div>
+
+</section>
+
+<script>
+const START_BALANCE=1000000000,MAX_BET=5500,POINT_TIME=100;
+var globalLastWins36=[];
+var globalLastWins11=[];
+var globalResult36=null;
+var globalResult11=null;
+var globalResultUnsubscribe36=null;
+var globalResultUnsubscribe11=null;
+var globalRound36=null;
+var globalRound11=null;
+var globalRoundStart36=null;
+var globalRoundStart11=null;
+var globalBetClose36=null;
+var globalSpinEnd36=null;
+let balance=0;START_BALANCE;
+const money=n=>Math.floor(n).toLocaleString('en-IN');
+function showLogin(){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('login').classList.add('active');
+}
+const topBalance=document.getElementById('topBalance');
+function syncBalance(){
+  topBalance.textContent=money(balance);
+  document.getElementById('r36TopBalance').textContent=money(balance);
+  document.getElementById('r11bal').textContent=money(balance);
+  document.getElementById('gemsBal').textContent=money(balance);
+}
+function openGame(id){
+
+  // ADMIN PANEL — ADMIN ONLY
+  if(id === 'adminPanel' && window.zynoIsAdmin !== true){
+    alert('Admin access नहीं है');
+    return;
+  }
+
+  document.querySelectorAll('.view').forEach(v =>
+    v.classList.remove('active')
+  );
+  const globalBrand = document.querySelector('.brand');
+  if(globalBrand) globalBrand.style.display = (id === 'r36') ? 'none' : '';
+  
+  const globalBalance = document.querySelector('.balance');
+  if(globalBalance) globalBalance.style.display = (id === 'r36') ? 'none' : '';
+
+  document.getElementById(id).classList.add('active');
+  localStorage.setItem('zynoActiveView', id);
+  if(id === 'r36') startR36();
+  if(id === 'r11') startR11();
+}
+function goHome(){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  
+  const globalBrand = document.querySelector('.brand');
+  if(globalBrand) globalBrand.style.display = '';
+  
+  const globalBalance = document.querySelector('.balance');
+  if(globalBalance) globalBalance.style.display = '';
+
+  document.getElementById('home').classList.add('active');
+  localStorage.setItem('zynoActiveView','home');
+}
+/* ---------- ROULETTE 0-36 ---------- */
+const BET_OPTIONS36=[
+  1,2,3,4,5,6,7,8,9,10,
+  12,15,20,25,30,35,40,45,50,
+  60,70,80,90,100,125,150,200,
+  250,300,350,400,450,480,500
+];
+
+let selectedBetIndex36=0;
+
+function updateSelectedBet36(){
+  document.getElementById('selectedBet36').textContent =
+    BET_OPTIONS36[selectedBetIndex36];
+}
+document.getElementById('betPlus36').addEventListener('click',()=>{
+  if(selectedBetIndex36 < BET_OPTIONS36.length-1){
+    selectedBetIndex36++;
+    updateSelectedBet36();
+  }
+});
+
+document.getElementById('betMinus36').addEventListener('click',()=>{
+  if(selectedBetIndex36 > 0){
+    selectedBetIndex36--;
+    updateSelectedBet36();
+  }
+});
+const redNums=new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+const wheelNums=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+const wheel36=document.getElementById('wheel36'),grid36=document.getElementById('grid36');let bets36={},r36Open=true,r36Time=30,r36Spin=false,r36Rotation=0,r36Last=[];let selectedNumber36 = null;
+
+const R36_ROUND_MS = 30000;
+const R36_ROUND_KEY = 'zynoR36RoundEnd';
+
+function getR36RoundEnd(){
+  const saved = Number(localStorage.getItem(R36_ROUND_KEY) || 0);
+
+  if(saved > Date.now()){
+    return saved;
+  }
+
+  const end = Date.now() + R36_ROUND_MS;
+  localStorage.setItem(R36_ROUND_KEY, String(end));
+  return end;
+}
+
+function resetR36Round(){
+  const end = Date.now() + R36_ROUND_MS;
+  localStorage.setItem(R36_ROUND_KEY, String(end));
+
+  r36Time = 30;
+  r36Open = true;
+
+  document.getElementById('r36timer').textContent = '30';
+  document.getElementById('r36timer').classList.remove('closed');
+}
+
+function startR36(){
+  if(r36Spin) return;
+
+  const end = getR36RoundEnd();
+
+  r36Time = Math.max(0, Math.ceil((end - Date.now()) / 1000));
+
+  if(r36Time > 0){
+    r36Open = r36Time > 4;
+
+    document.getElementById('r36timer').textContent = r36Time;
+
+    if(r36Open){
+      document.getElementById('r36timer').classList.remove('closed');
+    }else{
+      document.getElementById('r36timer').classList.add('closed');
+    }
+  }
+}
+wheelNums.forEach((n,i)=>{const e=document.createElement('div');e.className='number'+(n===0?' zero':'');e.style.setProperty('--angle',(i*360/wheelNums.length)+'deg');e.textContent=n;wheel36.appendChild(e)});
+function colorClass(n){return n===0?'zero':redNums.has(n)?'red':'black'}
+for(let n=0;n<=36;n++){const b=document.createElement('div');b.className='bet-number '+colorClass(n);b.dataset.n=n;b.innerHTML='<span>'+n+'</span><span class="bet-count"></span>';bindHold36(b,n);grid36.appendChild(b)}
+function disableLongPressMenu(btn){
+  btn.addEventListener('contextmenu',e=>{
+    e.preventDefault();
+  });
+
+  btn.addEventListener('selectstart',e=>{
+    e.preventDefault();
+  });
+
+  btn.addEventListener('dragstart',e=>{
+    e.preventDefault();
+  });
+}
+function bindHold36(btn,n){
+  disableLongPressMenu(btn);
+
+  btn.addEventListener('pointerdown',()=>{
+    selectedNumber36 = n;
+  });
+
+  let holdTimer=null;
+  let holding=false;
+
+  const betNow=()=>{
+    if(r36Spin)return;
+
+    const betAmount=BET_OPTIONS36[selectedBetIndex36];
+    const current=bets36[n]||0;
+
+    if(current>=MAX_BET)return;
+    
+const maxAdd =
+  Math.min(
+    betAmount,
+    MAX_BET - current
+  );
+    
+
+    const newBet =
+  Math.min(
+    MAX_BET,
+    current + maxAdd
+  );
+    const add=newBet-current;
+
+    if(balance<add){
+      holding=false;
+      return;
+    }
+
+    balance-=add;
+    bets36[n]=newBet;
+
+    btn.classList.add('active');
+    updateCount36(btn,newBet);
+    syncBalance();
+
+    setTimeout(()=>{
+      btn.classList.remove('active');
+    },150);
+  };
+
+  const startHold=()=>{
+    if(r36Spin)return;
+
+    betNow();
+
+    holding=true;
+
+    holdTimer=setInterval(()=>{
+      if(!holding || r36Spin){
+        clearInterval(holdTimer);
+        holdTimer=null;
+        return;
+      }
+
+      betNow();
+
+      if((bets36[n]||0)>=MAX_BET){
+        holding=false;
+        clearInterval(holdTimer);
+        holdTimer=null;
+      }
+    },120);
+  };
+
+  const stopHold=()=>{
+    holding=false;
+
+    if(holdTimer){
+      clearInterval(holdTimer);
+      holdTimer=null;
+    }
+
+     btn.classList.remove('active');
+
+  if(window.saveUserBalance){
+
+    window.saveUserBalance();
+
+  }
+
+}
+
+  btn.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse' && e.button!==0)return;
+
+    e.preventDefault();
+    startHold();
+  });
+
+  btn.addEventListener('pointerup',e=>{
+    e.preventDefault();
+    stopHold();
+  });
+
+  btn.addEventListener('pointercancel',stopHold);
+  btn.addEventListener('pointerleave',stopHold);
+}
+function updateCount36(btn,n){btn.querySelector('.bet-count').textContent=n?money(n):''}
+
+document.getElementById('removeBet36').addEventListener('click',()=>{
+  if(r36Spin)return;
+
+  if(selectedNumber36 === null)return;
+
+  const amount = Number(bets36[selectedNumber36] || 0);
+
+  if(amount <= 0)return;
+
+  balance += amount;
+
+  bets36[selectedNumber36] = 0;
+
+  const btn = grid36.querySelector(
+    '.bet-number[data-n="' + selectedNumber36 + '"]'
+  );
+
+  if(btn){
+    updateCount36(btn,0);
+    btn.classList.remove('active');
+  }
+
+  syncBalance();
+
+  if(window.saveUserBalance){
+    window.saveUserBalance();
+  }
+
+  selectedNumber36 = null;
+});
+
+function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
+function tickR36(){
+
+  const v =
+    document.getElementById('r36timer');
+
+  if(r36Spin) return;
+
+  /*
+    FIREBASE GLOBAL TIMER
+    Agar Firestore me valid roundStart36
+    aur betClose36 milega to wahi timer use hoga.
+  */
+  const now = Date.now();
+
+  if(
+    typeof globalRoundStart36 === 'number' &&
+    typeof globalBetClose36 === 'number' &&
+    globalRoundStart36 > 0 &&
+    globalBetClose36 > globalRoundStart36
+  ){
+
+    const remaining =
+      Math.max(
+        0,
+        Math.ceil(
+          (globalBetClose36 - now) / 1000
+        )
+      );
+
+    r36Time = remaining;
+
+    if(
+      document
+        .getElementById('r36')
+        .classList
+        .contains('active')
+    ){
+      v.textContent = remaining;
+    }
+
+    if(
+      remaining <= 4 &&
+      remaining > 0
+    ){
+      r36Open = false;
+
+      if(
+        document
+          .getElementById('r36')
+          .classList
+          .contains('active')
+      ){
+        v.classList.add('closed');
+
+        document.getElementById('r36msg').textContent =
+          'BETTING CLOSED — spinning...';
+      }
+    }
+
+    if(
+      remaining === 0 &&
+      r36Spin === false
+    ){
+      r36Time = -1;
+      r36Open = false;
+      spin36();
+    }
+
+    return;
+  }
+
+  /*
+    FIRESTORE TIMER ABHI SET NAHI HAI.
+    Isliye current working 30-second
+    fallback behavior rahega.
+  */
+  if(r36Time > 0){
+
+  const savedEnd = Number(
+    localStorage.getItem(R36_ROUND_KEY) || 0
+  );
+
+  if(savedEnd > Date.now()){
+
+    r36Time = Math.ceil(
+      (savedEnd - Date.now()) / 1000
+    );
+
+  }else{
+
+    r36Time = 0;
+
+  }
+
+  if(
+    document
+      .getElementById('r36')
+      .classList
+      .contains('active')
+  ){
+    v.textContent = r36Time;
+  }
+}
+
+  if(
+    r36Time <= 4 &&
+    r36Time > 0
+  ){
+
+    r36Open = false;
+
+    if(
+      document
+        .getElementById('r36')
+        .classList
+        .contains('active')
+    ){
+
+      v.classList.add('closed');
+
+      document.getElementById('r36msg').textContent =
+        'BETTING CLOSED — spinning...';
+    }
+  }
+
+  if(
+    r36Time === 0 &&
+    r36Spin === false
+  ){
+
+    r36Time = -1;
+    r36Open = false;
+
+    spin36();
+  }
+}
+async function spin36(){
+  if(r36Spin) return;
+  r36Spin = true;
+  r36Open = false;
+  document.getElementById('r36msg').textContent =
+    'Wheel spinning...';
+     setTimeout(() => {
+
+  if(
+    document
+      .getElementById('r36')
+      .classList
+      .contains('active')
+  ){
+    playSpinSound();
+  }
+
+}, 50);
+  // Firebase global result mile to wahi use hoga.
+  // Agar result available nahi hai to 0-36 ke beech result generate hoga.
+  const winner =
+    Number.isInteger(globalResult36)
+      ? globalResult36
+      : Math.floor(Math.random() * 37);
+  const index =
+    wheelNums.indexOf(winner);
+  const slice =
+    360 / wheelNums.length;
+  const targetAngle =
+    -(index * slice);
+  const currentNormalized =
+    (r36Rotation % 360 + 360) % 360;
+  const targetNormalized =
+    (targetAngle % 360 + 360) % 360;
+  let difference =
+    targetNormalized - currentNormalized;
+  if(difference < 0){
+    difference += 360;
+  }
+  // Purane working wheel ka rotation behavior
+  r36Rotation +=
+    (360 * 8) + difference;
+  wheel36.style.transform =
+  'rotate(' + r36Rotation + 'deg)';
+  // Ek hi result — ek hi baar
+
+  setTimeout(async ()=>{
+    stopSpinSound();
+    document.getElementById('r36msg').textContent =
+      'WINNING NUMBER: ' + winner;
+      
+document.querySelector('.r36-brand-center').style.display = 'none';
+      
+document.getElementById('wheel36Winner').textContent =
+     winner;
+    // Sirf winning number highlight
+    grid36
+      .querySelectorAll('.bet-number')
+      .forEach(btn=>{
+        btn.classList.remove('winner');
+        if(+btn.dataset.n === winner){
+          btn.classList.add('winner');
+        }
+        setTimeout(()=>{
+  grid36
+    .querySelectorAll('.bet-number')
+    .forEach(btn=>{
+      btn.classList.remove('winner');
+    });
+},3500);
+      });
+      
+            // R36 WINNING PAYOUT
+const winningBet36 =
+  Number(bets36[winner] || 0);
+
+const win36 =
+  winningBet36 * 35;
+
+if(win36 > 0){
+
+  balance =
+    Number(balance || 0) + win36;
+    
+  window.r36SavingWin = true;
+  window.r36WinBalance = balance;
+
+  syncBalance();
+
+  console.log(
+    'R36 WIN ADDED:',
+    'winner=', winner,
+    'bet=', winningBet36,
+    'win=', win36,
+    'NEW BALANCE=', balance
+  );
+
+  if(window.saveUserBalance){
+
+    window.saveUserBalance();
+
+ }
+
+}
+    
+    // LAST 4 WIN update
+    r36Last.push(winner);
+r36Last = r36Last.slice(-4);
+localStorage.setItem('zynoR36LastWins', JSON.stringify(r36Last));
+renderLast('r36last', r36Last);
+    localStorage.setItem(
+  'zynoR36LastWins',
+  JSON.stringify(r36Last)
+);
+    r36Spin = false;
+    // Next round
+    setTimeout(()=>{
+  document.getElementById('wheel36Winner').textContent =
+    'ZYNO';
+    
+  document.querySelector('.r36-brand-center').style.display = '';
+  
+  resetR36Round();
+  clearBets36();
+  document.getElementById('r36msg').textContent =
+    'Press and hold a number to bet';
+},4000);
+  },5900);
+}
+/* ---------- ROULETTE 0-11 ---------- */
+
+const grid11 =
+  document.getElementById('grid11');
+
+const wheel11 =
+  document.getElementById('wheel11');
+
+let bets11 = {};
+let r11Open = true;
+let r11Time = 30;
+let r11Spin = false;
+let r11Last = [];
+
+const R11_ROUND_MS = 30000;
+const R11_SPIN_MS = 6000;
+const R11_RESULT_HOLD_MS = 2000;
+const R11_TOTAL_SPIN_MS =
+  R11_SPIN_MS + R11_RESULT_HOLD_MS;
+
+let r11ClaimingSpin = false;
+let r11FinalizingRound = false;
+let r11AnimatingRound = null;
+let r11Ready = false;
+let r11LockedResult = null;
+
+/* ---------- R11 WHEEL ---------- */
+
+for(let i=0;i<12;i++){
+
+  const e =
+    document.createElement('div');
+
+  e.className = 'z11n';
+
+  e.style.setProperty(
+    '--a',
+    (i * 30) + 'deg'
+  );
+
+  e.textContent = i;
+
+  wheel11.appendChild(e);
+
+}
+
+/* ---------- R11 BET GRID ---------- */
+
+for(let n=0;n<=11;n++){
+
+  const b =
+    document.createElement('div');
+
+  b.className =
+    'bet-number ' + colorClass(n);
+
+  b.dataset.n = n;
+
+  b.innerHTML =
+    '<span>' + n + '</span>' +
+    '<span class="bet-count"></span>';
+
+  bindHold11(b,n);
+
+  grid11.appendChild(b);
+
+}
+function clearBets11(){
+
+  bets11 = {};
+
+  grid11
+    .querySelectorAll('.bet-number')
+    .forEach(btn=>{
+
+      btn.classList.remove(
+        'active',
+        'winner'
+      );
+
+      const count =
+        btn.querySelector('.bet-count');
+
+      if(count){
+        count.textContent = '';
+      }
+
+    });
+
+}
+
+/* ---------- R11 HOLD BET ---------- */
+
+function bindHold11(btn,n){
+
+  disableLongPressMenu(btn);
+
+  let start = 0;
+  let frame = null;
+  let holding = false;
+
+  const begin = e => {
+
+    if(
+      e.type === 'mousedown' &&
+      e.button !== 0
+    ){
+      return;
+    }
+
+    if(
+      !r11Open ||
+      r11Spin
+    ){
+      return;
+    }
+
+    holding = true;
+
+    start = performance.now();
+
+    btn.classList.add('active');
+
+    const run = () => {
+
+      if(
+        !holding ||
+        r11Spin ||
+        !r11Open
+      ){
+        return;
+      }
+
+      const amt =
+  Math.min(
+    MAX_BET,
+    10 +
+    Math.floor(
+      (performance.now() - start) /
+      POINT_TIME
+    ) * 10
+  );
+
+      const current =
+        bets11[n] || 0;
+
+      if(amt > current){
+
+        const add =
+          amt - current;
+
+        if(balance >= add){
+
+          balance -= add;
+
+          bets11[n] = amt;
+
+          btn
+            .querySelector('.bet-count')
+            .textContent =
+              money(amt);
+
+          syncBalance();
+
+        }else{
+
+          holding = false;
+
+        }
+
+      }
+
+      frame =
+        requestAnimationFrame(run);
+
+    };
+
+    frame =
+      requestAnimationFrame(run);
+
+  };
+
+  const end = () => {
+
+    holding = false;
+
+    btn.classList.remove('active');
+
+    if(frame){
+
+      cancelAnimationFrame(frame);
+
+      frame = null;
+
+    }
+
+    if(window.saveUserBalance){
+
+      window.saveUserBalance();
+
+    }
+
+  };
+
+  btn.addEventListener(
+    'mousedown',
+    begin
+  );
+
+  btn.addEventListener(
+    'touchstart',
+    begin,
+    {passive:true}
+  );
+
+  btn.addEventListener(
+    'mouseup',
+    end
+  );
+
+  btn.addEventListener(
+    'mouseleave',
+    end
+  );
+
+  btn.addEventListener(
+    'touchend',
+    end,
+    {passive:true}
+  );
+
+    btn.addEventListener(
+    'touchcancel',
+    end,
+    {passive:true}
+  );
+
+}
+
+function clearBets11(){
+
+  bets11 = {};
+
+  grid11
+    .querySelectorAll('.bet-number')
+    .forEach(btn=>{
+
+      btn.classList.remove(
+        'active',
+        'winner'
+      );
+
+      const count =
+        btn.querySelector('.bet-count');
+
+      if(count){
+        count.textContent = '';
+      }
+
+    });
+
+}
+
+/* ---------- R11 FIRESTORE ---------- */
+
+function getR11Ref(){
+
+  return window.zynoDoc(
+    window.zynoDb,
+    'gameResults',
+    'roulette'
+  );
+
+}
+
+function getR11TimerValue(start){
+
+  const s =
+    Number(start || 0);
+
+  if(s <= 0){
+
+    return 30;
+
+  }
+
+  const end =
+    s + R11_ROUND_MS;
+
+  return Math.max(
+    0,
+    Math.ceil(
+      (end - Date.now()) / 1000
+    )
+  );
+
+}
+
+/* ---------- APPLY GLOBAL R11 DATA ---------- */
+
+window.r11ApplyFirestore =
+function(data){
+
+  if(!data){
+    return;
+  }
+
+  if(data.roundId11 !== undefined){
+
+    globalRound11 =
+      data.roundId11;
+
+  }
+
+  if(data.roundStart11 !== undefined){
+
+    globalRoundStart11 =
+      Number(
+        data.roundStart11
+      );
+
+  }
+
+  if(data.result11 !== undefined){
+
+    globalResult11 =
+      Number(
+        data.result11
+      );
+
+  }
+
+  if(
+    Array.isArray(
+      data.lastWins11
+    )
+  ){
+
+    globalLastWins11 =
+      data.lastWins11
+        .slice(0,4);
+
+    r11Last =
+      globalLastWins11
+        .slice(0,4);
+
+    renderLast(
+      'r11last',
+      r11Last
+    );
+
+    document
+      .getElementById('r11lastWin')
+      .textContent =
+        r11Last.length
+          ? r11Last[0]
+          : '-';
+
+  }
+
+  window.r11GlobalPhase11 =
+    data.phase11 ||
+    'betting';
+
+  /*
+    GLOBAL SPIN already claimed.
+    Har active client same result
+    ko animate karega.
+  */
+
+  if(
+    data.phase11 === 'spinning'
+  ){
+
+    r11Open = false;
+    r11Time = 0;
+
+    const timer =
+      document.getElementById(
+        'r11timer'
+      );
+
+    if(
+      document
+        .getElementById('r11')
+        .classList
+        .contains('active')
+    ){
+
+      timer.textContent = 0;
+
+      timer.classList.add(
+        'closed'
+      );
+
+    }
+
+    const roundId =
+      data.roundId11;
+
+    if(
+      roundId !== undefined &&
+      r11AnimatingRound !== roundId &&
+      !r11Spin
+    ){
+
+      r11LockedResult =
+        Number(data.result11);
+
+      spin11(
+        roundId,
+        r11LockedResult
+      );
+
+    }
+
+    return;
+
+  }
+
+  /*
+    NORMAL BETTING ROUND
+  */
+
+  if(
+    data.phase11 === 'betting'
+  ){
+
+    r11Ready = true;
+
+    if(!r11Spin){
+
+      const remaining =
+        getR11TimerValue(
+          globalRoundStart11
+        );
+
+      r11Time =
+        remaining;
+
+      r11Open =
+        remaining > 4;
+
+      const timer =
+        document.getElementById(
+          'r11timer'
+        );
+
+      if(
+        document
+          .getElementById('r11')
+          .classList
+          .contains('active')
+      ){
+
+        timer.textContent =
+          remaining;
+
+        timer.classList.toggle(
+          'closed',
+          !r11Open
+        );
+
+        document
+          .getElementById('r11msg')
+          .textContent =
+            remaining <= 4
+              ? 'BETTING CLOSED — spinning...'
+              : 'Press and hold a number to bet';
+
+      }
+
+    }
+
+  }
+
+};
+
+/* ---------- CLAIM GLOBAL SPIN ---------- */
+
+async function claimR11Spin(){
+
+  if(
+    r11ClaimingSpin ||
+    r11Spin
+  ){
+
+    return;
+
+  }
+
+  r11ClaimingSpin = true;
+
+  try{
+
+    const ref =
+      getR11Ref();
+
+    let spinNow = false;
+    let spinRoundId = null;
+    let spinResult = null;
+
+    await window.zynoRunTransaction(
+      window.zynoDb,
+      async(transaction)=>{
+
+        const snap =
+          await transaction.get(ref);
+
+        if(!snap.exists()){
+
+          return;
+
+        }
+
+        const data =
+          snap.data();
+
+        const phase =
+          data.phase11 ||
+          'betting';
+
+        const roundId =
+          data.roundId11;
+
+        const start =
+          Number(
+            data.roundStart11 || 0
+          );
+
+        const result =
+          Number(
+            data.result11
+          );
+
+        const now =
+          Date.now();
+
+        /*
+          Already spinning.
+          Is client ko bhi same global
+          spin dikhana hai.
+        */
+
+        if(
+          phase === 'spinning'
+        ){
+
+          const spinStart =
+            Number(
+              data.spinStart11 || 0
+            );
+
+          if(
+            spinStart > 0 &&
+            now <
+              spinStart +
+              R11_TOTAL_SPIN_MS
+          ){
+
+            spinNow = true;
+
+            spinRoundId =
+              roundId;
+
+            spinResult =
+              result;
+
+          }
+
+          return;
+
+        }
+
+        /*
+          Round abhi betting me hai.
+          Expire nahi hua to kuch nahi.
+        */
+
+        if(
+          start <= 0 ||
+          now <
+          start + R11_ROUND_MS
+        ){
+
+          return;
+
+        }
+
+        /*
+          EXACTLY ONE CLIENT
+          global spin claim karega.
+        */
+
+        transaction.set(
+          ref,
+          {
+            phase11: 'spinning',
+            spinStart11: now
+          },
+          {
+            merge:true
+          }
+        );
+
+        spinNow = true;
+
+        spinRoundId =
+          roundId;
+
+        spinResult =
+          result;
+
+      }
+    );
+
+    if(
+      spinNow &&
+      spinRoundId !== null &&
+      !r11Spin
+    ){
+
+      r11LockedResult =
+        Number.isInteger(
+          Number(spinResult)
+        ) &&
+        Number(spinResult) >= 0 &&
+        Number(spinResult) <= 11
+          ? Number(spinResult)
+          : 0;
+
+      spin11(
+        spinRoundId,
+        r11LockedResult
+      );
+
+    }
+
+  }catch(error){
+
+    console.error(
+      'R11 claim error:',
+      error
+    );
+
+  }finally{
+
+    r11ClaimingSpin = false;
+
+  }
+
+}
+
+/* ---------- R11 TIMER ---------- */
+
+function tickR11(){
+
+  const timer =
+    document.getElementById(
+      'r11timer'
+    );
+
+  if(!timer){
+    return;
+  }
+
+  /*
+    Spin ke dauran timer 0 hi rahega.
+  */
+
+  if(r11Spin){
+
+    timer.textContent = 0;
+
+    return;
+
+  }
+
+  /*
+    Firestore round abhi available nahi.
+  */
+
+  const start =
+    Number(
+      globalRoundStart11 || 0
+    );
+
+  if(
+    start <= 0 ||
+    !r11Ready
+  ){
+
+    return;
+
+  }
+
+  const phase =
+    window.r11GlobalPhase11 ||
+    'betting';
+
+  /*
+    Global spin kisi ne claim kar liya.
+  */
+
+  if(
+    phase === 'spinning'
+  ){
+
+    r11Open = false;
+
+    timer.textContent = 0;
+
+    timer.classList.add(
+      'closed'
+    );
+
+    return;
+
+  }
+
+  /*
+    NORMAL 30 SEC TIMER
+  */
+
+  const remaining =
+    getR11TimerValue(start);
+
+  r11Time =
+    remaining;
+
+  if(
+    document
+      .getElementById('r11')
+      .classList
+      .contains('active')
+  ){
+
+    timer.textContent =
+      remaining;
+
+  }
+
+  if(
+    remaining > 4
+  ){
+
+    r11Open = true;
+
+    timer.classList.remove(
+      'closed'
+    );
+
+    document
+      .getElementById('r11msg')
+      .textContent =
+        'Press and hold a number to bet';
+
+  }else if(
+    remaining > 0
+  ){
+
+    r11Open = false;
+
+    timer.classList.add(
+      'closed'
+    );
+
+    document
+      .getElementById('r11msg')
+      .textContent =
+        'BETTING CLOSED — spinning...';
+
+  }
+
+  /*
+    0 par global spin claim.
+  */
+
+  if(
+    remaining === 0 &&
+    !r11ClaimingSpin
+  ){
+
+    r11Open = false;
+
+    timer.textContent = 0;
+
+    claimR11Spin();
+
+  }
+
+}
+
+/* ---------- START R11 ---------- */
+
+async function startR11(){
+
+  if(r11Spin){
+    return;
+  }
+
+  try{
+
+    const ref =
+      getR11Ref();
+
+    const snap =
+      await window.zynoGetDoc(
+        ref
+      );
+
+    if(
+      !snap.exists()
+    ){
+
+      return;
+
+    }
+
+    const data =
+      snap.data();
+
+    /*
+      Directly Firestore ka current
+      global state screen par lagao.
+    */
+
+    window.r11ApplyFirestore(
+      data
+    );
+
+    /*
+      Agar round expired hai,
+      timer 0 par claim karega.
+    */
+
+    r11Ready = true;
+
+    tickR11();
+
+  }catch(error){
+
+    console.error(
+      'R11 start error:',
+      error
+    );
+
+  }
+
+}
+
+/* ---------- FINALIZE R11 ROUND ---------- */
+
+async function finalizeR11Round(
+  spinRoundId
+){
+
+  if(r11FinalizingRound){
+    return;
+  }
+
+  r11FinalizingRound = true;
+
+  try{
+
+    const ref =
+      getR11Ref();
+
+    await window.zynoRunTransaction(
+      window.zynoDb,
+      async(transaction)=>{
+
+        const snap =
+          await transaction.get(ref);
+
+        if(!snap.exists()){
+          return;
+        }
+
+        const data =
+          snap.data();
+
+        /*
+          Agar koi naya round already
+          create ho chuka hai to kuch nahi.
+        */
+
+        if(
+          String(data.roundId11) !==
+          String(spinRoundId)
+        ){
+
+          return;
+
+        }
+
+        if(
+          data.phase11 !== 'spinning'
+        ){
+
+          return;
+
+        }
+
+        const winner =
+          Number.isInteger(
+            Number(data.result11)
+          )
+            ? Number(data.result11)
+            : 0;
+
+        const oldLast =
+          Array.isArray(
+            data.lastWins11
+          )
+            ? data.lastWins11
+            : [];
+
+        const newLast =
+          [
+            winner,
+            ...oldLast
+          ].slice(0,4);
+
+        const nextStart =
+          Date.now();
+
+        const nextRoundId =
+          nextStart;
+
+        const nextResult =
+          Math.floor(
+            Math.random() * 12
+          );
+
+        transaction.set(
+          ref,
+          {
+            lastWins11:
+              newLast,
+
+            roundId11:
+              nextRoundId,
+
+            roundStart11:
+              nextStart,
+
+            result11:
+              nextResult,
+
+            phase11:
+              'betting',
+
+            spinStart11:
+              null
+
+          },
+          {
+            merge:true
+          }
+        );
+
+      }
+    );
+
+  }catch(error){
+
+    console.error(
+      'R11 finalize error:',
+      error
+    );
+
+  }finally{
+
+    r11FinalizingRound = false;
+
+  }
+
+}
+
+/* ---------- R11 SPIN ---------- */
+
+function spin11(
+  spinRoundId,
+  lockedResult
+){
+
+  if(r11Spin){
+    return;
+  }
+
+  if(
+    spinRoundId === undefined ||
+    spinRoundId === null
+  ){
+
+    return;
+
+  }
+
+  /*
+    Same global round ko
+    dobara animate nahi karna.
+  */
+
+  if(
+    r11AnimatingRound ===
+    spinRoundId
+  ){
+
+    return;
+
+  }
+
+  r11AnimatingRound =
+    spinRoundId;
+
+  r11Spin = true;
+  r11Open = false;
+  r11Time = 0;
+
+  const timer =
+    document.getElementById(
+      'r11timer'
+    );
+
+  timer.textContent = 0;
+
+  timer.classList.add(
+    'closed'
+  );
+
+  document
+    .getElementById('r11msg')
+    .textContent =
+      'Result spinning...';
+
+  const winner =
+    Number.isInteger(
+      Number(lockedResult)
+    ) &&
+    Number(lockedResult) >= 0 &&
+    Number(lockedResult) <= 11
+      ? Number(lockedResult)
+      : 0;
+
+  r11LockedResult =winner;
+
+  /*
+    Fresh animation every spin.
+  */
+
+  wheel11.style.transform =
+    'rotate(0deg)';
+
+  void wheel11.offsetWidth;
+
+setTimeout(() => {
+
+  if(
+    document
+      .getElementById('r11')
+      .classList
+      .contains('active')
+  ){
+    playR11SpinSound();
+  }
+
+}, 50);
+
+  wheel11.animate(
+    [
+      {
+        transform:
+          'rotate(0deg)'
+      },
+      {
+  transform:
+    'rotate(' + (1080 - winner * 30) + 'deg)'
+}
+    ],
+    {
+      duration:
+        R11_SPIN_MS,
+
+      easing:
+        'cubic-bezier(.12,.72,.12,1)'
+    }
+  );
+  
+wheel11.style.transform =
+  'rotate(' + (1080 - winner * 30) + 'deg)';
+
+  setTimeout(async ()=>{
+
+    stopR11SpinSound();
+
+    document
+      .getElementById('r11msg')
+      .textContent =
+        'WINNING NUMBER: ' +
+        winner;
+
+    grid11
+      .querySelectorAll('.bet-number')
+      .forEach(b=>{
+
+        b.classList.remove(
+          'winner'
+        );
+
+        if(
+          Number(b.dataset.n) ===
+          winner
+        ){
+
+          b.classList.add(
+            'winner'
+          );
+
+        }
+
+      });
+
+    const winningBet =
+  Number(bets11[winner] || 0);
+
+const win =
+  winningBet * 11;
+console.log(
+  'R11 PAYOUT CHECK',
+  'winner=', winner,
+  'winningBet=', winningBet,
+  'win=', win,
+  'balance=', balance,
+  'bets11=', bets11
+);
+
+if(win > 0){
+
+  const currentBalance =
+    Number(balance || 0);
+
+  const newBalance =
+    currentBalance + win;
+
+  balance = newBalance;
+
+  syncBalance();
+
+  console.log(
+    'R11 WIN BALANCE',
+    'before=', currentBalance,
+    'winningBet=', winningBet,
+    'win=', win,
+    'after=', balance
+  );
+
+  console.log(
+  'R11 FINAL WIN BALANCE =',
+  balance
+);
+
+if(window.saveUserBalance){
+
+    await window.saveUserBalance();
+
+  }
+
+}
+
+    /*
+      Winner screen hold.
+    */
+
+    setTimeout(async()=>{
+
+      clearBets11();
+
+      /*
+        Global next round create.
+        Sirf current round finalize hoga.
+      */
+
+      await finalizeR11Round(
+        spinRoundId
+      );
+
+      /*
+        Fresh Firestore read.
+      */
+
+      try{
+
+        const snap =
+          await window.zynoGetDoc(
+            getR11Ref()
+          );
+
+        if(
+          snap.exists()
+        ){
+
+          const data =
+            snap.data();
+
+          window.r11ApplyFirestore(
+            data
+          );
+
+        }
+
+      }catch(error){
+
+        console.error(
+          'R11 next round read error:',
+          error
+        );
+
+      }
+
+      /*
+        Local spin complete.
+      */
+
+      r11Spin = false;
+
+      r11LockedResult = null;
+
+      /*
+        New round ko animate nahi karna.
+      */
+
+      r11AnimatingRound = null;
+
+      /*
+        New global 30 sec round ka
+        actual Firestore timer.
+      */
+
+      r11Ready = true;
+
+      tickR11();
+
+      document
+        .getElementById('r11msg')
+        .textContent =
+          'Press and hold a number to bet';
+
+    },R11_RESULT_HOLD_MS);
+
+  },R11_SPIN_MS);
+
+}
+
+function renderLast(id,arr){
+  const el = document.getElementById(id);
+  el.innerHTML = '';
+  const list = [...arr];
+  while(list.length < 4){
+    list.push('-');
+  }
+  list.forEach(n=>{
+    const s = document.createElement('span');
+    s.textContent = n;
+    if(n === '-'){
+      s.className = 'last-number';
+    }else{
+      s.className = colorClass(n);
+      if(n === 0){
+        s.style.color = '#55f0b4';
+      }else if(redNums.has(n)){
+        s.style.color = '#ff5360';
+      }else{
+        s.style.color = '#fff';
+      }
+    }
+    el.appendChild(s);
+  });
+}
+/* ---------- AUDIO ---------- */
+let audioCtx=null,spinOsc=null,spinGain=null,spinFilter=null;
+function ensureAudio(){
+  try{
+    if(!audioCtx){
+      audioCtx =
+        new (window.AudioContext ||
+        window.webkitAudioContext)();
+    }
+
+    if(audioCtx.state === 'suspended'){
+      audioCtx.resume();
+    }
+  }catch(e){}
+}
+document.addEventListener(
+  'touchstart',
+  function unlockAudio(){
+    try{
+
+      ensureAudio();
+
+      if(!audioCtx) return;
+
+      const o =
+        audioCtx.createOscillator();
+
+      const g =
+        audioCtx.createGain();
+
+      g.gain.value = 0.00001;
+
+      o.connect(g)
+       .connect(audioCtx.destination);
+
+      o.start();
+      o.stop(
+        audioCtx.currentTime + 0.01
+      );
+
+      if(audioCtx.state === 'suspended'){
+        audioCtx.resume();
+      }
+
+    }catch(e){}
+  },
+  {capture:true}
+);
+function playTick(){try{ensureAudio();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=740;g.gain.setValueAtTime(.025,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.055);o.connect(g).connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.06)}catch(e){}}
+function playGemsWinSmall(){
+  try{
+    ensureAudio();
+    const now=audioCtx.currentTime;
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(620,now);
+    o.frequency.exponentialRampToValueAtTime(820,now+.16);
+    g.gain.setValueAtTime(.001,now);
+    g.gain.exponentialRampToValueAtTime(.10,now+.02);
+    g.gain.exponentialRampToValueAtTime(.001,now+.30);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(now);
+    o.stop(now+.32);
+  }catch(e){}
+}
+
+function playGemsWinBig(){
+  try{
+    ensureAudio();
+    const now=audioCtx.currentTime;
+    const o1=audioCtx.createOscillator(),o2=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o1.type='sine';
+    o2.type='triangle';
+    o1.frequency.setValueAtTime(520,now);
+    o1.frequency.exponentialRampToValueAtTime(880,now+.18);
+    o2.frequency.setValueAtTime(660,now+.08);
+    o2.frequency.exponentialRampToValueAtTime(1100,now+.32);
+    g.gain.setValueAtTime(.001,now);
+    g.gain.exponentialRampToValueAtTime(.14,now+.025);
+    g.gain.exponentialRampToValueAtTime(.001,now+.75);
+    o1.connect(g);
+    o2.connect(g);
+    g.connect(audioCtx.destination);
+    o1.start(now);
+    o2.start(now+.08);
+    o1.stop(now+.7);
+    o2.stop(now+.75);
+  }catch(e){}
+}
+
+function playGemsLoss(){
+  try{
+    ensureAudio();
+    const now=audioCtx.currentTime;
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.type='sine';
+    o.frequency.setValueAtTime(420,now);
+    o.frequency.exponentialRampToValueAtTime(180,now+.35);
+    g.gain.setValueAtTime(.001,now);
+    g.gain.exponentialRampToValueAtTime(.09,now+.03);
+    g.gain.exponentialRampToValueAtTime(.001,now+.42);
+    o.connect(g).connect(audioCtx.destination);
+    o.start(now);
+    o.stop(now+.45);
+  }catch(e){}
+}
+async function playSpinSound(){
+  try{
+    ensureAudio();
+    if(!audioCtx) return;
+    stopSpinSound();
+    const now = audioCtx.currentTime;
+    /*
+      ONLY MECHANICAL ROULETTE TICKS
+    */
+    let tickTime = now + 0.05;
+    let tickDelay = 0.045;
+    for(let i = 0; i < 105; i++){
+      if(tickTime > now + 5.75) break;
+      const osc =
+        audioCtx.createOscillator();
+      const gain =
+        audioCtx.createGain();
+      const filter =
+        audioCtx.createBiquadFilter();
+      osc.type = 'square';
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(
+        1250 + Math.random() * 650,
+        tickTime
+      );
+      filter.Q.setValueAtTime(
+        3.2,
+        tickTime
+      );
+      gain.gain.setValueAtTime(
+        0.0001,
+        tickTime
+      );
+      gain.gain.exponentialRampToValueAtTime(
+        0.14,
+        tickTime + 0.002
+      );
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        tickTime + 0.045
+      );
+      osc.connect(filter)
+        .connect(gain)
+        .connect(audioCtx.destination);
+      osc.start(tickTime);
+      osc.stop(tickTime + 0.026);
+      /*
+        Start fast
+        End slow
+      */
+      tickDelay += 0.0019;
+      tickTime += tickDelay;
+    }
+  }catch(e){
+    console.log(
+      'SPIN SOUND ERROR:',
+      e
+    );
+  }
+}
+async function playR11SpinSound(){
+  try{
+    ensureAudio();
+
+    if(!audioCtx) return;
+
+    const now = audioCtx.currentTime;
+
+    let tickTime = now + 0.05;
+    let tickDelay = 0.045;
+
+    for(let i = 0; i < 110; i++){
+
+      if(tickTime > now + 6.0) break;
+
+      const osc =
+        audioCtx.createOscillator();
+
+      const gain =
+        audioCtx.createGain();
+
+  const filter =
+    audioCtx.createBiquadFilter();
+        
+    if(!window.r11SoundNodes){
+      window.r11SoundNodes = [];
+     }
+
+      window.r11SoundNodes.push(osc);
+
+      osc.type = 'square';
+
+      filter.type = 'bandpass';
+
+      filter.frequency.setValueAtTime(
+        1250 + Math.random() * 650,
+        tickTime
+      );
+
+      filter.Q.setValueAtTime(
+        3.2,
+        tickTime
+      );
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        tickTime
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.14,
+        tickTime + 0.002
+      );
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        tickTime + 0.045
+      );
+
+      osc.connect(filter)
+        .connect(gain)
+        .connect(audioCtx.destination);
+
+      osc.start(tickTime);
+
+      osc.stop(
+        tickTime + 0.026
+      );
+
+      tickDelay += 0.0018;
+
+      tickTime += tickDelay;
+    }
+
+  }catch(e){
+
+    console.log(
+      'R11 SPIN SOUND ERROR:',
+      e
+    );
+
+  }
+}
+function stopR11SpinSound(){
+  try{
+    if(window.r11SoundNodes){
+      window.r11SoundNodes.forEach(node=>{
+        try{
+          node.stop();
+        }catch(e){}
+      });
+
+      window.r11SoundNodes = [];
+    }
+  }catch(e){}
+}
+function stopSpinSound(){
+  try{
+    /*
+      Mechanical ticks automatically
+      finish with their scheduled time.
+    */
+    if(spinOsc){
+      const now =
+        audioCtx.currentTime;
+      spinOsc.stop(
+        now + 0.05
+      );
+      spinOsc = null;
+    }
+  }catch(e){}
+}
+setInterval(()=>{
+
+  tickR36();
+  tickR11();
+  
+},1000);
+
+/* ---------- GEMS FORTUNE ---------- */
+const symbols=['◆','✦','✧','✚','✥','❖'],
+gemGrid=document.getElementById('gemGrid');
+
+let gemsRound=0,
+gemsBusy=false,
+gemsBet=10;
+
+document.getElementById('gemsBetMinus').addEventListener('click',()=>{
+  if(gemsBusy) return;
+
+  gemsBet=Math.max(1,gemsBet-1);
+
+  document.getElementById('gemsBetValue').textContent=gemsBet;
+  document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
+});
+
+document.getElementById('gemsBetPlus').addEventListener('click',()=>{
+  if(gemsBusy) return;
+
+  gemsBet=Math.min(1000,gemsBet+1);
+
+  document.getElementById('gemsBetValue').textContent=gemsBet;
+  document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
+});
+
+function makeGem(){
+ return Math.floor(Math.random()*symbols.length);
+}
+
+function createGem(n,cls=''){
+ const e=document.createElement('div');
+ e.className='gem g'+(n+1)+(cls?' '+cls:'');
+ e.dataset.v=n;
+ e.textContent=symbols[n];
+ return e;
+}
+
+function buildGems(){
+ gemGrid.innerHTML='';
+ for(let i=0;i<25;i++){
+  gemGrid.appendChild(createGem(makeGem()));
+ }
+}
+
+function neighbors(i){
+ const out=[];
+ const r=Math.floor(i/5);
+ const c=i%5;
+
+ [[r-1,c],[r+1,c],[r,c-1],[r,c+1]].forEach(([rr,cc])=>{
+  if(rr>=0&&rr<5&&cc>=0&&cc<5){
+   out.push(rr*5+cc);
+  }
+ });
+
+ return out;
+}
+
+function findClusters(){
+
+ const els=[...gemGrid.children];
+ const seen=new Set();
+ const groups=[];
+
+ for(let i=0;i<25;i++){
+
+  if(seen.has(i)) continue;
+
+  const val=+els[i].dataset.v;
+  const queue=[i];
+  const group=[];
+
+  seen.add(i);
+
+  while(queue.length){
+
+   const x=queue.shift();
+   group.push(x);
+
+   neighbors(x).forEach(y=>{
+    if(!seen.has(y)&&+els[y].dataset.v===val){
+     seen.add(y);
+     queue.push(y);
+    }
+   });
+
+  }
+
+  if(group.length>=3){
+   groups.push(group);
+  }
+ }
+
+ return groups;
+}
+
+function gemScore(size){
+
+ if(size===3) return 10;
+ if(size===4) return 20;
+ if(size===5) return 35;
+ if(size===6) return 55;
+
+ return size*12;
+}
+
+function dropGems(groups){
+
+ return new Promise(resolve=>{
+
+  const remove=new Set();
+
+  groups.forEach(group=>{
+   group.forEach(i=>remove.add(i));
+  });
+
+  remove.forEach(i=>{
+   const gem=gemGrid.children[i];
+   if(gem) gem.classList.add('pop');
+  });
+
+  setTimeout(()=>{
+
+   const old=[...gemGrid.children];
+   const board=new Array(25).fill(null);
+
+   /*
+    * Har column mein gems neeche girenge.
+    */
+   for(let c=0;c<5;c++){
+
+    const survivors=[];
+
+    for(let r=4;r>=0;r--){
+
+     const index=r*5+c;
+
+     if(!remove.has(index)){
+      survivors.push(old[index]);
+     }
+    }
+    for(let r=4;r>=0;r--){
+
+     const survivorIndex=4-r;
+
+     if(survivorIndex<survivors.length){
+      board[r*5+c]=survivors[survivorIndex];
+     }
+    }
+   }
+
+   gemGrid.innerHTML='';
+
+   /*
+    * Existing gems + naye gems.
+    */
+
+   for(let i=0;i<25;i++){
+
+    if(board[i]){
+
+     board[i].classList.remove('pop');
+     board[i].classList.add('drop');
+     gemGrid.appendChild(board[i]);
+
+    }else{
+
+     gemGrid.appendChild(
+
+      createGem(makeGem(),'new')
+     );
+
+    }
+   }
+
+   setTimeout(()=>{
+
+    [...gemGrid.children].forEach(g=>{
+     g.classList.remove('drop','new');
+    });
+
+    resolve();
+
+   },450);
+
+  },350);
+
+ });
+}
+
+async function playGems(){
+
+ if(gemsBusy) return;
+
+ if(balance<gemsBet){
+
+  document.getElementById('gemWin').textContent=
+   'NOT ENOUGH POINTS';
+
+  return;
+ }
+
+ ensureAudio();
+
+ balance-=gemsBet;
+ syncBalance();
+
+ gemsBusy=true;
+ gemsRound++;
+
+ document.getElementById('gemsRound').textContent=
+  gemsRound;
+
+ document.getElementById('gemsWin').textContent='0';
+
+ document.getElementById('gemWin').textContent=
+  'GEMS DROPPING...';
+
+ buildGems();
+
+ await new Promise(resolve=>setTimeout(resolve,350));
+
+ let totalWin=0;
+ let cascade=0;
+
+ /*
+  * Multiple matches = cascade.
+  */
+ while(cascade<8){
+
+  const groups=findClusters();
+
+  if(!groups.length) break;
+
+  cascade++;
+
+  let cascadeWin=0;
+
+  groups.forEach(group=>{
+   cascadeWin+=gemScore(group.length);
+  });
+
+  totalWin+=cascadeWin;
+
+  document.getElementById('gemWin').textContent=
+   'MATCH ×'+cascade+
+   '  +'+cascadeWin+' POINTS';
+  await dropGems(groups);
+  
+  await new Promise(resolve=>setTimeout(resolve,180));
+ }
+
+ if(totalWin>0){
+
+  balance+=totalWin;
+  syncBalance();
+
+  document.getElementById('gemsWin').textContent=
+   '+'+money(totalWin);
+   const bigWin=document.getElementById('gemBigWin');
+bigWin.innerHTML='<span class="win-amount-text">+'+money(totalWin)+'</span> <span class="win-points-text">POINTS</span>';
+bigWin.classList.remove('show');
+void bigWin.offsetWidth;
+bigWin.classList.add('show');
+if(totalWin>=20){
+  const trophy=document.getElementById('gemTrophy');
+
+  trophy.classList.remove('show');
+  void trophy.offsetWidth;
+  trophy.classList.add('show');
+
+  playGemsWinBig();
+
+}else{
+  playGemsLoss();
+  playGemsWinSmall();
+}
+  document.getElementById('gemWin').textContent=
+   'WIN +'+money(totalWin)+' POINTS';
+
+ }else{
+
+  document.getElementById('gemsWin').textContent='0';
+
+  document.getElementById('gemWin').textContent=
+   'NO WIN — TRY AGAIN';
+ }
+
+ setTimeout(()=>{
+  gemsBusy=false;
+ },350);
+}
+
+buildGems();
+syncBalance();
+try{
+  const savedLastWins =
+    localStorage.getItem('zynoR36LastWins');
+
+  if(savedLastWins){
+    const parsedLastWins =
+      JSON.parse(savedLastWins);
+
+    if(Array.isArray(parsedLastWins)){
+      r36Last = parsedLastWins.slice(0,4);
+      renderLast('r36last', r36Last);
+    }
+  }
+}catch(e){}
+try{
+  const savedView = localStorage.getItem('zynoActiveView');
+
+localStorage.removeItem('zynoActiveView');
+}catch(e){}
+</script>
+<script type="module">
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+getFirestore,
+collection,
+getDocs,
+doc,
+getDoc,
+setDoc,
+updateDoc,
+runTransaction,
+onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDpQHse79QRukas1LD_GTLf-CmDWtArA_c",
+    authDomain: "zyno-dc777.firebaseapp.com",
+    projectId: "zyno-dc777",
+    storageBucket: "zyno-dc777.firebasestorage.app",
+    messagingSenderId: "59378366235",
+    appId: "1:59378366235:web:72021899a3de7bf3a705be"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  alert('FIREBASE OK');
+const auth = getAuth(app);
+const db = getFirestore(app);
+window.zynoDb = db;
+window.zynoDoc = doc;
+window.zynoGetDoc = getDoc;
+window.zynoRunTransaction = runTransaction;
+window.zynoIsAdmin = false;
+
+/*
+ * Firebase functions required by the classic
+ * Part-1 R11 code.
+ */
+window.zynoDb = db;
+window.zynoDoc = doc;
+window.zynoGetDoc = getDoc;
+window.zynoRunTransaction = runTransaction;
+
+onSnapshot(doc(db,"gameResults","roulette"), snap=>{
+
+  if(!snap.exists()) return;
+
+  const data = snap.data();
+
+  if(data.roundId36 !== undefined){
+    window.globalRound36 = data.roundId36;
+  }
+
+  if(data.roundId11 !== undefined){
+    window.globalRound11 = data.roundId11;
+  }
+
+  if(data.phase11 !== undefined){
+
+  window.r11GlobalPhase11 =
+    data.phase11;
+
+}
+
+if(window.r11ApplyFirestore){
+
+  window.r11ApplyFirestore(data);
+
+}
+
+  if(data.roundStart36 !== undefined){
+    window.globalRoundStart36 = data.roundStart36;
+  }
+
+  if(data.betClose36 !== undefined){
+    window.globalBetClose36 = data.betClose36;
+  }
+
+  if(data.spinEnd36 !== undefined){
+    window.globalSpinEnd36 = data.spinEnd36;
+  }
+
+  if(Array.isArray(data.lastWins36)){
+    window.globalLastWins36 = data.lastWins36;
+  }
+
+  if(Array.isArray(data.lastWins11)){
+    window.globalLastWins11 = data.lastWins11.slice(0,4);
+
+    r11Last = window.globalLastWins11.slice(0,4);
+
+    renderLast('r11last', r11Last);
+
+    document.getElementById('r11lastWin').textContent =
+      r11Last.length ? r11Last[0] : '-';
+}
+
+  if(data.result36 !== undefined){
+    window.globalResult36 = data.result36;
+  }
+
+  if(data.result11 !== undefined){
+    window.globalResult11 = data.result11;
+  }
+
+});
+window.openAdminUser = async function(uid){
+
+  if(
+    !auth.currentUser ||
+    auth.currentUser.uid !== 'nPAn3k3fFmZWAqskELhEtW8sk332'
+  ){
+    alert('Admin access नहीं है');
+    return;
+  }
+
+  try{
+
+    const userRef = doc(db, 'users', uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      alert('User नहीं मिला');
+      return;
+    }
+
+    const data = snap.data();
+
+    alert(
+      'USER DETAILS\n\n' +
+      'Email: ' + (data.email || 'No Email') + '\n' +
+      'Points: ' + money(data.points || 0) + '\n' +
+      'Role: ' + (data.role || 'user') + '\n' +
+      'UID: ' + uid
+    );
+
+  }catch(error){
+
+    console.error(error);
+    alert('User details load नहीं हुई');
+
+  }
+
+};
+  // ===== USER BALANCE SAVE =====
+// ===== LOAD EXACT FIRESTORE USER BALANCE =====
+
+let balanceLoadedFromFirestore = false;
+let balanceUnsubscribe = null;
+
+function applyFirestoreBalance(points){
+
+  const exactPoints = Number(points || 0);
+
+  balance = exactPoints;
+  balanceLoadedFromFirestore = true;
+
+  syncBalance();
+
+  const transferBalance =
+    document.getElementById('transferBalance');
+
+  if(transferBalance){
+    transferBalance.textContent = money(exactPoints);
+  }
+
+  const adminBalance =
+    document.getElementById('adminBalance');
+
+  if(adminBalance && window.zynoIsAdmin === true){
+    adminBalance.textContent = money(exactPoints);
+  }
+}
+
+onAuthStateChanged(auth, async (user)=>{
+
+  if(balanceUnsubscribe){
+    balanceUnsubscribe();
+    balanceUnsubscribe = null;
+  }
+
+  balanceLoadedFromFirestore = false;
+
+  if(!user){
+  window.zynoIsAdmin = false;
+
+  document.querySelectorAll('.view').forEach(v =>
+    v.classList.remove('active')
+  );
+
+  document.getElementById('home').classList.add('active');
+
+  return;
+}
+
+  try{
+
+    const userRef = doc(db, 'users', user.uid);
+
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      console.error('Firestore user document not found');
+      return;
+    }
+
+    const data = snap.data();
+
+    applyFirestoreBalance(data.points);
+
+    if(
+      user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332' &&
+      data.role === 'admin'
+    ){
+      window.zynoIsAdmin = true;
+
+      const adminBalance =
+        document.getElementById('adminBalance');
+
+      if(adminBalance){
+        adminBalance.textContent =
+          money(Number(data.points || 0));
+      }
+
+    }else{
+      window.zynoIsAdmin = false;
+    }
+
+    // Firestore se balance change ho to screen bhi update ho
+    balanceUnsubscribe = onSnapshot(
+  userRef,
+  snap=>{
+    if(!snap.exists()) return;
+
+    const data = snap.data();
+
+     if (
+  typeof data.points === 'number' &&
+  !r36Spin &&
+  data.points !== balance &&
+  !window.r36SavingWin
+)
+    {
+  balance = data.points;
+  syncBalance();
+}
+  }
+);
+
+  }catch(error){
+
+    console.error(
+      'Firestore balance load error:',
+      error
+    );
+
+  }
+
+});
+let balanceSaveQueue = Promise.resolve();
+
+window.saveUserBalance = function(){
+
+  const balanceToSave =
+  Math.max(
+    0,
+    Math.floor(balance)
+  );
+  const save = async()=>{
+
+    try{
+
+      const user = auth.currentUser;
+
+      if(!user) return;
+
+      if(
+        user.uid ===
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+      ){
+
+        return;
+
+      }
+
+      const userRef =
+        doc(db, 'users', user.uid);
+
+      const savedBalance = balanceToSave;
+
+await updateDoc(
+  userRef,
+  {
+    points: savedBalance
+  }
+);
+
+if(Math.floor(balance) === savedBalance){
+  syncBalance();
+}
+
+if(window.r36SavingWin){
+   window.r36SavingWin = false;
+   window.r36WinBalance = null;
+ }
+
+      console.log(
+        'User balance saved:',
+        balance
+      );
+
+    }catch(error){
+
+      console.error(
+        'Balance save error:',
+        error
+      );
+
+    }
+
+  };
+
+  balanceSaveQueue =
+    balanceSaveQueue.then(
+      save,
+      save
+    );
+
+  return balanceSaveQueue;
+
+};
+
+window.sendPoints = async function(){
+
+  const receiverEmail =
+    document.getElementById('transferEmail').value.trim();
+
+  const amount =
+    Number(document.getElementById('transferAmount').value);
+
+  const msg =
+    document.getElementById('transferMsg');
+
+  if(!receiverEmail || !amount || amount <= 0){
+    msg.textContent = 'Receiver और सही Points डालें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  const sender = auth.currentUser;
+
+  if(!sender){
+    msg.textContent = 'पहले Login करें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  msg.textContent = 'Transfer हो रहा है...';
+  msg.style.color = '#ffd34e';
+
+  try{
+
+    const usersSnap =
+      await getDocs(collection(db, 'users'));
+
+    let receiverId = null;
+
+    usersSnap.forEach((userDoc) => {
+
+      const data = userDoc.data();
+
+      if(
+        data.email &&
+        data.email.toLowerCase() === receiverEmail.toLowerCase()
+      ){
+        receiverId = userDoc.id;
+      }
+
+    });
+
+    if(!receiverId){
+      msg.textContent = 'Receiver user नहीं मिला';
+      msg.style.color = '#ff5360';
+      return;
+    }
+
+    if(receiverId === sender.uid){
+      msg.textContent = 'अपने ही account में transfer नहीं कर सकते';
+      msg.style.color = '#ff5360';
+      return;
+    }
+
+    const senderRef = doc(db, 'users', sender.uid);
+    const receiverRef = doc(db, 'users', receiverId);
+
+    await runTransaction(db, async (transaction) => {
+
+      const senderSnap =
+        await transaction.get(senderRef);
+
+      const receiverSnap =
+        await transaction.get(receiverRef);
+
+      if(!senderSnap.exists()){
+        throw new Error('SENDER_NOT_FOUND');
+      }
+
+      if(!receiverSnap.exists()){
+        throw new Error('RECEIVER_NOT_FOUND');
+      }
+
+      const senderPoints =
+        Number(senderSnap.data().points || 0);
+
+      const receiverPoints =
+        Number(receiverSnap.data().points || 0);
+
+      if(senderPoints < amount){
+        throw new Error('INSUFFICIENT_POINTS');
+      }
+
+      transaction.update(
+        senderRef,
+        {
+          points: senderPoints - amount
+        }
+      );
+
+      transaction.update(
+        receiverRef,
+        {
+          points: receiverPoints + amount
+        }
+      );
+
+    });
+
+    balance -= amount;
+    syncBalance();
+
+    document.getElementById('transferBalance').textContent =
+      money(balance);
+
+    document.getElementById('transferAmount').value = '';
+
+    msg.textContent = 'Points successfully sent ✓';
+    msg.style.color = '#55f0b4';
+
+  }catch(error){
+
+    console.error(error);
+
+    if(error.message === 'INSUFFICIENT_POINTS'){
+      msg.textContent = 'आपके पास इतने Points नहीं हैं';
+    }else{
+      msg.textContent = 'Transfer नहीं हुआ';
+    }
+
+    msg.style.color = '#ff5360';
+
+  }
+
+};
+window.loginUser = async function(){
+
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const msg = document.getElementById('loginMsg');
+
+  if(!email || !password){
+    msg.textContent = 'Email और Password डालें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  msg.textContent = 'LOGIN हो रहा है...';
+  msg.style.color = '#ffd34e';
+
+  try{
+
+    const credential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+    const user = credential.user;
+
+    const userRef = doc(db, 'users', user.uid);
+    const snap = await getDoc(userRef);
+
+    if(!snap.exists()){
+      await signOut(auth);
+      msg.textContent = 'Account record नहीं मिला';
+      msg.style.color = '#ff5360';
+      return;
+    }
+
+    const data = snap.data();
+
+    // ADMIN LOGIN
+    if(
+      user.uid === 'nPAn3k3fFmZWAqskELhEtW8sk332' &&
+      data.role === 'admin'
+    ){
+      
+     window.zynoIsAdmin = true;
+    
+     balance = Number(data.points || 0);
+      syncBalance();
+
+      msg.textContent = 'Admin verified ✓';
+
+      document.querySelectorAll('.view').forEach(v =>
+        v.classList.remove('active')
+      );
+
+      document.getElementById('adminPanel').classList.add('active');
+
+      document.getElementById('adminBalance').textContent =
+        money(balance);
+
+      msg.style.color = '#55f0b4';
+
+      await loadAdminUsers();
+
+      return;
+    }
+
+    // NORMAL USER LOGIN
+    if(data.role === 'user')
+    {
+      window.zynoIsAdmin = false;
+      
+      balance = Number(data.points || 0);
+      syncBalance();
+
+      msg.textContent = 'Login successful ✓';
+      msg.style.color = '#55f0b4';
+
+      document.querySelectorAll('.view').forEach(v =>
+        v.classList.remove('active')
+      );
+
+      document.getElementById('home').classList.add('active');
+
+      return;
+    }
+
+    await signOut(auth);
+
+    msg.textContent = 'Account access नहीं है';
+    msg.style.color = '#ff5360';
+
+  }catch(error){
+
+    console.error(error);
+
+    msg.textContent = 'Email या Password गलत है';
+    msg.style.color = '#ff5360';
+  }
+};
+window.createAccount = async function(){
+  
+  alert('CREATE START');
+  console.log('STEP 1');
+  
+  
+  const email =
+    document.getElementById('signupEmail').value.trim();
+
+  const password =
+    document.getElementById('signupPassword').value;
+    
+  alert('EMAIL READ OK');
+  
+  const referralCode =
+    document.getElementById('signupReferralCode').value.trim();
+
+  const msg =
+    document.getElementById('signupMsg');
+
+  if(!email || !password){
+    msg.textContent =
+      'Email और Password डालें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  if(password.length < 6){
+    msg.textContent =
+      'Password कम से कम 6 characters का होना चाहिए';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  if(
+    signupReferralType === 'upline' &&
+    !referralCode
+  ){
+    msg.textContent =
+      'Upline Referral Code डालें';
+    msg.style.color = '#ff5360';
+    return;
+  }
+
+  msg.textContent =
+    'Account बन रहा है...';
+  msg.style.color = '#ffd34e';
+
+  try{
+
+    const credential =
+      await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+    console.log('STEP 2 - AUTH CREATED');
+    
+    const user = credential.user;
+
+    await setDoc(
+      doc(db, 'users', user.uid),
+      {
+        uid: user.uid,
+        email: user.email,
+        points: 0,
+        role: 'user',
+        referralType: signupReferralType,
+        referralCode:
+          signupReferralType === 'upline'
+            ? referralCode
+            : 'ZYNO-SYSTEM',
+        createdAt: new Date()
+      }
+    );
+
+    msg.textContent =
+      'Account successfully created ✓';
+    msg.style.color = '#55f0b4';
+
+  }catch(error){
+
+    console.error(error);
+
+    if(error.code === 'auth/email-already-in-use'){
+      msg.textContent =
+        'Ye Email already registered hai';
+    }else{
+      msg.textContent =
+        'Account create नहीं हुआ';
+    }
+
+    msg.style.color = '#ff5360';
+  }
+};
+window.showSignup = function(){
+
+  document
+    .querySelectorAll('.view')
+    .forEach(v =>
+      v.classList.remove('active')
+    );
+
+  document
+    .getElementById('signup')
+    .classList.add('active');
+
+};
+
+window.showLogin = function(){
+
+  document
+    .querySelectorAll('.view')
+    .forEach(v =>
+      v.classList.remove('active')
+    );
+
+  document
+    .getElementById('login')
+    .classList.add('active');
+
+};
+
+async function loadAdminUsers(){
+
+  const usersBox =
+    document.getElementById('adminUsers');
+
+  if(!usersBox) return;
+
+  usersBox.innerHTML = `
+    <div style="
+      text-align:center;
+      color:#ffd34e;
+      font-size:10px;
+      padding:15px;
+    ">
+      Users loading...
+    </div>
+  `;
+
+  try{
+
+    const usersSnap =
+      await getDocs(
+        collection(db, 'users')
+      );
+
+    if(usersSnap.empty){
+
+      usersBox.innerHTML = `
+        <div style="
+          text-align:center;
+          color:#7890aa;
+          font-size:10px;
+          padding:15px;
+        ">
+          कोई user नहीं मिला
+        </div>
+      `;
+
+      return;
+    }
+
+    let html = '';
+
+    const shownUids =
+      new Set();
+
+    usersSnap.forEach((userDoc)=>{
+
+      const data =
+        userDoc.data();
+
+      const currentUid =
+        data.uid || userDoc.id;
+
+      if(
+        shownUids.has(currentUid)
+      ){
+        return;
+      }
+
+      shownUids.add(currentUid);
+
+      let email =
+        data.email || 'No Email';
+
+      if(
+        currentUid ===
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+      ){
+
+        email =
+          'Firojkhan9636236300@gmail.com';
+
+      }
+
+      const points =
+        money(data.points || 0);
+
+      const role =
+        data.role || 'user';
+
+      html += `
+        <div style="
+          padding:12px;
+          margin-bottom:8px;
+          border-radius:12px;
+          background:#0b2034;
+          border:1px solid rgba(255,255,255,.08);
+        ">
+
+          <div style="
+            color:#fff;
+            font-weight:800;
+            font-size:12px;
+          ">
+            ${email}
+          </div>
+
+          <div style="
+            color:#ffd34e;
+            font-size:10px;
+            margin-top:5px;
+          ">
+            Points: ${points}
+          </div>
+
+          <div style="
+            color:#7890aa;
+            font-size:9px;
+            margin-top:4px;
+          ">
+            Role: ${role}
+          </div>
+
+          <div
+            onclick="openAdminUser('${currentUid}')"
+            style="
+              color:#00e5ff;
+              font-size:8px;
+              margin-top:4px;
+              word-break:break-all;
+              cursor:pointer;
+              text-decoration:underline;
+            "
+          >
+            UID: ${currentUid}
+          </div>
+
+          ${
+            role !== 'admin'
+            ? `
+              <div style="
+                display:flex;
+                gap:6px;
+                margin-top:10px;
+              ">
+
+                <input
+                  id="points_${currentUid}"
+                  type="number"
+                  min="1"
+                  placeholder="Points"
+                  style="
+                    flex:1;
+                    min-width:0;
+                    padding:8px;
+                    border-radius:8px;
+                    border:1px solid rgba(255,255,255,.12);
+                    background:#071522;
+                    color:#fff;
+                    font-size:10px;
+                  "
+                >
+
+                <button
+                  onclick="adminAddPoints('${currentUid}')"
+                  style="
+                    padding:8px 10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#55f0b4;
+                    color:#06131d;
+                    font-size:9px;
+                    font-weight:900;
+                  "
+                >
+                  ADD
+                </button>
+
+                <button
+                  onclick="adminRemovePoints('${currentUid}')"
+                  style="
+                    padding:8px 10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#ff5360;
+                    color:#fff;
+                    font-size:9px;
+                    font-weight:900;
+                  "
+                >
+                  REMOVE
+                </button>
+
+              </div>
+            `
+            : ''
+          }
+
+        </div>
+      `;
+    });
+
+    usersBox.innerHTML =
+      html;
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+    usersBox.innerHTML = `
+      <div style="
+        text-align:center;
+        color:#ff5360;
+        font-size:10px;
+        padding:15px;
+      ">
+        Users load नहीं हुए
+      </div>
+    `;
+
+  }
+
+}
+
+window.adminAddPoints =
+  async function(userUid){
+
+  try{
+
+    if(
+      !auth.currentUser ||
+      auth.currentUser.uid !==
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+    ){
+
+      alert(
+        'Admin access नहीं है'
+      );
+
+      return;
+    }
+
+    const input =
+      document.getElementById(
+        `points_${userUid}`
+      );
+
+    const amount =
+      Number(
+        input?.value
+      );
+
+    if(
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ){
+
+      alert(
+        'Valid points amount डालें'
+      );
+
+      return;
+    }
+
+    const userRef =
+      doc(
+        db,
+        'users',
+        userUid
+      );
+
+    const userSnap =
+      await getDoc(
+        userRef
+      );
+
+    if(
+      !userSnap.exists()
+    ){
+
+      alert(
+        'User नहीं मिला'
+      );
+
+      return;
+    }
+
+    const data =
+      userSnap.data();
+
+    if(
+      data.role === 'admin'
+    ){
+
+      alert(
+        'Admin points change नहीं कर सकते'
+      );
+
+      return;
+    }
+
+    const oldPoints =
+      Number(
+        data.points || 0
+      );
+
+    const newPoints =
+      oldPoints + amount;
+
+    await updateDoc(
+      userRef,
+      {
+        points:
+          newPoints
+      }
+    );
+
+    input.value = '';
+
+    alert(
+      `${money(amount)} points ADD हो गए`
+    );
+
+    await loadAdminUsers();
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+    alert(
+      'Points ADD नहीं हुए'
+    );
+
+  }
+
+};
+
+window.adminRemovePoints =
+  async function(userUid){
+
+  try{
+
+    if(
+      !auth.currentUser ||
+      auth.currentUser.uid !==
+        'nPAn3k3fFmZWAqskELhEtW8sk332'
+    ){
+
+      alert(
+        'Admin access नहीं है'
+      );
+
+      return;
+    }
+
+    const input =
+      document.getElementById(
+        `points_${userUid}`
+      );
+
+    const amount =
+      Number(
+        input?.value
+      );
+
+    if(
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ){
+
+      alert(
+        'Valid points amount डालें'
+      );
+
+      return;
+    }
+
+    const userRef =
+      doc(
+        db,
+        'users',
+        userUid
+      );
+
+    const userSnap =
+      await getDoc(
+        userRef
+      );
+
+    if(
+      !userSnap.exists()
+    ){
+
+      alert(
+        'User नहीं मिला'
+      );
+
+      return;
+    }
+
+    const data =
+      userSnap.data();
+
+    if(
+      data.role === 'admin'
+    ){
+
+      alert(
+        'Admin points change नहीं कर सकते'
+      );
+
+      return;
+    }
+
+    const oldPoints =
+      Number(
+        data.points || 0
+      );
+
+    if(
+      amount > oldPoints
+    ){
+
+      alert(
+        `User के पास सिर्फ ${money(oldPoints)} points हैं`
+      );
+
+      return;
+    }
+
+    const newPoints =
+      oldPoints - amount;
+
+    await updateDoc(
+      userRef,
+      {
+        points:
+          newPoints
+      }
+    );
+
+    input.value = '';
+
+    alert(
+      `${money(amount)} points REMOVE हो गए`
+    );
+
+    await loadAdminUsers();
+
+  }catch(error){
+
+    console.error(
+      error
+    );
+
+    alert(
+      'Points REMOVE नहीं हुए'
+    );
+
+  }
+
+};
+
+console.log(
+  "ZYNO Firebase Connected"
+);
+
+</script>
+</body>
+</html>
