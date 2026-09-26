@@ -781,6 +781,66 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   </div>
 
 </section>
+
+<section id="login" class="view">
+  <div class="panel">
+
+    <h2 style="text-align:center;color:#00e5ff;margin-bottom:6px;">
+      LOGIN
+    </h2>
+
+    <div style="text-align:center;color:#7890aa;font-size:10px;margin-bottom:18px;">
+      Login to your ZYNO account
+    </div>
+
+    <input
+      id="loginEmail"
+      type="email"
+      placeholder="Email"
+      autocomplete="email"
+      style="width:100%;height:45px;margin-bottom:10px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <input
+      id="loginPassword"
+      type="password"
+      placeholder="Password"
+      autocomplete="current-password"
+      style="width:100%;height:45px;margin-bottom:12px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;outline:none;"
+    >
+
+    <button
+      type="button"
+      onclick="loginUser()"
+      style="width:100%;height:45px;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);font-weight:1000;color:#fff;"
+    >
+      LOGIN
+    </button>
+
+    <div
+      id="loginMsg"
+      style="text-align:center;min-height:20px;margin-top:10px;color:#7890aa;font-size:9px;"
+    ></div>
+
+    <button
+      type="button"
+      onclick="showSignup()"
+      style="width:100%;height:38px;margin-top:4px;border-radius:10px;background:transparent;border:0;color:#00e5ff;font-weight:900;"
+    >
+      CREATE NEW ACCOUNT
+    </button>
+
+    <button
+      type="button"
+      onclick="goHome()"
+      style="width:100%;height:34px;margin-top:2px;border-radius:10px;background:transparent;border:0;color:#7890aa;font-weight:800;font-size:10px;"
+    >
+      ← BACK HOME
+    </button>
+
+  </div>
+</section>
+
 <section id="signup" class="view">
   <div class="panel">
 
