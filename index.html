@@ -3858,6 +3858,62 @@ window.loginUser = async function(){
     msg.style.color = '#ff5360';
   }
 };
+let signupReferralType = 'system';
+
+window.selectReferralType = function(type){
+
+  signupReferralType = type;
+
+  const systemBtn =
+    document.getElementById('systemReferralBtn');
+
+  const uplineBtn =
+    document.getElementById('uplineReferralBtn');
+
+  const referralCode =
+    document.getElementById('signupReferralCode');
+
+  if(type === 'system'){
+
+    systemBtn.style.background =
+      'rgba(0,229,255,.12)';
+
+    systemBtn.style.color =
+      '#00e5ff';
+
+    uplineBtn.style.background =
+      'transparent';
+
+    uplineBtn.style.color =
+      '#7890aa';
+
+    referralCode.style.display =
+      'none';
+
+    referralCode.value =
+      '';
+
+  }else{
+
+    uplineBtn.style.background =
+      'rgba(0,229,255,.12)';
+
+    uplineBtn.style.color =
+      '#00e5ff';
+
+    systemBtn.style.background =
+      'transparent';
+
+    systemBtn.style.color =
+      '#7890aa';
+
+    referralCode.style.display =
+      'block';
+
+  }
+
+};
+
 window.createAccount = async function(){
   
   alert('CREATE START');
