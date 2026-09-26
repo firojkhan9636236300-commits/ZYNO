@@ -3967,6 +3967,8 @@ window.createAccount = async function(){
         password
       );
 
+    console.log('STEP 2 - AUTH CREATED');
+    
     const user = credential.user;
 
     await setDoc(
