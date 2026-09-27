@@ -4005,7 +4005,7 @@ window.loginUser = async function(){
 
     // NORMAL USER LOGIN
     if(data.role === 'user'){
-      loadMyReferralCode();
+      await loadMyReferralCode();
       window.zynoIsAdmin = false;
       
       balance = Number(data.points || 0);
