@@ -1040,6 +1040,22 @@ async function loadMyReferralCode(){
     if(!snap.exists()) return;
 
     const data = snap.data();
+    
+    if(data.role === 'user' && !data.myReferralCode){
+
+  const newReferralCode =
+    'ZYNO-' +
+    user.uid.slice(0,6).toUpperCase();
+
+  await window.zynoUpdateDoc(
+    userRef,
+    {
+      myReferralCode: newReferralCode
+    }
+  );
+
+  data.myReferralCode = newReferralCode;
+}
 
     const code = data.myReferralCode || '—';
 
