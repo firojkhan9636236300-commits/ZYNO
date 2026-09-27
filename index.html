@@ -3501,6 +3501,7 @@ onSnapshot
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+window.zynoAuth = auth;
 const db = getFirestore(app);
 window.zynoDb = db;
 window.zynoDoc = doc;
@@ -3958,7 +3959,7 @@ window.loginUser = async function(){
     console.log('LOGIN PASSWORD LENGTH:', password.length);
     
     const credential = await signInWithEmailAndPassword(
-      auth,
+      window.zynoAuth,
       email,
       password
     );
