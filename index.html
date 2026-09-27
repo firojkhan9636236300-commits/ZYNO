@@ -4031,7 +4031,11 @@ window.loginUser = async function(){
   }catch(error){
 
   console.error('LOGIN ERROR CODE:', error.code);
-  alert(JSON.stringify(error));
+  alert(
+  'NAME: ' + (error.name || 'NONE') +
+  '\nMESSAGE: ' + (error.message || 'NONE') +
+  '\nCODE: ' + (error.code || 'NONE')
+);
   console.error('LOGIN ERROR:', error);
 
   msg.textContent =
