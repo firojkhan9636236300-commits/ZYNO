@@ -3972,8 +3972,6 @@ window.sendPoints = async function(){
 window.loginUser = async function(){
 
   const email = document.getElementById('loginEmail').value.trim();
-  alert('EMAIL = [' + email + ']');
-  console.log('LOGIN EMAIL EXACT:', JSON.stringify(email));
   const password = document.getElementById('loginPassword').value;
   const msg = document.getElementById('loginMsg');
 
@@ -3990,12 +3988,15 @@ window.loginUser = async function(){
     
     console.log('LOGIN EMAIL:', email);
     console.log('LOGIN PASSWORD LENGTH:', password.length);
+    alert('SIGNIN START: ' + email);
     
     const credential = await window.zynoSignInWithEmailAndPassword(
   window.zynoAuth,
   email,
   password
 );
+
+alert('SIGNIN SUCCESS');
 
     const user = credential.user;
 
