@@ -4030,12 +4030,16 @@ window.loginUser = async function(){
 
   }catch(error){
 
-    console.error(error);
+  console.error('LOGIN ERROR CODE:', error.code);
+  console.error('LOGIN ERROR:', error);
 
-    msg.textContent = 'Email या Password गलत है';
-    msg.style.color = '#ff5360';
-  }
+  msg.textContent =
+    'LOGIN ERROR: ' + (error.code || 'UNKNOWN');
+
+  msg.style.color = '#ff5360';
+}
 };
+
 let signupReferralType = 'system';
 
 window.selectReferralType = function(type){
