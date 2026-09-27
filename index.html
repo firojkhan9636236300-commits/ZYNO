@@ -3953,7 +3953,10 @@ window.loginUser = async function(){
   msg.style.color = '#ffd34e';
 
   try{
-
+    
+    console.log('LOGIN EMAIL:', email);
+    console.log('LOGIN PASSWORD LENGTH:', password.length);
+    
     const credential = await signInWithEmailAndPassword(
       auth,
       email,
