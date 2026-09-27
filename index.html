@@ -1030,8 +1030,12 @@ async function loadMyReferralCode(){
 
   try{
 
-    const userRef = doc(db,'users',user.uid);
-    const snap = await getDoc(userRef);
+    const userRef = window.zynoDoc(
+  window.zynoDb,
+  'users',
+  user.uid
+);
+    const snap = await window.zynoGetDoc(userRef);
 
     if(!snap.exists()) return;
 
