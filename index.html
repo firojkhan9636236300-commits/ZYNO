@@ -3509,6 +3509,17 @@ window.zynoGetDoc = getDoc;
 window.zynoRunTransaction = runTransaction;
 window.zynoIsAdmin = false;
 
+window.zynoSignInWithEmailAndPassword = signInWithEmailAndPassword;
+window.zynoCreateUserWithEmailAndPassword = createUserWithEmailAndPassword;
+window.zynoSignOut = signOut;
+window.zynoOnAuthStateChanged = onAuthStateChanged;
+
+window.zynoCollection = collection;
+window.zynoGetDocs = getDocs;
+window.zynoSetDoc = setDoc;
+window.zynoUpdateDoc = updateDoc;
+window.zynoOnSnapshot = onSnapshot;
+
 /*
  * Firebase functions required by the classic
  * Part-1 R11 code.
@@ -3958,19 +3969,23 @@ window.loginUser = async function(){
     console.log('LOGIN EMAIL:', email);
     console.log('LOGIN PASSWORD LENGTH:', password.length);
     
-    const credential = await signInWithEmailAndPassword(
-      window.zynoAuth,
-      email,
-      password
-    );
+    const credential = await window.zynoSignInWithEmailAndPassword(
+  window.zynoAuth,
+  email,
+  password
+);
 
     const user = credential.user;
 
-    const userRef = doc(db, 'users', user.uid);
-    const snap = await getDoc(userRef);
+    const userRef = window.zynoDoc(
+  window.zynoDb,
+  'users',
+  user.uid
+);
+    const snap = await window.zynoGetDoc(userRef);
 
     if(!snap.exists()){
-  await signOut(window.zynoAuth);
+  await window.zynoSignOut(window.zynoAuth);
   msg.textContent = 'Account record नहीं मिला';
   msg.style.color = '#ff5360';
   return;
@@ -4027,7 +4042,7 @@ window.loginUser = async function(){
       return;
     }
 
-    await signOut(window.zynoAuth);
+    await window.zynoSignOut(window.zynoAuth);
 
     msg.textContent = 'Account access नहीं है';
     msg.style.color = '#ff5360';
