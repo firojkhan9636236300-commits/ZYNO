@@ -1052,7 +1052,8 @@ async function loadMyReferralCode(){
     let code = data.myReferralCode;
     
     alert('MY REFERRAL: ' + (code || 'NO CODE'));
-
+    alert('ROLE: ' + data.role);
+    
     // Agar current user ka referral code missing hai
     if(data.role === 'user' && !code){
 
