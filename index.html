@@ -1063,14 +1063,27 @@ async function loadMyReferralCode(){
         
       alert('NEW CODE: ' + code);
       
-      await window.zynoUpdateDoc(
-  userRef,
-  {
-    myReferralCode: code
-  }
-);
+      try{
 
-alert('REFERRAL SAVED: ' + code);
+  await window.zynoUpdateDoc(
+    userRef,
+    {
+      myReferralCode: code
+    }
+  );
+
+  alert('REFERRAL SAVED: ' + code);
+
+}catch(saveError){
+
+  alert(
+    'REFERRAL SAVE ERROR: ' +
+    (saveError.code || 'NO CODE') +
+    '\n' +
+    (saveError.message || 'NO MESSAGE')
+  );
+
+}
 
     }
 
