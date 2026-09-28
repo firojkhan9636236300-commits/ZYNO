@@ -1024,6 +1024,13 @@ function syncBalance(){
 
 async function loadMyReferralCode(){
 
+  const box = document.getElementById('myReferCode');
+
+  // Pehle purana referral code hatao
+  if(box){
+    box.textContent = '—';
+  }
+
   const user = window.zynoAuth.currentUser;
 
   if(!user) return;
@@ -1031,42 +1038,38 @@ async function loadMyReferralCode(){
   try{
 
     const userRef = window.zynoDoc(
-  window.zynoDb,
-  'users',
-  user.uid
-);
+      window.zynoDb,
+      'users',
+      user.uid
+    );
+
     const snap = await window.zynoGetDoc(userRef);
 
     if(!snap.exists()) return;
 
     const data = snap.data();
-    
-    if(data.role === 'user' && !data.myReferralCode){
 
-  const newReferralCode =
-    'ZYNO-' +
-    user.uid.slice(0,6).toUpperCase();
+    let code = data.myReferralCode;
 
-  await window.zynoUpdateDoc(
-    userRef,
-    {
-      myReferralCode: newReferralCode
+    // Agar current user ka referral code missing hai
+    if(data.role === 'user' && !code){
+
+      code =
+        'ZYNO-' +
+        user.uid.slice(0,6).toUpperCase();
+
+      await window.zynoUpdateDoc(
+        userRef,
+        {
+          myReferralCode: code
+        }
+      );
+
     }
-  );
 
-  data.myReferralCode = newReferralCode;
-  
-  alert('UID: ' + user.uid);
-  alert('OLD REF CODE SAVED: ' + data.myReferralCode);
-  
-}
-
-    const code = data.myReferralCode || '—';
-
-    const box = document.getElementById('myReferCode');
-
+    // Sirf CURRENT logged-in user ka code show hoga
     if(box){
-      box.textContent = code;
+      box.textContent = code || '—';
     }
 
   }catch(error){
@@ -1075,6 +1078,10 @@ async function loadMyReferralCode(){
       'Referral code load error:',
       error
     );
+
+    if(box){
+      box.textContent = '—';
+    }
 
   }
 
