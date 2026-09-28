@@ -1064,11 +1064,13 @@ async function loadMyReferralCode(){
       alert('NEW CODE: ' + code);
       
       await window.zynoUpdateDoc(
-        userRef,
-        {
-          myReferralCode: code
-        }
-      );
+  userRef,
+  {
+    myReferralCode: code
+  }
+);
+
+alert('REFERRAL SAVED: ' + code);
 
     }
 
