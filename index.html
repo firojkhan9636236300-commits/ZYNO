@@ -4097,15 +4097,9 @@ window.loginUser = async function(){
   }catch(error){
 
   console.error('LOGIN ERROR CODE:', error.code);
-  alert(
-  'NAME: ' + (error.name || 'NONE') +
-  '\nMESSAGE: ' + (error.message || 'NONE') +
-  '\nCODE: ' + (error.code || 'NONE')
-);
   console.error('LOGIN ERROR:', error);
 
-  msg.textContent =
-    'LOGIN ERROR: ' + (error.code || 'UNKNOWN');
+  msg.textContent = 'Email ya password galat hai';
   msg.style.color = '#ff5360';
 }
 };
