@@ -3738,6 +3738,8 @@ onAuthStateChanged(auth, async (user)=>{
 
     const data = snap.data();
 
+    await loadMyReferralCode();
+    
     applyFirestoreBalance(data.points);
 
     if(
