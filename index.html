@@ -1060,7 +1060,9 @@ async function loadMyReferralCode(){
       code =
         'ZYNO-' +
         user.uid.slice(0,6).toUpperCase();
-
+        
+      alert('NEW CODE: ' + code);
+      
       await window.zynoUpdateDoc(
         userRef,
         {
