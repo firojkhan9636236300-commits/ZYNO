@@ -4644,6 +4644,19 @@ window.adminAddPoints =
 
     const newPoints =
       oldPoints + amount;
+      
+      const accounting =
+  getZynoAccounting(amount);
+
+console.log(
+  'ZYNO ACCOUNTING',
+  {
+    total: accounting.total,
+    adminSystem: accounting.adminSystem,
+    directReferral: accounting.directReferral,
+    winLoss: accounting.winLoss
+  }
+);
 
     await updateDoc(
       userRef,
