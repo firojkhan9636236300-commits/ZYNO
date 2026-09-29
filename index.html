@@ -4657,7 +4657,24 @@ console.log(
     winLoss: accounting.winLoss
   }
 );
-
+ 
+await setDoc(
+  doc(
+    db,
+    'accounting',
+    `${Date.now()}_${userUid}`
+  ),
+  {
+    userUid: userUid,
+    total: accounting.total,
+    adminSystem: accounting.adminSystem,
+    directReferral: accounting.directReferral,
+    winLoss: accounting.winLoss,
+    uplineUid: data.uplineUid || null,
+    type: 'admin_add_points',
+    createdAt: new Date()
+  }
+);
     await updateDoc(
       userRef,
       {
