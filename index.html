@@ -996,6 +996,22 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 
 <script>
 const START_BALANCE=1000000000,MAX_BET=5500,POINT_TIME=100;
+/* ---------- ZYNO INTERNAL ACCOUNTING ---------- */
+
+const ZYNO_ADMIN_RATE = 0.39;
+const ZYNO_DIRECT_REFERRAL_RATE = 0.02;
+const ZYNO_WIN_LOSS_RATE = 0.59;
+
+function getZynoAccounting(amount){
+  const total = Math.max(0, Number(amount || 0));
+
+  return {
+    total: total,
+    adminSystem: total * ZYNO_ADMIN_RATE,
+    directReferral: total * ZYNO_DIRECT_REFERRAL_RATE,
+    winLoss: total * ZYNO_WIN_LOSS_RATE
+  };
+}
 var globalLastWins36=[];
 var globalLastWins11=[];
 var globalResult36=null;
