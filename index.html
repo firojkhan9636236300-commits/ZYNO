@@ -4220,36 +4220,40 @@ window.createAccount = async function(){
 
   try{
     
-if(signupReferralType==='upline'){
 
-  const usersSnap=await getDocs(
-    collection(db,'users')
-  );
+  if(signupReferralType==='upline'){
 
-  const enteredCode=referralCode.trim().toUpperCase();
+  const enteredCode =
+    referralCode.trim().toUpperCase();
 
-  let uplineUser=null;
+  const referralRef =
+    doc(
+      db,
+      'referralCodes',
+      enteredCode
+    );
 
-  usersSnap.forEach(userDoc=>{
-    const data=userDoc.data();
+  const referralSnap =
+    await getDoc(referralRef);
 
-    if(
-      String(data.myReferralCode||'').toUpperCase() === enteredCode
-    ){
-      uplineUser={
-        uid:userDoc.id,
-        data:data
-      };
-    }
-  });
-
-  if(!uplineUser){
+  if(!referralSnap.exists()){
     msg.textContent='Invalid Upline Referral Code';
     return;
   }
 
-  window.signupUplineUid=uplineUser.uid;
-  window.signupUplineCode=enteredCode;
+  const referralData =
+    referralSnap.data();
+
+  if(!referralData.uid){
+    msg.textContent='Invalid Upline Referral Code';
+    return;
+  }
+
+  window.signupUplineUid =
+    referralData.uid;
+
+  window.signupUplineCode =
+    enteredCode;
 }
     const credential =
       await createUserWithEmailAndPassword(
