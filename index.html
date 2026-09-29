@@ -4309,7 +4309,10 @@ createdAt: new Date()
         'Ye Email already registered hai';
     }else{
       msg.textContent =
-        'Account create नहीं हुआ';
+        'Account create नहीं हुआ: ' +
+        (error.code || 'NO CODE') +
+        ' | ' +
+        (error.message || 'NO MESSAGE');
     }
 
     msg.style.color = '#ff5360';
