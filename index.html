@@ -4698,7 +4698,10 @@ await setDoc(
     );
 
     alert(
-      'Points ADD नहीं हुए'
+      'Points ADD नहीं हुए: ' +
+      (error.code || 'NO CODE') +
+      '\n' +
+      (error.message || 'NO MESSAGE')
     );
 
   }
