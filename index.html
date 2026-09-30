@@ -1282,13 +1282,14 @@ const maxAdd =
     balance-=add;
 bets36[n]=newBet;
 
+syncBalance();
+
 if(window.addWagerCompleted && add>0){
-  await window.addWagerCompleted(add);
+  window.addWagerCompleted(add);
 }
 
     btn.classList.add('active');
     updateCount36(btn,newBet);
-    syncBalance();
 
     setTimeout(()=>{
       btn.classList.remove('active');
