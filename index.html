@@ -1284,6 +1284,10 @@ bets36[n]=newBet;
 
 syncBalance();
 
+if(window.saveUserBalance){
+  window.saveUserBalance();
+}
+
 if(window.addWagerCompleted && add>0){
   window.addWagerCompleted(add);
 }
