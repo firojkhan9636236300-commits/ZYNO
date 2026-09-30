@@ -3494,7 +3494,11 @@ syncBalance();
  if(totalWin>0){
 
   balance+=totalWin;
-  syncBalance();
+syncBalance();
+
+if(window.saveUserBalance){
+  window.saveUserBalance();
+}
 
   document.getElementById('gemsWin').textContent=
    '+'+money(totalWin);
