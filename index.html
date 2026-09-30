@@ -1252,7 +1252,7 @@ function bindHold36(btn,n){
   let holdTimer=null;
   let holding=false;
 
-  const betNow=()=>{
+  const betNow=async()=>{
     if(r36Spin)return;
 
     const betAmount=BET_OPTIONS36[selectedBetIndex36];
@@ -1280,7 +1280,11 @@ const maxAdd =
     }
 
     balance-=add;
-    bets36[n]=newBet;
+bets36[n]=newBet;
+
+if(window.addWagerCompleted && add>0){
+  await window.addWagerCompleted(add);
+}
 
     btn.classList.add('active');
     updateCount36(btn,newBet);
@@ -3877,6 +3881,74 @@ if(window.r36SavingWin){
     );
 
   return balanceSaveQueue;
+
+};
+
+window.addWagerCompleted = async function(amount){
+
+  const wagerAmount =
+    Math.max(
+      0,
+      Number(amount || 0)
+    );
+
+  if(!wagerAmount) return;
+
+  try{
+
+    const user = auth.currentUser;
+
+    if(!user) return;
+
+    if(
+      user.uid ===
+      'nPAn3k3fFmZWAqskELhEtW8sk332'
+    ){
+
+      return;
+
+    }
+
+    const userRef =
+      doc(db, 'users', user.uid);
+
+    const snap =
+      await getDoc(userRef);
+
+    if(!snap.exists()) return;
+
+    const data =
+      snap.data();
+
+    const oldCompleted =
+      Number(data.wagerCompleted || 0);
+
+    const newCompleted =
+      oldCompleted + wagerAmount;
+
+    await updateDoc(
+      userRef,
+      {
+        wagerCompleted:
+          newCompleted
+      }
+    );
+
+    console.log(
+      'Wager completed:',
+      wagerAmount,
+      'Total:',
+      newCompleted
+    );
+
+  }catch(error){
+
+    console.error(
+      'Wager save error:',
+      error
+    );
+
+  }
 
 };
 
