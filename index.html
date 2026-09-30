@@ -4652,6 +4652,24 @@ window.adminAddPoints =
     const newPoints =
       oldPoints + amount;
       
+      const oldWagerRequired =
+  Number(data.wagerRequired || 0);
+
+const oldWagerCompleted =
+  Number(data.wagerCompleted || 0);
+
+const wagerForThisPurchase =
+  amount <= 1000
+    ? amount
+    : amount * 0.50;
+
+const newWagerRequired =
+  oldWagerRequired +
+  wagerForThisPurchase;
+
+const newWagerCompleted =
+  oldWagerCompleted;
+      
       const accounting =
   getZynoAccounting(amount);
 
@@ -4684,12 +4702,18 @@ await setDoc(
   }
 );
     await updateDoc(
-      userRef,
-      {
-        points:
-          newPoints
-      }
-    );
+  userRef,
+  {
+    points:
+      newPoints,
+
+    wagerRequired:
+      newWagerRequired,
+
+    wagerCompleted:
+      newWagerCompleted
+  }
+);
 
     input.value = '';
 
