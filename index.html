@@ -3290,40 +3290,48 @@ function neighbors(i){
 
 function findClusters(){
 
- const els=[...gemGrid.children];
- const seen=new Set();
- const groups=[];
+  const els=[...gemGrid.children];
+  const groups=[];
 
- for(let i=0;i<25;i++){
+  /*
+   * Sirf horizontal matches count honge.
+   * Vertical / diagonal matches count nahi honge.
+   */
 
-  if(seen.has(i)) continue;
+  for(let r=0;r<5;r++){
 
-  const val=+els[i].dataset.v;
-  const queue=[i];
-  const group=[];
+    let c=0;
 
-  seen.add(i);
+    while(c<5){
 
-  while(queue.length){
+      const start=c;
+      const val=+els[r*5+c].dataset.v;
 
-   const x=queue.shift();
-   group.push(x);
+      c++;
 
-   neighbors(x).forEach(y=>{
-    if(!seen.has(y)&&+els[y].dataset.v===val){
-     seen.add(y);
-     queue.push(y);
+      while(
+        c<5 &&
+        +els[r*5+c].dataset.v===val
+      ){
+        c++;
+      }
+
+      const size=c-start;
+
+      if(size>=3){
+
+        const group=[];
+
+        for(let x=start;x<c;x++){
+          group.push(r*5+x);
+        }
+
+        groups.push(group);
+      }
     }
-   });
-
   }
 
-  if(group.length>=3){
-   groups.push(group);
-  }
- }
-
- return groups;
+  return groups;
 }
 
 function gemScore(size){
