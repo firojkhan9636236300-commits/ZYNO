@@ -3435,7 +3435,16 @@ async function playGems(){
  ensureAudio();
 
  balance-=gemsBet;
- syncBalance();
+
+if(window.saveUserBalance){
+  window.saveUserBalance();
+}
+
+if(window.addWagerCompleted && gemsBet > 0){
+  window.addWagerCompleted(gemsBet);
+}
+
+syncBalance();
 
  gemsBusy=true;
  gemsRound++;
