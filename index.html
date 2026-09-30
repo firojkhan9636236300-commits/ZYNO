@@ -1813,6 +1813,10 @@ function bindHold11(btn,n){
 
           bets11[n] = amt;
 
+         if(window.addWagerCompleted && add > 0){
+           window.addWagerCompleted(add);
+           }
+
           btn
             .querySelector('.bet-count')
             .textContent =
