@@ -1812,7 +1812,11 @@ function bindHold11(btn,n){
           balance -= add;
 
           bets11[n] = amt;
-
+          
+          if(window.saveUserBalance){
+         window.saveUserBalance();
+         }
+        
          if(window.addWagerCompleted && add > 0){
            window.addWagerCompleted(add);
            }
