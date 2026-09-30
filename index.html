@@ -3948,7 +3948,15 @@ window.addWagerCompleted = async function(amount){
 
   }catch(error){
 
-    
+    console.error(
+      'Wager save error:',
+      error
+    );
+
+    alert(
+      'WAGER ERROR: ' +
+      error.message
+    );
 
   }
 
