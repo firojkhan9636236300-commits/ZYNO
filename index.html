@@ -3360,10 +3360,62 @@ function createGem(n,cls=''){
 }
 
 function buildGems(){
+
  gemGrid.innerHTML='';
+
+ const cellHeight =
+   gemGrid.getBoundingClientRect().height / 5;
+
  for(let i=0;i<25;i++){
-  gemGrid.appendChild(createGem(makeGem()));
+
+  const gem =
+    createGem(makeGem(),'new');
+
+  gemGrid.appendChild(gem);
+
+  const row =
+    Math.floor(i/5);
+
+  gem.style.transition='none';
+
+  /*
+   * Har gem board ke upar se aayega.
+   * Neeche wali rows thoda zyada distance se girengi.
+   */
+  gem.style.transform =
+    `translateY(-${(row+2)*cellHeight}px)`;
+
+  requestAnimationFrame(()=>{
+
+    requestAnimationFrame(()=>{
+
+      gem.style.transition =
+        'transform .55s cubic-bezier(.16,.72,.24,1)';
+
+      gem.style.transform =
+        'translateY(0)';
+
+    });
+
+  });
+
  }
+
+ /*
+  * Animation ke baad temporary styles hata do.
+  */
+ setTimeout(()=>{
+
+  [...gemGrid.children].forEach(gem=>{
+
+   gem.classList.remove('new');
+
+   gem.style.transition='';
+   gem.style.transform='';
+
+  });
+
+ },700);
 }
 
 function neighbors(i){
