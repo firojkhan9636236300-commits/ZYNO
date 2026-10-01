@@ -3480,7 +3480,7 @@ function findClusters(){
 
 function gemScore(size,bet,symbol){
 
-  const base=[
+  const smallWin=[
     0.10,
     0.20,
     0.30,
@@ -3490,22 +3490,22 @@ function gemScore(size,bet,symbol){
   ][symbol] || 0.10;
 
   if(size===3){
-    return Math.round(base*100)/100;
+    return smallWin;
   }
 
   if(size===4){
-    return Math.round(base*2*100)/100;
+    return Math.round(smallWin*3*100)/100;
   }
 
   if(size===5){
-    return Math.round(base*5*100)/100;
+    return Math.round(smallWin*8*100)/100;
   }
 
-  if(size===6){
-    return Math.round(base*10*100)/100;
+  if(size>=6){
+    return Math.round(smallWin*20*100)/100;
   }
 
-  return Math.round(base*12*100)/100;
+  return 0;
 }
 
 function dropGems(groups){
