@@ -3562,8 +3562,22 @@ function dropGems(groups){
 
      newGem.style.transition='none';
 
-     newGem.style.transform=
-      `translateY(-${(row+1)*cellHeight}px)`;
+newGem.style.transform=
+  `translateY(-${(row+2)*cellHeight}px)`;
+
+requestAnimationFrame(()=>{
+
+  requestAnimationFrame(()=>{
+
+    newGem.style.transition=
+      'transform .55s cubic-bezier(.16,.72,.24,1)';
+
+    newGem.style.transform=
+      'translateY(0)';
+
+  });
+
+});
 
      requestAnimationFrame(()=>{
 
