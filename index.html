@@ -3489,23 +3489,25 @@ function gemScore(size,bet,symbol){
     1.00
   ][symbol] || 0.10;
 
+  let win=0;
+
   if(size===3){
-    return smallWin;
+    win=smallWin;
   }
 
-  if(size===4){
-    return Math.round(smallWin*3*100)/100;
+  else if(size===4){
+    win=smallWin*3;
   }
 
-  if(size===5){
-    return Math.round(smallWin*8*100)/100;
+  else if(size===5){
+    win=smallWin*8;
   }
 
-  if(size>=6){
-    return Math.round(smallWin*20*100)/100;
+  else if(size>=6){
+    win=smallWin*20;
   }
 
-  return 0;
+  return Math.round(win*bet*100)/100;
 }
 
 function dropGems(groups){
