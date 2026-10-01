@@ -3478,14 +3478,14 @@ function findClusters(){
   return groups;
 }
 
-function gemScore(size){
+function gemScore(size, bet=gemsBet){
 
- if(size===3) return 10;
- if(size===4) return 20;
- if(size===5) return 35;
- if(size===6) return 55;
+ if(size===3) return bet * 1;
+ if(size===4) return bet * 2;
+ if(size===5) return bet * 5;
+ if(size===6) return bet * 10;
 
- return size*12;
+ return bet * 12;
 }
 
 function dropGems(groups){
@@ -3735,7 +3735,7 @@ syncBalance();
   let cascadeWin=0;
 
   groups.forEach(group=>{
-   cascadeWin+=gemScore(group.length);
+   cascadeWin+=gemScore(group.length,gemsBet);
   });
 
   totalWin+=cascadeWin;
