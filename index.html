@@ -3478,14 +3478,34 @@ function findClusters(){
   return groups;
 }
 
-function gemScore(size, bet=gemsBet){
+function gemScore(size,bet,symbol){
 
- if(size===3) return bet * 1;
- if(size===4) return bet * 2;
- if(size===5) return bet * 5;
- if(size===6) return bet * 10;
+  const base=[
+    0.10,
+    0.20,
+    0.30,
+    0.50,
+    0.80,
+    1.00
+  ][symbol] || 0.10;
 
- return bet * 12;
+  if(size===3){
+    return Math.round(base*100)/100;
+  }
+
+  if(size===4){
+    return Math.round(base*2*100)/100;
+  }
+
+  if(size===5){
+    return Math.round(base*5*100)/100;
+  }
+
+  if(size===6){
+    return Math.round(base*10*100)/100;
+  }
+
+  return Math.round(base*12*100)/100;
 }
 
 function dropGems(groups){
@@ -3735,7 +3755,11 @@ syncBalance();
   let cascadeWin=0;
 
   groups.forEach(group=>{
-   cascadeWin+=gemScore(group.length,gemsBet);
+   cascadeWin+=gemScore(
+  group.length,
+  gemsBet,
+  +gemGrid.children[group[0]].dataset.v
+);
   });
 
   totalWin+=cascadeWin;
