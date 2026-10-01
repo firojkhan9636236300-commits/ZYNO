@@ -3498,13 +3498,15 @@ function dropGems(groups){
    group.forEach(i=>remove.add(i));
   });
 
-  /* Matched gems pop honge */
+  /* Matched gems POP */
   remove.forEach(i=>{
+
    const gem=gemGrid.children[i];
 
    if(gem){
     gem.classList.add('pop');
    }
+
   });
 
   setTimeout(()=>{
@@ -3516,7 +3518,7 @@ function dropGems(groups){
     gemGrid.getBoundingClientRect().height / 5;
 
    /*
-    * Har column ke gems ko bottom ki taraf pack karo.
+    * Har column ko bottom se fill karo.
     */
    for(let c=0;c<5;c++){
 
@@ -3527,15 +3529,18 @@ function dropGems(groups){
      const index=r*5+c;
 
      if(!remove.has(index)){
+
       survivors.push({
        gem:old[index],
        oldRow:r
       });
+
      }
+
     }
 
     /*
-     * Existing gems bottom mein jayenge.
+     * Surviving gems bottom mein settle honge.
      */
     for(let n=0;n<survivors.length;n++){
 
@@ -3544,109 +3549,131 @@ function dropGems(groups){
 
      if(item.gem){
 
-      item.gem.dataset.fallFromRow=item.oldRow;
-      item.gem.dataset.fallToRow=newRow;
+      item.gem.dataset.oldRow=item.oldRow;
+      item.gem.dataset.newRow=newRow;
 
       board[newRow*5+c]=item.gem;
+
      }
+
     }
+
    }
 
    gemGrid.innerHTML='';
 
    /*
-    * Board dobara build karo.
+    * Board ko dobara render karo.
     */
    for(let i=0;i<25;i++){
 
     const row=Math.floor(i/5);
 
-    if(board[i]){
+    const gem=board[i];
 
-     const gem=board[i];
+    if(gem){
 
-     const oldRow=
-      Number(gem.dataset.fallFromRow);
+      const oldRow=
+       Number(gem.dataset.oldRow);
 
-     const newRow=
-      Number(gem.dataset.fallToRow);
+      const newRow=
+       Number(gem.dataset.newRow);
 
-     const distance=
-      Math.max(0,newRow-oldRow);
+      const distance=
+       Math.max(0,newRow-oldRow);
 
-     gem.classList.remove('pop');
+      gem.classList.remove('pop');
 
-     gem.style.transition='none';
+      /*
+       * Existing gem ko actual falling distance
+       * ke hisaab se upar rakho.
+       */
+      gem.style.transition='none';
 
-     /*
-      * Existing gem ko upar se start karao,
-      * phir neeche apni new position par lao.
-      */
-     gem.style.transform=
-      `translateY(-${distance*cellHeight}px)`;
+      gem.style.transform=
+       `translateY(-${distance*cellHeight}px)`;
 
-     gemGrid.appendChild(gem);
+      gemGrid.appendChild(gem);
 
-     requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
 
-      gem.style.transition=
-       'transform .55s cubic-bezier(.16,.72,.24,1)';
+       requestAnimationFrame(()=>{
 
-      gem.style.transform='translateY(0)';
-     });
+        gem.style.transition=
+         'transform .65s cubic-bezier(.16,.72,.24,1)';
+
+        gem.style.transform=
+         'translateY(0)';
+
+       });
+
+      });
 
     }else{
 
-     /*
-      * Naya gem grid ke upar se aayega.
-      */
-     const newGem=
-      createGem(makeGem(),'new');
+      /*
+       * NEW GEM:
+       * Grid ke bilkul upar se aayega.
+       */
+      const newGem=
+       createGem(makeGem(),'new');
 
-     gemGrid.appendChild(newGem);
+      gemGrid.appendChild(newGem);
 
-     newGem.style.transition='none';
+      newGem.style.transition='none';
 
-     /*
-      * Khali row ke hisaab se upar se proper distance.
-      */
-     newGem.style.transform=
-      `translateY(-${(row+2)*cellHeight}px)`;
-
-     requestAnimationFrame(()=>{
-
-      newGem.style.transition=
-       'transform .55s cubic-bezier(.16,.72,.24,1)';
-
+      /*
+       * Har empty row ke liye upar ki
+       * distance alag hogi.
+       */
       newGem.style.transform=
-       'translateY(0)';
-     });
+       `translateY(-${(row+5)*cellHeight}px)`;
+
+      requestAnimationFrame(()=>{
+
+       requestAnimationFrame(()=>{
+
+        newGem.style.transition=
+         `transform .75s cubic-bezier(.16,.72,.24,1)`;
+
+        newGem.style.transform=
+         'translateY(0)';
+
+       });
+
+      });
+
     }
+
    }
 
    /*
-    * Animation complete hone do.
+    * Falling animation ko complete hone do.
     */
    setTimeout(()=>{
 
     [...gemGrid.children].forEach(g=>{
 
-     g.classList.remove('drop','new');
+     g.classList.remove('drop');
+     g.classList.remove('new');
+     g.classList.remove('pop');
 
      g.style.transition='';
      g.style.transform='';
 
-     delete g.dataset.fallFromRow;
-     delete g.dataset.fallToRow;
+     delete g.dataset.oldRow;
+     delete g.dataset.newRow;
+
     });
 
     resolve();
 
-   },650);
+   },850);
 
   },350);
 
  });
+
 }
 
 async function playGems(){
