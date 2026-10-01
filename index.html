@@ -3512,17 +3512,11 @@ function dropGems(groups){
    const old=[...gemGrid.children];
    const board=new Array(25).fill(null);
 
-   /*
-    * Grid ki actual row height nikalo,
-    * taaki phone screen par bhi falling
-    * distance sahi rahe.
-    */
    const cellHeight =
     gemGrid.getBoundingClientRect().height / 5;
 
    /*
-    * Har column mein surviving gems ko
-    * bottom se pack karo.
+    * Har column ke gems ko bottom ki taraf pack karo.
     */
    for(let c=0;c<5;c++){
 
@@ -3541,7 +3535,7 @@ function dropGems(groups){
     }
 
     /*
-     * Bottom se survivors place honge.
+     * Existing gems bottom mein jayenge.
      */
     for(let n=0;n<survivors.length;n++){
 
@@ -3577,26 +3571,26 @@ function dropGems(groups){
      const newRow=
       Number(gem.dataset.fallToRow);
 
-     gem.classList.remove('pop');
-
-     /*
-      * Existing gem jitni rows neeche gaya,
-      * utni distance se animation start karega.
-      */
      const distance=
       Math.max(0,newRow-oldRow);
 
+     gem.classList.remove('pop');
+
      gem.style.transition='none';
 
+     /*
+      * Existing gem ko upar se start karao,
+      * phir neeche apni new position par lao.
+      */
      gem.style.transform=
-      `translateY(${-distance*cellHeight}px)`;
+      `translateY(-${distance*cellHeight}px)`;
 
      gemGrid.appendChild(gem);
 
      requestAnimationFrame(()=>{
 
       gem.style.transition=
-       'transform .45s cubic-bezier(.2,.75,.25,1)';
+       'transform .55s cubic-bezier(.16,.72,.24,1)';
 
       gem.style.transform='translateY(0)';
      });
@@ -3604,8 +3598,7 @@ function dropGems(groups){
     }else{
 
      /*
-      * Khali jagah ke liye naye gems.
-      * Ye grid ke upar se girenge.
+      * Naya gem grid ke upar se aayega.
       */
      const newGem=
       createGem(makeGem(),'new');
@@ -3614,33 +3607,26 @@ function dropGems(groups){
 
      newGem.style.transition='none';
 
-newGem.style.transform=
-  `translateY(-${(row+2)*cellHeight}px)`;
-
-requestAnimationFrame(()=>{
-
-  requestAnimationFrame(()=>{
-
-    newGem.style.transition=
-      'transform .55s cubic-bezier(.16,.72,.24,1)';
-
-    newGem.style.transform=
-      'translateY(0)';
-
-  });
-
-});
+     /*
+      * Khali row ke hisaab se upar se proper distance.
+      */
+     newGem.style.transform=
+      `translateY(-${(row+2)*cellHeight}px)`;
 
      requestAnimationFrame(()=>{
 
       newGem.style.transition=
-       'transform .45s cubic-bezier(.2,.75,.25,1)';
+       'transform .55s cubic-bezier(.16,.72,.24,1)';
 
-      newGem.style.transform='translateY(0)';
+      newGem.style.transform=
+       'translateY(0)';
      });
     }
    }
 
+   /*
+    * Animation complete hone do.
+    */
    setTimeout(()=>{
 
     [...gemGrid.children].forEach(g=>{
@@ -3656,7 +3642,7 @@ requestAnimationFrame(()=>{
 
     resolve();
 
-   },520);
+   },650);
 
   },350);
 
