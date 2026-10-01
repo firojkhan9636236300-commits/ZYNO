@@ -3354,9 +3354,13 @@ function dropGems(groups){
    group.forEach(i=>remove.add(i));
   });
 
+  /* Matched gems pop honge */
   remove.forEach(i=>{
    const gem=gemGrid.children[i];
-   if(gem) gem.classList.add('pop');
+
+   if(gem){
+    gem.classList.add('pop');
+   }
   });
 
   setTimeout(()=>{
@@ -3365,7 +3369,16 @@ function dropGems(groups){
    const board=new Array(25).fill(null);
 
    /*
-    * Har column mein gems neeche girenge.
+    * Grid ki actual row height nikalo,
+    * taaki phone screen par bhi falling
+    * distance sahi rahe.
+    */
+   const cellHeight =
+    gemGrid.getBoundingClientRect().height / 5;
+
+   /*
+    * Har column mein surviving gems ko
+    * bottom se pack karo.
     */
    for(let c=0;c<5;c++){
 
@@ -3376,15 +3389,27 @@ function dropGems(groups){
      const index=r*5+c;
 
      if(!remove.has(index)){
-      survivors.push(old[index]);
+      survivors.push({
+       gem:old[index],
+       oldRow:r
+      });
      }
     }
-    for(let r=4;r>=0;r--){
 
-     const survivorIndex=4-r;
+    /*
+     * Bottom se survivors place honge.
+     */
+    for(let n=0;n<survivors.length;n++){
 
-     if(survivorIndex<survivors.length){
-      board[r*5+c]=survivors[survivorIndex];
+     const newRow=4-n;
+     const item=survivors[n];
+
+     if(item.gem){
+
+      item.gem.dataset.fallFromRow=item.oldRow;
+      item.gem.dataset.fallToRow=newRow;
+
+      board[newRow*5+c]=item.gem;
      }
     }
    }
@@ -3392,36 +3417,88 @@ function dropGems(groups){
    gemGrid.innerHTML='';
 
    /*
-    * Existing gems + naye gems.
+    * Board dobara build karo.
     */
-
    for(let i=0;i<25;i++){
+
+    const row=Math.floor(i/5);
 
     if(board[i]){
 
-     board[i].classList.remove('pop');
-     board[i].classList.add('drop');
-     gemGrid.appendChild(board[i]);
+     const gem=board[i];
+
+     const oldRow=
+      Number(gem.dataset.fallFromRow);
+
+     const newRow=
+      Number(gem.dataset.fallToRow);
+
+     gem.classList.remove('pop');
+
+     /*
+      * Existing gem jitni rows neeche gaya,
+      * utni distance se animation start karega.
+      */
+     const distance=
+      Math.max(0,newRow-oldRow);
+
+     gem.style.transition='none';
+
+     gem.style.transform=
+      `translateY(${-distance*cellHeight}px)`;
+
+     gemGrid.appendChild(gem);
+
+     requestAnimationFrame(()=>{
+
+      gem.style.transition=
+       'transform .45s cubic-bezier(.2,.75,.25,1)';
+
+      gem.style.transform='translateY(0)';
+     });
 
     }else{
 
-     gemGrid.appendChild(
+     /*
+      * Khali jagah ke liye naye gems.
+      * Ye grid ke upar se girenge.
+      */
+     const newGem=
+      createGem(makeGem(),'new');
 
-      createGem(makeGem(),'new')
-     );
+     gemGrid.appendChild(newGem);
 
+     newGem.style.transition='none';
+
+     newGem.style.transform=
+      `translateY(-${(row+1)*cellHeight}px)`;
+
+     requestAnimationFrame(()=>{
+
+      newGem.style.transition=
+       'transform .45s cubic-bezier(.2,.75,.25,1)';
+
+      newGem.style.transform='translateY(0)';
+     });
     }
    }
 
    setTimeout(()=>{
 
     [...gemGrid.children].forEach(g=>{
+
      g.classList.remove('drop','new');
+
+     g.style.transition='';
+     g.style.transform='';
+
+     delete g.dataset.fallFromRow;
+     delete g.dataset.fallToRow;
     });
 
     resolve();
 
-   },450);
+   },520);
 
   },350);
 
