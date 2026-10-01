@@ -3610,6 +3610,7 @@ async function playGems(){
  }
 
  ensureAudio();
+ playGemsStartSound();
 
  balance-=gemsBet;
 
@@ -3659,6 +3660,8 @@ syncBalance();
   });
 
   totalWin+=cascadeWin;
+  
+  playGemsMatchSound();
 
   document.getElementById('gemWin').textContent=
    'MATCH ×'+cascade+
