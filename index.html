@@ -3861,87 +3861,64 @@ function dropGems(groups){
        */
       let newValue=makeGem();
 
-for(let attempt=0;attempt<20;attempt++){
+      /*
+       * Same row mein turant 3 same gems
+       * banne se bachao.
+       */
+      for(let attempt=0;attempt<20;attempt++){
 
-  const left1=board[i-1];
-  const left2=board[i-2];
+        const col=i%5;
 
-  const left1Value=left1 ? Number(left1.dataset.v) : -1;
-  const left2Value=left2 ? Number(left2.dataset.v) : -1;
+        const left1=
+         col>=1 ? board[i-1] : null;
 
-  if(
-    newValue!==left1Value ||
-    newValue!==left2Value
-  ){
-    break;
-  }
+        const left2=
+         col>=2 ? board[i-2] : null;
 
-  newValue=makeGem();
-}
+        const left1Value=
+         left1 ? Number(left1.dataset.v) : -1;
 
-let newValue=makeGem();
+        const left2Value=
+         left2 ? Number(left2.dataset.v) : -1;
 
-for(let attempt=0;attempt<20;attempt++){
+        if(
+          newValue!==left1Value ||
+          newValue!==left2Value
+        ){
+          break;
+        }
 
-  const left1=board[i-1];
-  const left2=board[i-2];
+        newValue=makeGem();
 
-  const left1Value=left1 ? Number(left1.dataset.v) : -1;
-  const left2Value=left2 ? Number(left2.dataset.v) : -1;
+      }
 
-  if(
-    newValue!==left1Value ||
-    newValue!==left2Value
-  ){
-    break;
-  }
+      const newGem=
+       createGem(newValue,'new');
 
-  newValue=makeGem();
-}
+      gemGrid.appendChild(newGem);
 
-let newValue=makeGem();
+      newGem.style.transition='none';
 
-for(let attempt=0;attempt<20;attempt++){
+      /*
+       * Naya gem grid ke upar se
+       * neeche wali position par aayega.
+       */
+      newGem.style.transform=
+       `translateY(-${(row+5)*cellHeight}px)`;
 
-  const left1=board[i-1];
-  const left2=board[i-2];
+      requestAnimationFrame(()=>{
 
-  const left1Value=left1 ? Number(left1.dataset.v) : -1;
-  const left2Value=left2 ? Number(left2.dataset.v) : -1;
+       requestAnimationFrame(()=>{
 
-  if(
-    newValue!==left1Value ||
-    newValue!==left2Value
-  ){
-    break;
-  }
+        newGem.style.transition=
+         'transform .75s cubic-bezier(.16,.72,.24,1)';
 
-  newValue=makeGem();
-}
+        newGem.style.transform=
+         'translateY(0)';
 
-const newGem=
- createGem(newValue,'new');
+       });
 
-gemGrid.appendChild(newGem);
-
-newGem.style.transition='none';
-
-newGem.style.transform=
- `translateY(-${(row+5)*cellHeight}px)`;
-
-requestAnimationFrame(()=>{
-
-  requestAnimationFrame(()=>{
-
-    newGem.style.transition=
-     `transform .75s cubic-bezier(.16,.72,.24,1)`;
-
-    newGem.style.transform=
-     'translateY(0)';
-
-  });
-
-});
+      });
 
     }
 
