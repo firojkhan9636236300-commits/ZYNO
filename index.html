@@ -3715,10 +3715,10 @@ function findClusters(){
 function gemScore(size,bet,symbol){
 
   const multipliers = {
-    3: [1.00, 1.00, 1.00, 1.20, 1.50, 2.00],
-    4: [1.50, 2.00, 2.50, 3.00, 3.50, 4.00],
-    5: [2.00, 3.00, 4.00, 5.00, 6.00, 8.00],
-    6: [4.00, 5.00, 8.00, 10.00, 15.00, 20.00]
+    3: [0.10, 0.20, 0.30, 0.50, 0.80, 1.00],
+    4: [0.50, 1.00, 1.50, 2.00, 2.50, 3.00],
+    5: [1.00, 2.00, 3.00, 4.00, 6.00, 8.00],
+    6: [3.00, 5.00, 8.00, 10.00, 15.00, 20.00]
   };
 
   const row = multipliers[size];
@@ -3727,12 +3727,9 @@ function gemScore(size,bet,symbol){
     return 0;
   }
 
-  const multiplier =
-    row[symbol] ?? row[0];
+  const multiplier = row[symbol] ?? row[0];
 
-  return Math.round(
-    bet * multiplier * 100
-  ) / 100;
+  return Math.round(bet * multiplier * 100) / 100;
 }
 
   const multiplier = row[symbol] ?? row[0];
