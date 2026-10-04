@@ -3453,8 +3453,48 @@ function makeEmptyBoard(){
 /*
  * Selected winning match ke saath board banao.
  */
+
 function makeWinningBoard(size){
 
+  /*
+   * FULL SCREEN
+   * 25 mein se 25 same colour
+   */
+  if(size===25){
+
+    const symbol=Math.floor(Math.random()*symbols.length);
+    const board=[];
+
+    for(let i=0;i<25;i++){
+      board.push(symbol);
+    }
+
+    return board;
+  }
+
+  /*
+   * HALF SCREEN
+   * 25 mein se 13 same colour
+   */
+  if(size===13){
+
+    const symbol=Math.floor(Math.random()*symbols.length);
+    const board=makeEmptyBoard();
+
+    let placed=0;
+
+    for(let i=0;i<25 && placed<13;i++){
+
+      board[i]=symbol;
+      placed++;
+    }
+
+    return board;
+  }
+
+  /*
+   * NORMAL 3 / 4 / 5 MATCH
+   */
   for(let attempt=0;attempt<300;attempt++){
 
     const board=makeEmptyBoard();
@@ -3481,8 +3521,7 @@ function makeWinningBoard(size){
   }
 
   /*
-   * Safety fallback:
-   * last row mein selected match.
+   * Safety fallback
    */
   const board=makeEmptyBoard();
 
@@ -3490,7 +3529,7 @@ function makeWinningBoard(size){
   const row=4;
   const start=0;
 
-  for(let c=0;c<size;c++){
+  for(let c=start;c<start+size;c++){
     board[row*5+c]=symbol;
   }
 
@@ -3501,6 +3540,7 @@ function makeWinningBoard(size){
  * Sirf wahi match allowed hai jo humne
  * intentionally create kiya hai.
  */
+
 function boardClusters(board){
 
   const groups=[];
@@ -3583,8 +3623,9 @@ function prepareGemRound(){
     const size =
       outcome==='SMALL' ? 3 :
       outcome==='NORMAL' ? 4 :
-      outcome==='BIG' ? 5 :
-          5;
+      outcome==='BIG' ? 13 :
+      outcome==='MEGA' ? 25 :
+      3;
 
     gemsRoundBoard=makeWinningBoard(size);
   }
