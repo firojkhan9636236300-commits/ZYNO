@@ -3732,11 +3732,6 @@ function gemScore(size,bet,symbol){
   return Math.round(bet * multiplier * 100) / 100;
 }
 
-  const multiplier = row[symbol] ?? row[0];
-
-  return Math.round(bet * multiplier * 100) / 100;
-}
-
 function dropGems(groups){
 
  return new Promise(resolve=>{
