@@ -3674,6 +3674,63 @@ function findClusters(){
   const groups=[];
 
   /*
+   * FULL SCREEN:
+   * Agar poore 25 gems ek hi colour ke hain
+   * to sirf ek FULL-SCREEN group return hoga.
+   */
+  const firstVal=+els[0].dataset.v;
+  let fullScreen=true;
+
+  for(let i=1;i<25;i++){
+    if(+els[i].dataset.v!==firstVal){
+      fullScreen=false;
+      break;
+    }
+  }
+
+  if(fullScreen){
+    const group=[];
+
+    for(let i=0;i<25;i++){
+      group.push(i);
+    }
+
+    return [group];
+  }
+
+  /*
+   * HALF SCREEN:
+   * Agar kisi ek colour ke kam se kam 13 gems hain
+   * to us colour ka sirf ek HALF-SCREEN group return hoga.
+   */
+  const counts=[0,0,0,0,0];
+
+  for(let i=0;i<25;i++){
+    const v=+els[i].dataset.v;
+
+    if(v>=0 && v<5){
+      counts[v]++;
+    }
+  }
+
+  for(let symbol=0;symbol<5;symbol++){
+
+    if(counts[symbol]>=13){
+
+      const group=[];
+
+      for(let i=0;i<25;i++){
+        if(+els[i].dataset.v===symbol){
+          group.push(i);
+        }
+      }
+
+      return [group];
+    }
+  }
+
+  /*
+   * NORMAL:
    * Sirf horizontal matches count honge.
    */
   for(let r=0;r<5;r++){
@@ -3725,31 +3782,55 @@ function gemScore(size,bet,symbol){
   ];
 
   const win4 = [
+    1.50,
     2.00,
+    2.50,
     3.00,
-    4.00,
-    5.00,
-    6.00
+    4.00
   ];
 
   const win5 = [
+    6.00,
     8.00,
     10.00,
     12.00,
-    15.00,
-    20.00
+    15.00
   ];
 
-  if(size===3){
-    return +(bet * (win3[colour] || 0)).toFixed(2);
+  const winHalf = [
+    5.00,
+    7.00,
+    9.00,
+    12.00,
+    15.00
+  ];
+
+  const winFull = [
+    20.00,
+    25.00,
+    30.00,
+    40.00,
+    50.00
+  ];
+
+  if(size>=25){
+    return +(bet * (winFull[colour] || 0)).toFixed(2);
+  }
+
+  if(size>=13){
+    return +(bet * (winHalf[colour] || 0)).toFixed(2);
+  }
+
+  if(size===5){
+    return +(bet * (win5[colour] || 0)).toFixed(2);
   }
 
   if(size===4){
     return +(bet * (win4[colour] || 0)).toFixed(2);
   }
 
-  if(size===5){
-    return +(bet * (win5[colour] || 0)).toFixed(2);
+  if(size===3){
+    return +(bet * (win3[colour] || 0)).toFixed(2);
   }
 
   return 0;
