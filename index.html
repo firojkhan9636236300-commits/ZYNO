@@ -3813,6 +3813,7 @@ function findClusters(){
 function gemScore(size,bet,symbol){
 
   const colour = Number(symbol);
+  const index = (colour >= 0 && colour < 5) ? colour : 0;
 
   const win3 = [
     0.20,
