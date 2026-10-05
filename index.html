@@ -1026,6 +1026,10 @@ var globalBetClose36=null;
 var globalSpinEnd36=null;
 let balance=0;START_BALANCE;
 const money=n=>Math.floor(n).toLocaleString('en-IN');
+const gemsMoney=n=>Number(n).toLocaleString('en-IN',{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+});
 function showLogin(){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('login').classList.add('active');
@@ -3322,7 +3326,7 @@ setInterval(()=>{
 },1000);
 
 /* ---------- GEMS FORTUNE ---------- */
-const symbols=['◆','✦','✧','✚','✥','❖'],
+const symbols=['◆','✦','✧','✚','✥'],
 gemGrid=document.getElementById('gemGrid');
 
 let gemsRound=0,
@@ -4191,7 +4195,6 @@ if(window.saveUserBalance){
 }
 
   document.getElementById('gemsWin').textContent=
-   '+'+money(totalWin);
    const bigWin=document.getElementById('gemBigWin');
 bigWin.innerHTML='<span class="win-amount-text">+'+money(totalWin)+'</span> <span class="win-points-text">POINTS</span>';
 bigWin.classList.remove('show');
@@ -4532,10 +4535,10 @@ let balanceSaveQueue = Promise.resolve();
 window.saveUserBalance = function(){
 
   const balanceToSave =
-  Math.max(
-    0,
-    Math.floor(balance)
-  );
+    Math.max(
+      0,
+      Number(balance)
+    );
   const save = async()=>{
 
     try{
