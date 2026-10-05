@@ -3333,23 +3333,31 @@ let gemsRound=0,
 gemsBusy=false,
 gemsBet=1;
 
-document.getElementById('gemsBetMinus').addEventListener('click',()=>{
-  if(gemsBusy) return;
+const gemsBetMinus=document.getElementById('gemsBetMinus');
 
-  gemsBet=Math.max(1,gemsBet-1);
+if(gemsBetMinus){
+  gemsBetMinus.addEventListener('click',()=>{
+    if(gemsBusy) return;
 
-  document.getElementById('gemsBetValue').textContent=gemsBet;
-  document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
-});
+    gemsBet=Math.max(1,gemsBet-1);
 
-document.getElementById('gemsBetPlus').addEventListener('click',()=>{
-  if(gemsBusy) return;
+    document.getElementById('gemsBetValue').textContent=gemsBet;
+    document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
+  });
+}
 
-  gemsBet=Math.min(1000,gemsBet+1);
+const gemsBetPlus=document.getElementById('gemsBetPlus');
 
-  document.getElementById('gemsBetValue').textContent=gemsBet;
-  document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
-});
+if(gemsBetPlus){
+  gemsBetPlus.addEventListener('click',()=>{
+    if(gemsBusy) return;
+
+    gemsBet=Math.min(1000,gemsBet+1);
+
+    document.getElementById('gemsBetValue').textContent=gemsBet;
+    document.getElementById('gemsBetLabel').textContent='BET '+gemsBet;
+  });
+}
 
 function makeGem(){
   return Math.floor(Math.random()*symbols.length);
