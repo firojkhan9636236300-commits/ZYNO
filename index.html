@@ -3428,12 +3428,23 @@ function createGem(n,cls=''){
  */
 function chooseGemOutcome(){
 
-  const r=Math.random();
+  const r = Math.random() * 100;
 
-  if(r<0.15) return 'EMPTY';
-  if(r<0.55) return 'SMALL';
-  if(r<0.80) return 'NORMAL';
-  if(r<0.95) return 'BIG';
+  if(r < 25){
+    return 'EMPTY';
+  }
+
+  if(r < 65){
+    return 'SMALL';
+  }
+
+  if(r < 85){
+    return 'NORMAL';
+  }
+
+  if(r < 95){
+    return 'BIG';
+  }
 
   return 'MEGA';
 }
