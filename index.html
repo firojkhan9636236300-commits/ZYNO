@@ -1128,19 +1128,63 @@ function openGame(id){
     return;
   }
 
-  document.querySelectorAll('.view').forEach(v =>
-    v.classList.remove('active')
-  );
-  const globalBrand = document.querySelector('.brand');
-  if(globalBrand) globalBrand.style.display = (id === 'r36') ? 'none' : '';
-  
-  const globalBalance = document.querySelector('.balance');
-  if(globalBalance) globalBalance.style.display = (id === 'r36') ? 'none' : '';
+  document.querySelectorAll('.view').forEach(v=>{
+    v.classList.remove('active');
+  });
 
-  document.getElementById(id).classList.add('active');
-  localStorage.setItem('zynoActiveView', id);
-  if(id === 'r36') startR36();
-  if(id === 'r11') startR11();
+  const target=document.getElementById(id);
+
+  if(!target){
+    alert('Game screen नहीं मिली: '+id);
+    return;
+  }
+
+  const globalBrand=document.querySelector('.brand');
+  if(globalBrand){
+    globalBrand.style.display=(id === 'r36') ? 'none' : '';
+  }
+
+  const globalBalance=document.querySelector('.balance');
+  if(globalBalance){
+    globalBalance.style.display=(id === 'r36') ? 'none' : '';
+  }
+
+  target.classList.add('active');
+
+  localStorage.setItem('zynoActiveView',id);
+
+  if(id === 'r36'){
+    startR36();
+  }
+
+  if(id === 'r11'){
+    startR11();
+  }
+}
+
+function goHome(){
+
+  document.querySelectorAll('.view').forEach(v=>{
+    v.classList.remove('active');
+  });
+
+  const globalBrand=document.querySelector('.brand');
+  if(globalBrand){
+    globalBrand.style.display='';
+  }
+
+  const globalBalance=document.querySelector('.balance');
+  if(globalBalance){
+    globalBalance.style.display='';
+  }
+
+  const home=document.getElementById('home');
+
+  if(home){
+    home.classList.add('active');
+  }
+
+  localStorage.setItem('zynoActiveView','home');
 }
 function goHome(){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
