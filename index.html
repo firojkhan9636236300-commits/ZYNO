@@ -1137,7 +1137,6 @@ function openGame(id){
   const globalBalance = document.querySelector('.balance');
   if(globalBalance) globalBalance.style.display = (id === 'r36') ? 'none' : '';
 
-  alert('openGame chala — '+id);
   document.getElementById(id).classList.add('active');
   localStorage.setItem('zynoActiveView', id);
   if(id === 'r36') startR36();
