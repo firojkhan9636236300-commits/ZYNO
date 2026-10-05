@@ -4196,7 +4196,7 @@ if(window.saveUserBalance){
 
   document.getElementById('gemsWin').textContent=
    const bigWin=document.getElementById('gemBigWin');
-bigWin.innerHTML='<span class="win-amount-text">+'+money(totalWin)+'</span> <span class="win-points-text">POINTS</span>';
+bigWin.innerHTML='<span class="win-amount-text">+'+gemsMoney(totalWin)+'</span> <span class="win-points-text">POINTS</span>';
 bigWin.classList.remove('show');
 void bigWin.offsetWidth;
 bigWin.classList.add('show');
@@ -4214,7 +4214,7 @@ if(totalWin>=20){
   playGemsWinSmall();
 }
   document.getElementById('gemWin').textContent=
-   'WIN +'+money(totalWin)+' POINTS';
+   'WIN +'+gemsMoney(totalWin)+' POINTS';
 
  }else{
 
