@@ -3428,30 +3428,26 @@ function createGem(n,cls=''){
  */
 function chooseGemOutcome(){
 
-  const r = Math.random() * 100;
+const r = Math.random() * 100;
 
-  if(r < 50){
-    return 'EMPTY';
-  }
-
-  if(r < 80){
-    return 'SMALL';
-  }
-
-  if(r < 92){
-    return 'NORMAL';
-  }
-
-  if(r < 97){
-    return 'BIG';
-  }
-
-  return 'MEGA';
+if(r < 60){
+return ‘EMPTY’;
 }
 
-/*
- * Board mein horizontal match check.
- */
+if(r < 82){
+return ‘SMALL’;
+}
+
+if(r < 92){
+return ‘NORMAL’;
+}
+
+if(r < 98){
+return ‘BIG’;
+}
+
+return ‘MEGA’;
+}
 function boardHasMatch(board){
 
   for(let r=0;r<5;r++){
