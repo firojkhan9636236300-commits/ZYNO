@@ -3382,6 +3382,8 @@ async function saveGemsGlobalStats(wager, payout){
   try{
 
     if(!window.zynoAuth?.currentUser) return;
+    
+    console.log('GEMS USER CHECK:', window.zynoAuth?.currentUser);
 
     const statsRef =
       window.zynoDoc(
