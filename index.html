@@ -4294,6 +4294,9 @@ function dropGems(groups){
 
 }
 
+let gemsFreeRounds = 0;
+let gemsFreeBet = 0;
+
 async function playGems(){
 
  if(gemsBusy) return;
@@ -4377,8 +4380,17 @@ syncBalance();
  }
 
  if(totalWin>0){
-
   balance+=totalWin;
+  
+  if(gemOutcome === 'MEGA'){
+
+  gemsFreeRounds = 10;
+  gemsFreeBet = gemsBet;
+
+  document.getElementById('gemWin').textContent =
+    'MEGA WIN — 10 BET FREE';
+
+}
   
 if(window.saveUserBalance){
   window.saveUserBalance();
