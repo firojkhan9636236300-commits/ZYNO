@@ -4001,8 +4001,8 @@ function gemScore(size,bet,symbol){
   ];
 
   if(size>=25){
-    return +(bet * (winFull[colour] || 0)).toFixed(2);
-  }
+    return +(bet * 20).toFixed(2);
+}
 
   if(size>=13){
     return +(bet * (winHalf[colour] || 0)).toFixed(2);
