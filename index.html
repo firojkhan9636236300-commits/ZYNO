@@ -3444,9 +3444,14 @@ async function saveGemsGlobalStats(wager, payout){
   }catch(error){
 
     console.error(
-      'GEMS GLOBAL STATS ERROR:',
-      error
-    );
+  'GEMS GLOBAL STATS ERROR:',
+  error
+);
+
+alert(
+  'GEMS STATS ERROR:\n' +
+  (error?.message || error)
+);
 
   }
 
