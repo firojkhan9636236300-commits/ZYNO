@@ -3377,18 +3377,64 @@ let gemsRound=0,
 gemsBusy=false,
 gemsBet=1;
 
-let gemsAuditWager = 0;
-let gemsAuditPayout = 0;
+async function saveGemsGlobalStats(wager, payout){
 
-function logGemsAudit(){
+  try{
 
-  const wager = Number(gemsAuditWager || 0);
-  const payout = Number(gemsAuditPayout || 0);
+    if(!auth.currentUser) return;
 
-  const percent =
-    wager > 0
-      ? (payout / wager) * 100
-      : 0;
+    const statsRef =
+      doc(db,'gemsStats','global');
+
+    await runTransaction(db, async(transaction)=>{
+
+      const snap =
+        await transaction.get(statsRef);
+
+      const old =
+        snap.exists()
+          ? snap.data()
+          : {};
+
+      const oldWager =
+        Number(old.totalWager || 0);
+
+      const oldPayout =
+        Number(old.totalPayout || 0);
+
+      const oldRounds =
+        Number(old.totalRounds || 0);
+
+      transaction.set(
+        statsRef,
+        {
+          totalWager:
+            oldWager + Number(wager || 0),
+
+          totalPayout:
+            oldPayout + Number(payout || 0),
+
+          totalRounds:
+            oldRounds + 1,
+
+          updatedAt:
+            serverTimestamp()
+        },
+        {merge:true}
+      );
+
+    });
+
+  }catch(error){
+
+    console.error(
+      'GEMS GLOBAL STATS ERROR:',
+      error
+    );
+
+  }
+
+}
 
   console.log('===== ZYNO GEMS AUDIT =====');
   console.log('TOTAL WAGER =', wager);
