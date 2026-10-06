@@ -206,6 +206,49 @@ border:2px solid #ff6b73;
  animation:gemWinShow .9s ease-out forwards;
 }
 
+.win-balance-box{
+ position:absolute;
+ left:12px;
+ top:12px;
+ z-index:30;
+ min-width:125px;
+ padding:10px 12px;
+ border-radius:12px;
+ background:linear-gradient(145deg,#15191c,#07090a);
+ border:1px solid rgba(229,200,120,.45);
+ box-shadow:0 6px 18px rgba(0,0,0,.45),inset 0 0 12px rgba(255,255,255,.03);
+ text-align:center;
+}
+
+.win-balance-title{
+ color:#e5c878;
+ font-size:9px;
+ font-weight:1000;
+ letter-spacing:1px;
+}
+
+.win-balance-amount{
+ margin-top:4px;
+ color:#fff4d0;
+ font-size:13px;
+ font-weight:1000;
+}
+
+.win-balance-ok{
+ margin-top:7px;
+ padding:5px 18px;
+ border:1px solid rgba(229,200,120,.45);
+ border-radius:7px;
+ background:#101417;
+ color:#e5c878;
+ font-size:10px;
+ font-weight:1000;
+}
+
+.win-balance-ok:active{
+ transform:scale(.96);
+}
+
 @keyframes gemWinShow{
  0%{opacity:0;transform:translate(-50%,-35%) scale(.6)}
  25%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}
@@ -677,6 +720,13 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   <span id="gemsBetValue">10</span>
   <button type="button" id="gemsBetPlus">+</button>
 </div>
+
+<div class="win-balance-box">
+  <div class="win-balance-title">WIN BALANCE</div>
+  <div class="win-balance-amount" id="gemsWinBalance">0 POINTS</div>
+  <button class="win-balance-ok" onclick="this.parentElement.classList.remove('show')">OK</button>
+</div>
+
 <div class="gem-big-win" id="gemBigWin"></div><div class="gem-trophy" id="gemTrophy">🏆</div><div class="gem-win" id="gemWin">Match 3+ connected gems</div><div class="gem-note">Each round drops new gems. Connected groups of 3 or more clear and score.</div><button class="action" onclick="playGems()">PLAY ROUND</button></div>
 </section>
 <section id="adminPanel" class="view">
