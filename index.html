@@ -4356,10 +4356,10 @@ if(totalWin>=20){
    'NO WIN — TRY AGAIN';
  }
 
- saveGemsGlobalStats(
+await saveGemsGlobalStats(
   gemsBet,
   totalWin
- );
+);
 
  setTimeout(()=>{
   gemsBusy=false;
