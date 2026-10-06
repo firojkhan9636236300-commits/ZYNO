@@ -3377,6 +3377,26 @@ let gemsRound=0,
 gemsBusy=false,
 gemsBet=1;
 
+let gemsAuditWager = 0;
+let gemsAuditPayout = 0;
+
+function logGemsAudit(){
+
+  const wager = Number(gemsAuditWager || 0);
+  const payout = Number(gemsAuditPayout || 0);
+
+  const percent =
+    wager > 0
+      ? (payout / wager) * 100
+      : 0;
+
+  console.log('===== ZYNO GEMS AUDIT =====');
+  console.log('TOTAL WAGER =', wager);
+  console.log('TOTAL PAYOUT =', payout);
+  console.log('ACTUAL WIN % =', percent.toFixed(2) + '%');
+
+}
+
 const gemsBetMinus=document.getElementById('gemsBetMinus');
 
 if(gemsBetMinus){
@@ -4179,7 +4199,9 @@ async function playGems(){
 
  balance-=gemsBet;
 
-if(window.saveUserBalance){
+ gemsAuditWager += gemsBet;
+
+ if(window.saveUserBalance){
   window.saveUserBalance();
 }
 
@@ -4247,7 +4269,10 @@ syncBalance();
  if(totalWin>0){
 
   balance+=totalWin;
-syncBalance();
+  
+  gemsAuditPayout += totalWin;
+  
+  syncBalance();
 
 if(window.saveUserBalance){
   window.saveUserBalance();
@@ -4281,6 +4306,8 @@ if(totalWin>=20){
   document.getElementById('gemWin').textContent=
    'NO WIN — TRY AGAIN';
  }
+
+ logGemsAudit();
 
  setTimeout(()=>{
   gemsBusy=false;
