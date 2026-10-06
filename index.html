@@ -3380,17 +3380,20 @@ gemsBet=1;
 async function saveGemsGlobalStats(wager, payout){
 
   try{
-    
-  console.log(
-  'GEMS STATS CALL',
-  wager,
-  payout,
-  window.zynoAuth?.currentUser?.uid
-);
+
+    console.log(
+      'GEMS STATS CALL',
+      wager,
+      payout,
+      window.zynoAuth?.currentUser?.uid
+    );
 
     if(!window.zynoAuth?.currentUser) return;
-    
-    console.log('GEMS USER CHECK:', window.zynoAuth?.currentUser);
+
+    console.log(
+      'GEMS USER CHECK:',
+      window.zynoAuth?.currentUser
+    );
 
     const statsRef =
       window.zynoDoc(
@@ -3399,28 +3402,58 @@ async function saveGemsGlobalStats(wager, payout){
         'global'
       );
 
-    await window.zynoSetDoc(
-  statsRef,
-  {
-    totalWager: Number(wager || 0),
-    totalPayout: Number(payout || 0),
-    totalRounds: 1,
-    updatedAt: new Date()
-  },
-  {merge:true}
-);
+    await window.zynoRunTransaction(
+      window.zynoDb,
+      async transaction => {
+
+        const snap =
+          await transaction.get(statsRef);
+
+        const oldData =
+          snap.exists()
+            ? snap.data()
+            : {};
+
+        const oldWager =
+          Number(oldData.totalWager || 0);
+
+        const oldPayout =
+          Number(oldData.totalPayout || 0);
+
+        const oldRounds =
+          Number(oldData.totalRounds || 0);
+
+        transaction.set(
+          statsRef,
+          {
+            totalWager:
+              oldWager + Number(wager || 0),
+
+            totalPayout:
+              oldPayout + Number(payout || 0),
+
+            totalRounds:
+              oldRounds + 1,
+
+            updatedAt: new Date()
+          },
+          {merge:true}
+        );
+
+      }
+    );
 
   }catch(error){
 
     console.error(
-  'GEMS GLOBAL STATS ERROR:',
-  error
-);
+      'GEMS GLOBAL STATS ERROR:',
+      error
+    );
 
-alert(
-  'GEMS STATS ERROR:\n' +
-  (error?.message || error)
-);
+    alert(
+      'GEMS STATS ERROR:\n' +
+      (error?.message || error)
+    );
 
   }
 
