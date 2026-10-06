@@ -3381,49 +3381,56 @@ async function saveGemsGlobalStats(wager, payout){
 
   try{
 
-    if(!auth.currentUser) return;
+    if(!window.zynoAuth?.currentUser) return;
 
     const statsRef =
-      doc(db,'gemsStats','global');
-
-    await runTransaction(db, async(transaction)=>{
-
-      const snap =
-        await transaction.get(statsRef);
-
-      const old =
-        snap.exists()
-          ? snap.data()
-          : {};
-
-      const oldWager =
-        Number(old.totalWager || 0);
-
-      const oldPayout =
-        Number(old.totalPayout || 0);
-
-      const oldRounds =
-        Number(old.totalRounds || 0);
-
-      transaction.set(
-        statsRef,
-        {
-          totalWager:
-            oldWager + Number(wager || 0),
-
-          totalPayout:
-            oldPayout + Number(payout || 0),
-
-          totalRounds:
-            oldRounds + 1,
-
-          updatedAt:
-            serverTimestamp()
-        },
-        {merge:true}
+      window.zynoDoc(
+        window.zynoDb,
+        'gemsStats',
+        'global'
       );
 
-    });
+    await window.zynoRunTransaction(
+      window.zynoDb,
+      async(transaction)=>{
+
+        const snap =
+          await transaction.get(statsRef);
+
+        const old =
+          snap.exists()
+            ? snap.data()
+            : {};
+
+        const oldWager =
+          Number(old.totalWager || 0);
+
+        const oldPayout =
+          Number(old.totalPayout || 0);
+
+        const oldRounds =
+          Number(old.totalRounds || 0);
+
+        transaction.set(
+          statsRef,
+          {
+            totalWager:
+              oldWager + Number(wager || 0),
+
+            totalPayout:
+              oldPayout + Number(payout || 0),
+
+            totalRounds:
+              oldRounds + 1,
+
+            updatedAt:
+              new Date()
+          },
+          {merge:true}
+        );
+
+      }
+    );
 
   }catch(error){
 
@@ -3433,13 +3440,6 @@ async function saveGemsGlobalStats(wager, payout){
     );
 
   }
-
-}
-
-  console.log('===== ZYNO GEMS AUDIT =====');
-  console.log('TOTAL WAGER =', wager);
-  console.log('TOTAL PAYOUT =', payout);
-  console.log('ACTUAL WIN % =', percent.toFixed(2) + '%');
 
 }
 
