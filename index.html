@@ -4245,8 +4245,6 @@ async function playGems(){
 
  balance-=gemsBet;
 
- gemsAuditWager += gemsBet;
-
  if(window.saveUserBalance){
   window.saveUserBalance();
 }
@@ -4316,9 +4314,7 @@ syncBalance();
 
   balance+=totalWin;
   
-  gemsAuditPayout += totalWin;
-  
-  syncBalance();
+  mil gayisyncBalance();
 
 if(window.saveUserBalance){
   window.saveUserBalance();
