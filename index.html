@@ -3380,6 +3380,13 @@ gemsBet=1;
 async function saveGemsGlobalStats(wager, payout){
 
   try{
+    
+  console.log(
+  'GEMS STATS CALL',
+  wager,
+  payout,
+  window.zynoAuth?.currentUser?.uid
+);
 
     if(!window.zynoAuth?.currentUser) return;
     
