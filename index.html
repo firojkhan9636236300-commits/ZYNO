@@ -4362,7 +4362,7 @@ async function playGems(){
    );
   }
   if(totalWin>0){
-   gemsPendingWin = totalWin;
+   gemsPendingWin += totalWin;
 
 document.getElementById('gemsWinBalance').textContent =
  '+' + gemsMoney(totalWin) + ' POINTS';
