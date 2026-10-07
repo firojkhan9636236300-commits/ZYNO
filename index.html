@@ -4298,141 +4298,113 @@ let gemsFreeRounds = 0;
 let gemsFreeBet = 0;
 
 async function playGems(){
-
  if(gemsBusy) return;
-
  if(balance<gemsBet){
-
   document.getElementById('gemWin').textContent=
    'NOT ENOUGH POINTS';
-
   return;
  }
-
- ensureAudio();
- playGemsStartSound();
-
- balance-=gemsBet;
-
- if(window.saveUserBalance){
-  window.saveUserBalance();
-}
-
-if(window.addWagerCompleted && gemsBet > 0){
-  window.addWagerCompleted(gemsBet);
-}
-
-syncBalance();
-
  gemsBusy=true;
- gemsRound++;
-
- gemsRoundBoard=null;
- prepareGemRound();
-
- document.getElementById('gemsRound').textContent=
-  gemsRound;
-
- document.getElementById('gemsWin').textContent='0';
-
- document.getElementById('gemWin').textContent=
-  'GEMS DROPPING...';
-
- buildGems();
-
- await new Promise(resolve=>setTimeout(resolve,1250));
-
- let totalWin=0;
- let cascade=0;
-
- /*
-  * Multiple matches = cascade.
-  */
- while(cascade<1){
-
-  const groups=findClusters();
-
-  if(!groups.length) break;
-
-  cascade++;
-
-  let cascadeWin=0;
-
-  groups.forEach(group=>{
-   cascadeWin+=gemScore(
-  group.length,
-  gemsBet,
-  +gemGrid.children[group[0]].dataset.v,
-  cascade
-);
-  });
-
-  totalWin+=cascadeWin;
-  
-  playGemsMatchSound();
-
-  document.getElementById('gemWin').textContent=
-   'MATCH ×'+cascade+
-   '  +'+cascadeWin+' POINTS';
-  await dropGems(groups);
-  
-  await new Promise(resolve=>setTimeout(resolve,180));
- }
-
- if(totalWin>0){
-  balance+=totalWin;
-  
-  if(gemOutcome === 'MEGA'){
-
-  gemsFreeRounds = 10;
-  gemsFreeBet = gemsBet;
-
-  document.getElementById('gemWin').textContent =
-    'MEGA WIN — 10 BET FREE';
-
-}
-  
-if(window.saveUserBalance){
-  window.saveUserBalance();
-}
-
-  const bigWin=document.getElementById('gemBigWin');
-bigWin.innerHTML='<span class="win-amount-text">+'+gemsMoney(totalWin)+'</span> <span class="win-points-text">POINTS</span>';
-bigWin.classList.remove('show');
-void bigWin.offsetWidth;
-bigWin.classList.add('show');
-if(totalWin>=20){
-  const trophy=document.getElementById('gemTrophy');
-
-  trophy.classList.remove('show');
-  void trophy.offsetWidth;
-  trophy.classList.add('show');
-
-  playGemsWinBig();
-
-}else{
-  playGemsLoss();
-  playGemsWinSmall();
-}
-  document.getElementById('gemWin').textContent=
-   'WIN +'+gemsMoney(totalWin)+' POINTS';
-
- }else{
-
+ try{
+  ensureAudio();
+  playGemsStartSound();
+  balance-=gemsBet;
+  if(window.saveUserBalance){
+   window.saveUserBalance();
+  }
+  if(window.addWagerCompleted && gemsBet > 0){
+   window.addWagerCompleted(gemsBet);
+  }
+  syncBalance();
+  gemsRound++;
+  gemsRoundBoard=null;
+  prepareGemRound();
+  document.getElementById('gemsRound').textContent=
+   gemsRound;
   document.getElementById('gemsWin').textContent='0';
-
   document.getElementById('gemWin').textContent=
-   'NO WIN — TRY AGAIN';
- }
-
-await saveGemsGlobalStats(
-  gemsBet,
-  totalWin
-);
-
- setTimeout(()=>{
+   'GEMS DROPPING...';
+  buildGems();
+  await new Promise(resolve=>
+   setTimeout(resolve,1250)
+  );
+  let totalWin=0;
+  let cascade=0;
+  /*
+   * Multiple matches = cascade.
+   */
+  while(cascade<1){
+   const groups=findClusters();
+   if(!groups.length) break;
+   cascade++;
+   let cascadeWin=0;
+   groups.forEach(group=>{
+    cascadeWin+=gemScore(
+     group.length,
+     gemsBet,
+     +gemGrid.children[group[0]].dataset.v,
+     cascade
+    );
+   });
+   totalWin+=cascadeWin;
+   playGemsMatchSound();
+   document.getElementById('gemWin').textContent=
+    'MATCH ×'+cascade+
+    '  +'+cascadeWin+' POINTS';
+   await dropGems(groups);
+   await new Promise(resolve=>
+    setTimeout(resolve,180)
+   );
+  }
+  if(totalWin>0){
+   balance+=totalWin;
+   if(gemOutcome === 'MEGA'){
+    gemsFreeRounds = 10;
+    gemsFreeBet = gemsBet;
+    document.getElementById('gemWin').textContent =
+     'MEGA WIN — 10 BET FREE';
+   }
+   if(window.saveUserBalance){
+    window.saveUserBalance();
+   }
+   const bigWin=
+    document.getElementById('gemBigWin');
+   bigWin.innerHTML=
+    '<span class="win-amount-text">+'+
+    gemsMoney(totalWin)+
+    '</span> <span class="win-points-text">POINTS</span>';
+   bigWin.classList.remove('show');
+   void bigWin.offsetWidth;
+   bigWin.classList.add('show');
+   if(totalWin>=20){
+    const trophy=
+     document.getElementById('gemTrophy');
+    trophy.classList.remove('show');
+    void trophy.offsetWidth;
+    trophy.classList.add('show');
+    playGemsWinBig();
+   }else{
+    playGemsLoss();
+    playGemsWinSmall();
+   }
+   document.getElementById('gemWin').textContent=
+    'WIN +'+gemsMoney(totalWin)+' POINTS';
+  }else{
+   document.getElementById('gemsWin').textContent='0';
+   document.getElementById('gemWin').textContent=
+    'NO WIN — TRY AGAIN';
+  }
+  await saveGemsGlobalStats(
+   gemsBet,
+   totalWin
+  );
+ }catch(error){
+  console.error('GEMS PLAY ERROR:',error);
+  document.getElementById('gemWin').textContent=
+   'PLEASE TRY AGAIN';
+ }finally{
   gemsBusy=false;
- },350);
+ }
 }
 
 buildGems();
