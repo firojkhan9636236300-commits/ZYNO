@@ -3809,7 +3809,8 @@ let gemsRoundBoard=null;
 function prepareGemRound(){
 
   const outcome=chooseGemOutcome();
-
+  gemOutcome=outcome;
+  
   if(outcome==='EMPTY'){
 
     gemsRoundBoard=makeEmptyBoard();
@@ -4297,9 +4298,10 @@ function dropGems(groups){
 
 let gemsFreeRounds = 0;
 let gemsFreeBet = 0;
+let gemOutcome = null;
 
 async function playGems(){
- if(gemsBusy) return;
+ if(gemsBusy || gemsPendingWin > 0) return;
  if(balance<gemsBet){
   document.getElementById('gemWin').textContent=
    'NOT ENOUGH POINTS';
@@ -4413,7 +4415,7 @@ document.querySelector('.win-balance-box').classList.add('show');
  }
 }
 
-function claimGemsWin(){
+async function claimGemsWin(){
 
   if(!gemsPendingWin || gemsPendingWin <= 0){
 
@@ -4423,21 +4425,39 @@ function claimGemsWin(){
     return;
   }
 
-  balance += gemsPendingWin;
+  const win = Number(gemsPendingWin || 0);
 
-  gemsPendingWin = 0;
+  try{
 
-  if(window.saveUserBalance){
-    window.saveUserBalance();
+    balance += win;
+
+    syncBalance();
+
+    if(window.saveUserBalance){
+
+      await window.saveUserBalance();
+
+    }
+
+    gemsPendingWin = 0;
+
+    document.getElementById('gemsWinBalance').textContent =
+      '0 POINTS';
+
+    document.querySelector('.win-balance-box')
+      .classList.remove('show');
+
+  }catch(error){
+
+    console.error(
+      'GEMS WIN CLAIM ERROR:',
+      error
+    );
+
+    document.getElementById('gemWin').textContent =
+      'WIN SAVE ERROR — PLEASE TRY AGAIN';
+
   }
-
-  syncBalance();
-
-  document.getElementById('gemsWinBalance').textContent =
-    '0 POINTS';
-
-  document.querySelector('.win-balance-box')
-    .classList.remove('show');
 
 }
 
