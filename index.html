@@ -211,6 +211,7 @@ border:2px solid #ff6b73;
  right:-5px;
  top:-160px;
  z-index:30;
+ pointer-events:auto;
  min-width:105px;
  padding:7px 9px;
  border-radius:12px;
@@ -4411,8 +4412,17 @@ document.querySelector('.win-balance-box').classList.add('show');
   document.getElementById('gemWin').textContent=
    'PLEASE TRY AGAIN';
  }finally{
+
   gemsBusy=false;
- }
+
+  const winBox =
+    document.querySelector('.win-balance-box');
+
+  if(winBox){
+    winBox.style.pointerEvents='auto';
+  }
+
+}
 }
 
 async function claimGemsWin(){
