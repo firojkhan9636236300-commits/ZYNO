@@ -4303,7 +4303,7 @@ let gemsFreeBet = 0;
 let gemOutcome = null;
 
 async function playGems(){
- if(gemsBusy || gemsPendingWin > 0) return;
+ if(gemsBusy) return;
  if(balance<gemsBet){
   document.getElementById('gemWin').textContent=
    'NOT ENOUGH POINTS';
