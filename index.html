@@ -3425,7 +3425,8 @@ gemGrid=document.getElementById('gemGrid');
 
 let gemsRound=0,
 gemsBusy=false,
-gemsBet=1;
+gemsBet=1,
+gemsPendingWin=0;
 
 async function saveGemsGlobalStats(wager, payout){
 
@@ -4357,7 +4358,12 @@ async function playGems(){
    );
   }
   if(totalWin>0){
-   balance+=totalWin;
+   gemsPendingWin = totalWin;
+
+document.getElementById('gemsWinBalance').textContent =
+ '+' + gemsMoney(totalWin) + ' POINTS';
+
+document.querySelector('.win-balance-box').classList.add('show');
    if(gemOutcome === 'MEGA'){
     gemsFreeRounds = 10;
     gemsFreeBet = gemsBet;
@@ -4405,6 +4411,34 @@ async function playGems(){
  }finally{
   gemsBusy=false;
  }
+}
+
+function claimGemsWin(){
+
+  if(!gemsPendingWin || gemsPendingWin <= 0){
+
+    document.querySelector('.win-balance-box')
+      .classList.remove('show');
+
+    return;
+  }
+
+  balance += gemsPendingWin;
+
+  gemsPendingWin = 0;
+
+  if(window.saveUserBalance){
+    window.saveUserBalance();
+  }
+
+  syncBalance();
+
+  document.getElementById('gemsWinBalance').textContent =
+    '0 POINTS';
+
+  document.querySelector('.win-balance-box')
+    .classList.remove('show');
+
 }
 
 buildGems();
