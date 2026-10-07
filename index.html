@@ -4426,18 +4426,55 @@ async function claimGemsWin(){
   }
 
   const win = Number(gemsPendingWin || 0);
+  const user = auth.currentUser;
+
+  if(!user){
+    document.getElementById('gemWin').textContent =
+      'LOGIN REQUIRED';
+    return;
+  }
 
   try{
 
-    balance += win;
+    const userRef =
+      doc(db, 'users', user.uid);
+
+    /* Wait for any earlier balance save */
+    if(balanceSaveQueue){
+      await balanceSaveQueue;
+    }
+
+    let newBalance = 0;
+
+    await runTransaction(db, async transaction => {
+
+      const snap =
+        await transaction.get(userRef);
+
+      if(!snap.exists()){
+        throw new Error('USER ACCOUNT NOT FOUND');
+      }
+
+      const data = snap.data();
+
+      const currentPoints =
+        Number(data.points || 0);
+
+      newBalance =
+        currentPoints + win;
+
+      transaction.update(
+        userRef,
+        {
+          points: newBalance
+        }
+      );
+
+    });
+
+    balance = newBalance;
 
     syncBalance();
-
-    if(window.saveUserBalance){
-
-      await window.saveUserBalance();
-
-    }
 
     gemsPendingWin = 0;
 
