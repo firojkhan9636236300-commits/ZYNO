@@ -4489,7 +4489,7 @@ await window.zynoRunTransaction(
     );
 
     document.getElementById('gemWin').textContent =
-      'WIN SAVE ERROR — PLEASE TRY AGAIN';
+      'ERROR: ' + (error.message || error);
 
   }
 
