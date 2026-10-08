@@ -4427,17 +4427,12 @@ async function claimGemsWin(){
 
   try{
 
-    const userRef =
+const userRef =
   window.zynoDoc(
     window.zynoDb,
     'users',
     user.uid
   );
-
-/* Wait for any earlier balance save */
-if(balanceSaveQueue){
-  await balanceSaveQueue;
-}
 
 let newBalance = 0;
 
