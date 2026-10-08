@@ -4352,7 +4352,7 @@ async function playGems(){
    gemsPendingWin += totalWin;
 
 document.getElementById('gemsWinBalance').textContent =
- '+' + gemsMoney(totalWin) + ' POINTS';
+  '+' + gemsMoney(gemsPendingWin) + ' POINTS';
 
 document.querySelector('.win-balance-box').classList.add('show');
    if(gemOutcome === 'MEGA'){
