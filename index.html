@@ -4417,7 +4417,7 @@ async function claimGemsWin(){
   }
 
   const win = Number(gemsPendingWin || 0);
-  const user = auth.currentUser;
+  const user = window.zynoAuth.currentUser;
 
   if(!user){
     document.getElementById('gemWin').textContent =
