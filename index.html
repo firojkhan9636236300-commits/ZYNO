@@ -4439,16 +4439,18 @@ if(balanceSaveQueue){
   await balanceSaveQueue;
 }
 
-    let newBalance = 0;
+let newBalance = 0;
 
-    await runTransaction(db, async transaction => {
+await window.zynoRunTransaction(
+    window.zynoDb,
+    async transaction => {
 
-      const snap =
-        await transaction.get(userRef);
+    const snap =
+    await transaction.get(userRef);
 
-      if(!snap.exists()){
-        throw new Error('USER ACCOUNT NOT FOUND');
-      }
+    if(!snap.exists()){
+      throw new Error('USER ACCOUNT NOT FOUND');
+    }
 
       const data = snap.data();
 
