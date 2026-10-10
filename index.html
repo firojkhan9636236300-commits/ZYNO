@@ -3795,25 +3795,49 @@ function boardHasUnexpectedMatch(board,row,start,size){
  */
 let gemsRoundBoard=null;
 
-function prepareGemRound(){
+async function prepareGemRound(){
 
-  const outcome=chooseGemOutcome();
-  gemOutcome=outcome;
-  
-  if(outcome==='EMPTY'){
+  const user = window.zynoAuth.currentUser;
 
-    gemsRoundBoard=makeEmptyBoard();
+  if(!user){
+    throw new Error('Please login first');
+  }
 
+  const token = await user.getIdToken();
+
+  const response = await fetch(
+    'https://zyno-gems-api.firojkhan9636236300.workers.dev/outcome',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        bet: gemsBet
+      })
+    }
+  );
+
+  const data = await response.json();
+
+  if(!response.ok || !data.success || !data.outcome){
+    throw new Error(data.error || 'Gems API failed');
+  }
+
+  const outcome = data.outcome;
+  gemOutcome = outcome;
+
+  if(outcome === 'EMPTY'){
+    gemsRoundBoard = makeEmptyBoard();
   }else{
-
     const size =
-  outcome==='SMALL' ? 3 :
-  outcome==='NORMAL' ? 4 :
-  outcome==='BIG' ? 5 :
-  outcome==='MEGA' ? 25 :
-  3;
+      outcome === 'SMALL' ? 3 :
+      outcome === 'NORMAL' ? 4 :
+      outcome === 'BIG' ? 5 :
+      outcome === 'MEGA' ? 25 : 3;
 
-    gemsRoundBoard=makeWinningBoard(size);
+    gemsRoundBoard = makeWinningBoard(size);
   }
 
   return outcome;
@@ -4309,7 +4333,7 @@ async function playGems(){
   }
   syncBalance();
   gemsRound++;
-  gemsRoundBoard=null;
+  await prepareGemRound();
   prepareGemRound();
   document.getElementById('gemsRound').textContent=
    gemsRound;
