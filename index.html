@@ -3878,8 +3878,9 @@ function buildGems(){
         }
       ],
       {
-        duration: 400,
-        delay: i * 35,
+        duration: 650,
+         delay: i * 20,
+        
         easing: 'cubic-bezier(0.16, 0.72, 0.24, 1)',
         fill: 'forwards'
       }
@@ -4356,8 +4357,7 @@ async function playGems(){
    document.getElementById('gemsWin').textContent = '0';
    document.getElementById('gemWin').textContent =
     isFreeRound ? 'FREE GEMS DROPPING...' : 'GEMS DROPPING...';
-   buildGems();
-   await new Promise(resolve => setTimeout(resolve,900));
+   await buildGems();
    let totalWin = 0;
    let cascade = 0;
    while(cascade < 1){
