@@ -3870,7 +3870,7 @@ function buildGems(){
       [
         {
           transform: `translate(${startX}px, -450px)`,
-          opacity: 0.25
+          opacity: 1
         },
         {
           transform: 'translate(0px, 0px)',
@@ -3881,7 +3881,7 @@ function buildGems(){
         duration: 400,
         delay: i * 35,
         easing: 'cubic-bezier(0.16, 0.72, 0.24, 1)',
-        fill: 'both'
+        fill: 'forwards'
       }
     );
 
