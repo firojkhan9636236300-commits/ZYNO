@@ -3845,32 +3845,28 @@ async function prepareGemRound(){
 
 function buildGems(){
 
-  gemGrid.innerHTML = '';
+return new Promise(async (resolve, reject) => {
 
+try{
+  gemGrid.innerHTML = '';
   if(!gemsRoundBoard){
     gemsRoundBoard = makeEmptyBoard();
   }
-
   const animations = [];
-
   for(let i = 0; i < 25; i++){
-
     const gem = createGem(gemsRoundBoard[i], 'new');
-
     gemGrid.appendChild(gem);
-
-    // Har goti ke liye alag horizontal direction
-    const directions = [-45, -30, -15, 0, 15, 30, 45];
-
+    const directions = [-35, -20, -10, 0, 10, 20, 35];
     const startX =
       directions[Math.floor(Math.random() * directions.length)];
-
-    // Har goti upar se, alag direction aur samay par giregi
+    gem.style.transform =
+      `translate(${startX}px, -650px)`;
+    gem.style.opacity = '0';
     const animation = gem.animate(
       [
         {
           transform: `translate(${startX}px, -650px)`,
-          opacity: 1
+          opacity: 0
         },
         {
           transform: 'translate(0px, 0px)',
@@ -3878,32 +3874,30 @@ function buildGems(){
         }
       ],
       {
-        duration: 900,
-        delay: i * 35,
-        
+        duration: 700 + Math.random() * 350,
+        delay: i * 45 + Math.random() * 100,
         easing: 'cubic-bezier(0.16, 0.72, 0.24, 1)',
         fill: 'forwards'
       }
     );
-
     animations.push(animation);
   }
-
-  // Sabhi 25 gotiyon ki animation poori hone do
-  Promise.all(
+  await Promise.all(
     animations.map(animation => animation.finished)
-  ).then(() => {
-
-    [...gemGrid.children].forEach(gem => {
-      gem.classList.remove('new');
-      gem.style.transform = '';
-    });
-
-    animations.forEach(animation => animation.cancel());
-
-  }).catch(error => {
-    console.log('Gems animation:', error);
+  );
+  [...gemGrid.children].forEach(gem => {
+    gem.classList.remove('new');
+    gem.style.transform = '';
+    gem.style.opacity = '';
   });
+  animations.forEach(animation => animation.cancel());
+  resolve();
+}catch(error){
+  console.error('GEMS DROP ERROR:', error);
+  reject(error);
+}
+
+});
 
 }
 
