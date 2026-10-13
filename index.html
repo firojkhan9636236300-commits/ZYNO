@@ -4345,7 +4345,7 @@ async function playGems(){
    document.getElementById('gemWin').textContent =
     isFreeRound ? 'FREE GEMS DROPPING...' : 'GEMS DROPPING...';
    buildGems();
-   await new Promise(resolve => setTimeout(resolve,2400));
+   await new Promise(resolve => setTimeout(resolve,100));
    let totalWin = 0;
    let cascade = 0;
    while(cascade < 1){
