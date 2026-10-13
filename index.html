@@ -3853,7 +3853,7 @@ function buildGems(){
     const gem = createGem(gemsRoundBoard[i], 'new');
     // Pehle gem ko grid mein add karo
     gemGrid.appendChild(gem);
-    const row = Math.floor(i / 5);
+    const row = i % 5;
     // Har row upar se alag samay par giregi
     const animation = gem.animate(
       [
