@@ -1189,6 +1189,13 @@ function openGame(id){
   }
 
   target.classList.add('active');
+  // GEMS — show the board when the screen opens
+if(id === ‘gems’ && gemGrid.children.length === 0){
+if(!gemsRoundBoard){
+gemsRoundBoard = makeEmptyBoard();
+}
+buildGems();
+}
 
   localStorage.setItem('zynoActiveView',id);
 
