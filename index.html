@@ -4436,85 +4436,61 @@ async function playGems(){
 
 async function claimGemsWin(){
 
-  if(!gemsPendingWin || gemsPendingWin <= 0){
+const user = window.zynoAuth.currentUser;
 
-    document.querySelector('.win-balance-box')
-      .classList.remove('show');
+if(!user){
+document.getElementById(‘gemWin’).textContent =
+‘LOGIN REQUIRED’;
+return;
+}
 
-    return;
+if(!gemsServerRoundId){
+document.getElementById(‘gemWin’).textContent =
+‘NO PENDING SERVER WIN’;
+return;
+}
+
+try{
+
+const token = await user.getIdToken();
+const response = await fetch(
+  'https://zyno-gems-api.firojkhan9636236300.workers.dev/claim-win',
+  {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token
+    },
+    body: JSON.stringify({
+      roundId: gemsServerRoundId
+    })
   }
+);
+const data = await response.json();
+if(!response.ok || !data.success){
+  throw new Error(data.error || 'Win claim failed');
+}
+balance = Number(data.balance);
+syncBalance();
+gemsPendingWin = 0;
+gemsServerRoundId = null;
+gemsServerPayout = 0;
+document.getElementById('gemsWinBalance').textContent =
+  '0 POINTS';
+document.querySelector('.win-balance-box')
+  ?.classList.remove('show');
+document.getElementById('gemWin').textContent =
+  'WIN CREDITED: ' +
+  gemsMoney(Number(data.credited || 0)) +
+  ' POINTS';
 
-  const win = Number(gemsPendingWin || 0);
-  const user = window.zynoAuth.currentUser;
+}catch(error){
 
-  if(!user){
-    document.getElementById('gemWin').textContent =
-      'LOGIN REQUIRED';
-    return;
-  }
+console.error('GEMS WIN CLAIM ERROR:', error);
+document.getElementById('gemWin').textContent =
+  'CLAIM ERROR: ' + (error.message || error);
 
-  try{
-
-const userRef =
-  window.zynoDoc(
-    window.zynoDb,
-    'users',
-    user.uid
-  );
-
-let newBalance = 0;
-
-await window.zynoRunTransaction(
-    window.zynoDb,
-    async transaction => {
-
-    const snap =
-    await transaction.get(userRef);
-
-    if(!snap.exists()){
-      throw new Error('USER ACCOUNT NOT FOUND');
-    }
-
-      const data = snap.data();
-
-      const currentPoints =
-        Number(data.points || 0);
-
-      newBalance =
-        currentPoints + win;
-
-      transaction.update(
-        userRef,
-        {
-          points: newBalance
-        }
-      );
-
-    });
-
-    balance = newBalance;
-
-    syncBalance();
-
-    gemsPendingWin = 0;
-
-    document.getElementById('gemsWinBalance').textContent =
-      '0 POINTS';
-
-    document.querySelector('.win-balance-box')
-      .classList.remove('show');
-
-  }catch(error){
-
-    console.error(
-      'GEMS WIN CLAIM ERROR:',
-      error
-    );
-
-    document.getElementById('gemWin').textContent =
-      'ERROR: ' + (error.message || error);
-
-  }
+}
 
 }
 
