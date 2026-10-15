@@ -4308,132 +4308,183 @@ let gemsFreeBet = 0;
 let gemOutcome = null;
 
 async function playGems(){
- if(gemsBusy) return;
- const isFreeRound = gemsFreeRounds > 0;
- const roundBet = isFreeRound ? gemsFreeBet : gemsBet;
- if(!isFreeRound && balance < roundBet){
-  document.getElementById('gemWin').textContent =
-   'NOT ENOUGH POINTS';
-  return;
- }
- gemsBusy = true;
- try{
-  ensureAudio();
-  playGemsStartSound();
-  if(isFreeRound){
-   gemsFreeRounds--;
-   document.getElementById('gemWin').textContent =
-    'FREE ROUND ' + (10 - gemsFreeRounds) + '/10';
-  }else{
-   balance -= roundBet;
-   if(window.saveUserBalance){
-    await window.saveUserBalance();
-   }
-   if(window.addWagerCompleted && roundBet > 0){
-    await window.addWagerCompleted(roundBet);
-   }
-   syncBalance();
+
+  if(gemsBusy) return;
+
+  // Pichhla round claim nahi hua toh naya round mat chalao.
+  if(gemsServerRoundId){
+    document.getElementById('gemWin').textContent =
+      'PLEASE CLAIM PREVIOUS ROUND FIRST';
+    return;
   }
-  gemsRound++;
-  // Free round mein bhi saved MEGA bet use hoga.
+
+  const isFreeRound = gemsFreeRounds > 0;
+  const roundBet = isFreeRound ? gemsFreeBet : gemsBet;
+
+  if(!isFreeRound && balance < roundBet){
+    document.getElementById('gemWin').textContent =
+      'NOT ENOUGH POINTS';
+    return;
+  }
+
+  gemsBusy = true;
+
   const previousBet = gemsBet;
-  gemsBet = roundBet;
+
   try{
-   await prepareGemRound();
-   document.getElementById('gemsRound').textContent =
-    gemsRound;
-   document.getElementById('gemsWin').textContent = '0';
-   document.getElementById('gemWin').textContent =
-    isFreeRound ? 'FREE GEMS DROPPING...' : 'GEMS DROPPING...';
-   await buildGems();
-   let totalWin = 0;
-   let cascade = 0;
-   while(cascade < 1){
-    const groups = findClusters();
-    if(!groups.length) break;
-    cascade++;
-    let cascadeWin = 0;
-    groups.forEach(group => {
-     cascadeWin += gemScore(
-      group.length,
-      roundBet,
-      +gemGrid.children[group[0]].dataset.v,
-      cascade
-     );
-    });
-    totalWin += cascadeWin;
-    playGemsMatchSound();
-    document.getElementById('gemWin').textContent =
-     'MATCH ×' + cascade + ' +' + cascadeWin + ' POINTS';
-    await dropGems(groups);
-    await new Promise(resolve => setTimeout(resolve,180));
-   }
-   if(totalWin > 0){
-    gemsPendingWin += totalWin;
-    document.getElementById('gemsWinBalance').textContent =
-     '+' + gemsMoney(gemsPendingWin) + ' POINTS';
-    document.querySelector('.win-balance-box').classList.add('show');
-    const bigWin = document.getElementById('gemBigWin');
-    bigWin.innerHTML =
-     '<span class="win-amount-text">+' +
-     gemsMoney(totalWin) +
-     '</span> <span class="win-points-text">POINTS</span>';
-    bigWin.classList.remove('show');
-    void bigWin.offsetWidth;
-    bigWin.classList.add('show');
-    if(totalWin >= 20){
-     const trophy = document.getElementById('gemTrophy');
-     trophy.classList.remove('show');
-     void trophy.offsetWidth;
-     trophy.classList.add('show');
-     playGemsWinBig();
+
+    ensureAudio();
+    playGemsStartSound();
+
+    gemsBet = roundBet;
+    gemsRound++;
+
+    if(isFreeRound){
+      document.getElementById('gemWin').textContent =
+        'FREE ROUND...';
     }else{
-     playGemsWinSmall();
+      document.getElementById('gemWin').textContent =
+        'CONNECTING TO SERVER...';
     }
-   }else{
-    document.getElementById('gemsWin').textContent = '0';
-   }
-   if(window.saveGemsGlobalStats){
-    await saveGemsGlobalStats(
-     isFreeRound ? 0 : roundBet,
-     totalWin
+
+    // Server verifies the bet and deducts it.
+    const roundData = await prepareGemRound(
+      isFreeRound,
+      roundBet
     );
-   }
-   // MEGA outcome par 10 free rounds activate karo.
-   if(!isFreeRound && gemOutcome === 'MEGA'){
-    gemsFreeRounds = 10;
-    gemsFreeBet = roundBet;
+
+    document.getElementById('gemsRound').textContent =
+      gemsRound;
+
     document.getElementById('gemWin').textContent =
-     'MEGA WIN — 10 FREE ROUNDS';
-    playGemsWinBig();
-   }else if(isFreeRound){
-    document.getElementById('gemWin').textContent =
-     'FREE ROUNDS LEFT: ' + gemsFreeRounds;
-   }else if(totalWin > 0){
-    document.getElementById('gemWin').textContent =
-     'WIN +' + gemsMoney(totalWin) + ' POINTS';
-   }else{
-    document.getElementById('gemWin').textContent =
-     'NO WIN — TRY AGAIN';
-   }
-  }finally{
-   gemsBet = previousBet;
-  }
-  // Free turns ko automatic chalao.
-  if(gemsFreeRounds > 0){
-   setTimeout(() => {
-    if(!gemsBusy){
-     playGems();
+      isFreeRound
+        ? 'FREE GEMS DROPPING...'
+        : 'GEMS DROPPING...';
+
+    // Record wagering separately; do not deduct balance again.
+    if(!isFreeRound && window.addWagerCompleted){
+      try{
+        await window.addWagerCompleted(roundBet);
+      }catch(error){
+        console.error('WAGER RECORD ERROR:', error);
+      }
     }
-   },1000);
+
+    await buildGems();
+
+    let cascade = 0;
+
+    while(cascade < 1){
+
+      const groups = findClusters();
+
+      if(!groups.length) break;
+
+      cascade++;
+
+      playGemsMatchSound();
+
+      document.getElementById('gemWin').textContent =
+        'MATCH FOUND!';
+
+      await dropGems(groups);
+
+      await new Promise(resolve =>
+        setTimeout(resolve, 180)
+      );
+    }
+
+    // The server's payout is authoritative.
+    const totalWin = Number(gemsServerPayout || 0);
+
+    if(totalWin > 0){
+
+      gemsPendingWin = totalWin;
+
+      document.getElementById('gemsWinBalance').textContent =
+        '+' + gemsMoney(totalWin) + ' POINTS';
+
+      document.querySelector('.win-balance-box')
+        .classList.add('show');
+
+      const bigWin = document.getElementById('gemBigWin');
+
+      bigWin.innerHTML =
+        '<span class="win-amount-text">+' +
+        gemsMoney(totalWin) +
+        '</span> <span class="win-points-text">POINTS</span>';
+
+      bigWin.classList.remove('show');
+      void bigWin.offsetWidth;
+      bigWin.classList.add('show');
+
+      if(totalWin >= 20){
+        const trophy = document.getElementById('gemTrophy');
+        trophy.classList.remove('show');
+        void trophy.offsetWidth;
+        trophy.classList.add('show');
+        playGemsWinBig();
+      }else{
+        playGemsWinSmall();
+      }
+
+    }else{
+
+      // Close zero-payout rounds on the server too.
+      await claimGemsWin();
+
+      document.getElementById('gemWin').textContent =
+        'NO WIN — TRY AGAIN';
+    }
+
+    if(window.saveGemsGlobalStats){
+      try{
+        await window.saveGemsGlobalStats(
+          isFreeRound ? 0 : roundBet,
+          totalWin
+        );
+      }catch(error){
+        console.error('GEMS STATS ERROR:', error);
+      }
+    }
+
+    if(!isFreeRound && gemOutcome === 'MEGA'){
+      document.getElementById('gemWin').textContent =
+        'MEGA WIN — 10 FREE ROUNDS';
+    }else if(isFreeRound){
+      document.getElementById('gemWin').textContent =
+        'FREE ROUND COMPLETE';
+    }else if(totalWin > 0){
+      document.getElementById('gemWin').textContent =
+        'WIN +' + gemsMoney(totalWin) + ' POINTS';
+    }
+
+    // Free-round winnings are claimed automatically.
+    if(isFreeRound && gemsServerRoundId){
+      await claimGemsWin();
+    }
+
+  }catch(error){
+
+    console.error('GEMS PLAY ERROR:', error);
+
+    document.getElementById('gemWin').textContent =
+      'ERROR: ' + (error.message || error);
+
+  }finally{
+
+    gemsBet = previousBet;
+    gemsBusy = false;
+
   }
- }catch(error){
-  console.error('GEMS PLAY ERROR:',error);
-  document.getElementById('gemWin').textContent =
-   'PLEASE TRY AGAIN';
- }finally{
-  gemsBusy = false;
- }
+
+  // Continue free rounds automatically.
+  if(isFreeRound && gemsFreeRounds > 0){
+    setTimeout(() => {
+      playGems();
+    }, 1000);
+  }
+
 }
 
 async function claimGemsWin(){
