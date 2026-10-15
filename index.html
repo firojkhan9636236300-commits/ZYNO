@@ -3769,6 +3769,8 @@ function boardHasUnexpectedMatch(board,row,start,size){
  * controlled result board.
  */
 let gemsRoundBoard=null;
+let gemsServerRoundId = null;
+let gemsServerPayout = 0;
 
 async function prepareGemRound(isFreeRound = false, roundBet = gemsBet){
 
