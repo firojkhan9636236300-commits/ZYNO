@@ -3639,92 +3639,67 @@ function makeEmptyBoard(){
  * Selected winning match ke saath board banao.
  */
 
-function makeWinningBoard(size){
+function makeWinningBoard(size, forcedSymbol){
 
-  /*
-   * FULL SCREEN
-   * 25 mein se 25 same colour
-   */
-  if(size===25){
+  const symbol = Number.isInteger(forcedSymbol) &&
+    forcedSymbol >= 0 &&
+    forcedSymbol < symbols.length
+      ? forcedSymbol
+      : Math.floor(Math.random() * symbols.length);
 
-    const symbol=Math.floor(Math.random()*symbols.length);
-    const board=[];
+  // FULL SCREEN: 25 same-colour gems
+  if(size === 25){
 
-    for(let i=0;i<25;i++){
+    const board = [];
+
+    for(let i = 0; i < 25; i++){
       board.push(symbol);
     }
 
     return board;
   }
 
-  /*
-   * HALF SCREEN
-   * 25 mein se 13 same colour
-   */
-  if(size===13){
+  // HALF SCREEN: 13 same-colour gems
+  if(size === 13){
 
-    const symbol=Math.floor(Math.random()*symbols.length);
-    const board=makeEmptyBoard();
+    const board = makeEmptyBoard();
 
-    let placed=0;
-
-    for(let i=0;i<25 && placed<13;i++){
-
-      board[i]=symbol;
-      placed++;
+    for(let i = 0; i < 13; i++){
+      board[i] = symbol;
     }
 
     return board;
   }
 
-  /*
-   * NORMAL 3 / 4 / 5 MATCH
-   */
-  for(let attempt=0;attempt<300;attempt++){
+  // NORMAL MATCH: 3, 4 or 5
+  for(let attempt = 0; attempt < 300; attempt++){
 
-    const board=makeEmptyBoard();
+    const board = makeEmptyBoard();
 
-    const symbol=Math.floor(Math.random()*symbols.length);
+    const row = Math.floor(Math.random() * 5);
 
-    const row=Math.floor(Math.random()*5);
-
-    const start=Math.floor(
-      Math.random()*(6-size)
+    const start = Math.floor(
+      Math.random() * (6 - size)
     );
 
-    for(let c=start;c<start+size;c++){
-      board[row*5+c]=symbol;
+    for(let c = start; c < start + size; c++){
+      board[row * 5 + c] = symbol;
     }
 
-    /*
-     * Agar selected match ke alawa koi
-     * unwanted match ban gaya to dobara try.
-     */
-    if(!boardHasUnexpectedMatch(board,row,start,size)){
+    if(!boardHasUnexpectedMatch(board, row, start, size)){
       return board;
     }
   }
 
-  /*
-   * Safety fallback
-   */
-  const board=makeEmptyBoard();
+  // Safety fallback
+  const board = makeEmptyBoard();
 
-  const symbol=0;
-  const row=4;
-  const start=0;
-
-  for(let c=start;c<start+size;c++){
-    board[row*5+c]=symbol;
+  for(let c = 0; c < size; c++){
+    board[20 + c] = symbol;
   }
 
   return board;
 }
-
-/*
- * Sirf wahi match allowed hai jo humne
- * intentionally create kiya hai.
- */
 
 function boardClusters(board){
 
@@ -3795,52 +3770,69 @@ function boardHasUnexpectedMatch(board,row,start,size){
  */
 let gemsRoundBoard=null;
 
-async function prepareGemRound(){
+async function prepareGemRound(isFreeRound = false, roundBet = gemsBet){
 
-  const user = window.zynoAuth.currentUser;
+const user = window.zynoAuth.currentUser;
 
-  if(!user){
-    throw new Error('Please login first');
-  }
+if(!user){
+throw new Error(‘Please login first’);
+}
 
-  const token = await user.getIdToken();
+const token = await user.getIdToken();
 
-  const response = await fetch(
-    'https://zyno-gems-api.firojkhan9636236300.workers.dev/outcome',
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({
-        bet: gemsBet
-      })
-    }
-  );
+const response = await fetch(
+‘https://zyno-gems-api.firojkhan9636236300.workers.dev/play’,
+{
+method: ‘POST’,
+headers: {
+‘Content-Type’: ‘application/json’,
+‘Authorization’: ’Bearer ’ + token
+},
+body: JSON.stringify({
+bet: Number(roundBet),
+isFreeRound: Boolean(isFreeRound)
+})
+}
+);
 
-  const data = await response.json();
+const data = await response.json();
 
-  if(!response.ok || !data.success || !data.outcome){
-    throw new Error(data.error || 'Gems API failed');
-  }
+if(!response.ok || !data.success || !data.roundId){
+throw new Error(data.error || ‘Gems round failed’);
+}
 
-  const outcome = data.outcome;
-  gemOutcome = outcome;
+gemOutcome = data.outcome;
+gemsServerRoundId = data.roundId;
+gemsServerPayout = Number(data.payout || 0);
 
-  if(outcome === 'EMPTY'){
-    gemsRoundBoard = makeEmptyBoard();
-  }else{
-    const size =
-      outcome === 'SMALL' ? 3 :
-      outcome === 'NORMAL' ? 4 :
-      outcome === 'BIG' ? 5 :
-      outcome === 'MEGA' ? 25 : 3;
+balance = Number(data.balance);
+syncBalance();
 
-    gemsRoundBoard = makeWinningBoard(size);
-  }
+gemsFreeRounds = Number(data.freeRoundsLeft || 0);
+gemsFreeBet = Number(data.freeBet || 0);
 
-  return outcome;
+if(data.outcome === ‘EMPTY’){
+
+gemsRoundBoard = makeEmptyBoard();
+
+}else{
+
+const size =
+  data.outcome === 'SMALL' ? 3 :
+  data.outcome === 'NORMAL' ? 4 :
+  data.outcome === 'BIG' ? 5 :
+  data.outcome === 'MEGA' ? 25 : 0;
+if(size === 0){
+  throw new Error('Invalid server outcome');
+}
+gemsRoundBoard = makeWinningBoard(
+  size,
+  Number(data.symbol)
+);
+
+}
+
+return data;
 }
 
 function buildGems(){
