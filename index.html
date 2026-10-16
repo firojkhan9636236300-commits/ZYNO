@@ -3773,62 +3773,65 @@ let gemsServerRoundId = null;
 let gemsServerPayout = 0;
 
 async function prepareGemRound(isFreeRound = false, roundBet = gemsBet) {
-const user = window.zynoAuth.currentUser;
+  const user = window.zynoAuth.currentUser;
 
-if (!user) {
-throw new Error(“Please login first”);
-}
+  if (!user) {
+    throw new Error("Please login first");
+  }
 
-const token = await user.getIdToken();
+  const token = await user.getIdToken();
 
-const response = await fetch(
-“https://zyno-gems-api.firojkhan9636236300.workers.dev/play”,
-{
-method: “POST”,
-headers: {
-“Content-Type”: “application/json”,
-“Authorization”: “Bearer “ + token
-},
-body: JSON.stringify({
-bet: Number(roundBet),
-isFreeRound: Boolean(isFreeRound)
-})
-}
-);
+  const response = await fetch(
+    "https://zyno-gems-api.firojkhan9636236300.workers.dev/play",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({
+        bet: Number(roundBet),
+        isFreeRound: Boolean(isFreeRound)
+      })
+    }
+  );
 
-const data = await response.json();
+  const data = await response.json();
 
-if (!response.ok || !data.success || !data.roundId) {
-throw new Error(data.error || “Gems round failed”);
-}
+  if (!response.ok || !data.success || !data.roundId) {
+    throw new Error(data.error || "Gems round failed");
+  }
 
-gemOutcome = data.outcome;
-gemsServerRoundId = data.roundId;
-gemsServerPayout = Number(data.payout || 0);
+  gemOutcome = data.outcome;
+  gemsServerRoundId = data.roundId;
+  gemsServerPayout = Number(data.payout || 0);
 
-balance = Number(data.balance);
-syncBalance();
+  balance = Number(data.balance);
+  syncBalance();
 
-gemsFreeRounds = Number(data.freeRoundsLeft || 0);
-gemsFreeBet = Number(data.freeBet || 0);
+  gemsFreeRounds = Number(data.freeRoundsLeft || 0);
+  gemsFreeBet = Number(data.freeBet || 0);
 
-if (data.outcome === “EMPTY”) {
-gemsRoundBoard = makeEmptyBoard();
-} else {
-const size =
-data.outcome === “SMALL” ? 3 :
-data.outcome === “NORMAL” ? 4 :
-data.outcome === “BIG” ? 5 :
-data.outcome === “MEGA” ? 25 : 0;
+  if (data.outcome === "EMPTY") {
+    gemsRoundBoard = makeEmptyBoard();
+  } else {
+    const size =
+      data.outcome === "SMALL" ? 3 :
+      data.outcome === "NORMAL" ? 4 :
+      data.outcome === "BIG" ? 5 :
+      data.outcome === "MEGA" ? 25 : 0;
 
-if (size === 0) {
-  throw new Error("Invalid server outcome");
-}
-gemsRoundBoard = makeWinningBoard(size, Number(data.symbol));
+    if (size === 0) {
+      throw new Error("Invalid server outcome");
+    }
 
-}
+    gemsRoundBoard = makeWinningBoard(
+      size,
+      Number(data.symbol)
+    );
+  }
 
-return data;
+  return data;
 }
 
 function buildGems(){
@@ -4482,63 +4485,46 @@ async function playGems(){
 }
 
 async function claimGemsWin(){
-
-const user = window.zynoAuth.currentUser;
-
-if(!user){
-document.getElementById(‘gemWin’).textContent =
-‘LOGIN REQUIRED’;
-return;
-}
-
-if(!gemsServerRoundId){
-document.getElementById(‘gemWin’).textContent =
-‘NO PENDING SERVER WIN’;
-return;
-}
-
-try{
-
-const token = await user.getIdToken();
-const response = await fetch(
-  'https://zyno-gems-api.firojkhan9636236300.workers.dev/claim-win',
-  {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token
-    },
-    body: JSON.stringify({
-      roundId: gemsServerRoundId
-    })
+  const user = window.zynoAuth.currentUser;
+  if(!user){
+    document.getElementById('gemWin').textContent = 'LOGIN REQUIRED';
+    return;
   }
-);
-const data = await response.json();
-if(!response.ok || !data.success){
-  throw new Error(data.error || 'Win claim failed');
-}
-balance = Number(data.balance);
-syncBalance();
-gemsPendingWin = 0;
-gemsServerRoundId = null;
-gemsServerPayout = 0;
-document.getElementById('gemsWinBalance').textContent =
-  '0 POINTS';
-document.querySelector('.win-balance-box')
-  ?.classList.remove('show');
-document.getElementById('gemWin').textContent =
-  'WIN CREDITED: ' +
-  gemsMoney(Number(data.credited || 0)) +
-  ' POINTS';
-
-}catch(error){
-
-console.error('GEMS WIN CLAIM ERROR:', error);
-document.getElementById('gemWin').textContent =
-  'CLAIM ERROR: ' + (error.message || error);
-
-}
-
+  if(!gemsServerRoundId){
+    document.getElementById('gemWin').textContent = 'NO PENDING SERVER WIN';
+    return;
+  }
+  try{
+    const token = await user.getIdToken();
+    const response = await fetch(
+      'https://zyno-gems-api.firojkhan9636236300.workers.dev/claim-win',
+      {
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'Authorization':'Bearer '+token
+        },
+        body:JSON.stringify({roundId:gemsServerRoundId})
+      }
+    );
+    const data = await response.json();
+    if(!response.ok || !data.success){
+      throw new Error(data.error || 'Win claim failed');
+    }
+    balance = Number(data.balance);
+    syncBalance();
+    gemsPendingWin = 0;
+    gemsServerRoundId = null;
+    gemsServerPayout = 0;
+    document.getElementById('gemsWinBalance').textContent = '0 POINTS';
+    document.querySelector('.win-balance-box')?.classList.remove('show');
+    document.getElementById('gemWin').textContent =
+      'WIN CREDITED: ' + gemsMoney(Number(data.credited || 0)) + ' POINTS';
+  }catch(error){
+    console.error('GEMS WIN CLAIM ERROR:', error);
+    document.getElementById('gemWin').textContent =
+      'CLAIM ERROR: ' + (error.message || error);
+  }
 }
 
 buildGems();
