@@ -3772,23 +3772,22 @@ let gemsRoundBoard=null;
 let gemsServerRoundId = null;
 let gemsServerPayout = 0;
 
-async function prepareGemRound(isFreeRound = false, roundBet = gemsBet){
-
+async function prepareGemRound(isFreeRound = false, roundBet = gemsBet) {
 const user = window.zynoAuth.currentUser;
 
-if(!user){
-throw new Error(‘Please login first’);
+if (!user) {
+throw new Error(“Please login first”);
 }
 
 const token = await user.getIdToken();
 
 const response = await fetch(
-‘https://zyno-gems-api.firojkhan9636236300.workers.dev/play’,
+“https://zyno-gems-api.firojkhan9636236300.workers.dev/play”,
 {
-method: ‘POST’,
+method: “POST”,
 headers: {
-‘Content-Type’: ‘application/json’,
-‘Authorization’: ’Bearer ’ + token
+“Content-Type”: “application/json”,
+“Authorization”: “Bearer “ + token
 },
 body: JSON.stringify({
 bet: Number(roundBet),
@@ -3799,8 +3798,8 @@ isFreeRound: Boolean(isFreeRound)
 
 const data = await response.json();
 
-if(!response.ok || !data.success || !data.roundId){
-throw new Error(data.error || ‘Gems round failed’);
+if (!response.ok || !data.success || !data.roundId) {
+throw new Error(data.error || “Gems round failed”);
 }
 
 gemOutcome = data.outcome;
@@ -3813,24 +3812,19 @@ syncBalance();
 gemsFreeRounds = Number(data.freeRoundsLeft || 0);
 gemsFreeBet = Number(data.freeBet || 0);
 
-if(data.outcome === ‘EMPTY’){
-
+if (data.outcome === “EMPTY”) {
 gemsRoundBoard = makeEmptyBoard();
-
-}else{
-
+} else {
 const size =
-  data.outcome === 'SMALL' ? 3 :
-  data.outcome === 'NORMAL' ? 4 :
-  data.outcome === 'BIG' ? 5 :
-  data.outcome === 'MEGA' ? 25 : 0;
-if(size === 0){
-  throw new Error('Invalid server outcome');
+data.outcome === “SMALL” ? 3 :
+data.outcome === “NORMAL” ? 4 :
+data.outcome === “BIG” ? 5 :
+data.outcome === “MEGA” ? 25 : 0;
+
+if (size === 0) {
+  throw new Error("Invalid server outcome");
 }
-gemsRoundBoard = makeWinningBoard(
-  size,
-  Number(data.symbol)
-);
+gemsRoundBoard = makeWinningBoard(size, Number(data.symbol));
 
 }
 
