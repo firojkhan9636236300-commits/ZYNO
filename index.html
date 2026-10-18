@@ -4309,12 +4309,7 @@ async function playGems(){
   if(gemsBusy) return;
 
   // Pichhla round claim nahi hua toh naya round mat chalao.
-  if(gemsServerRoundId){
-    document.getElementById('gemWin').textContent =
-      'PLEASE CLAIM PREVIOUS ROUND FIRST';
-    return;
-  }
-
+  
   const isFreeRound = gemsFreeRounds > 0;
   const roundBet = isFreeRound ? gemsFreeBet : gemsBet;
 
