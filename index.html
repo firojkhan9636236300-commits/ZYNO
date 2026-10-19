@@ -4494,106 +4494,127 @@ document.getElementById('gemsWinBalance').textContent =
 
 }
 
-async function claimGemsWin(roundIdToClaim = null){
-
+async function claimGemsWin(roundIdToClaim = null) {
   const user = window.zynoAuth.currentUser;
 
-  if(!user){
-    document.getElementById('gemWin').textContent =
-      'LOGIN REQUIRED';
+  if (!user) {
+    document.getElementById('gemWin').textContent = 'LOGIN REQUIRED';
     return;
   }
 
-  // OK button claims the oldest pending paid win.
-  // Free rounds and zero-payout rounds can pass an explicit ID.
-  let targetRoundId = roundIdToClaim;
+  // Explicit ID = claim only that round.
+  // OK button (no ID) = claim every pending round.
+  const roundIds = roundIdToClaim
+    ? [roundIdToClaim]
+    : [...new Set(
+        gemsPendingClaims
+          .map(item => item.roundId)
+          .filter(Boolean)
+      )];
 
-  if(!targetRoundId){
-    if(!gemsPendingClaims.length){
-      document.getElementById('gemWin').textContent =
-        'NO PENDING SERVER WIN';
-      return;
-    }
-
-    targetRoundId = gemsPendingClaims[0].roundId;
+  if (!roundIds.length) {
+    document.getElementById('gemWin').textContent =
+      'NO PENDING SERVER WIN';
+    return;
   }
 
-  try{
+  const button = document.querySelector('.win-balance-box button');
+  if (button) button.disabled = true;
 
+  let claimedCount = 0;
+  let lastError = null;
+
+  try {
     const token = await user.getIdToken();
 
-    const response = await fetch(
-      'https://zyno-gems-api.firojkhan9636236300.workers.dev/claim-win',
-      {
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'Authorization':'Bearer '+token
-        },
-        body:JSON.stringify({
-          roundId:targetRoundId
-        })
+    // Claim each round separately; never combine server round IDs.
+    for (const targetRoundId of roundIds) {
+      try {
+        const response = await fetch(
+          'https://zyno-gems-api.firojkhan9636236300.workers.dev/claim-win',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({
+              roundId: targetRoundId
+            })
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Win claim failed');
+        }
+
+        // Always take the latest authoritative server balance.
+        if (Number.isFinite(Number(data.balance))) {
+          balance = Number(data.balance);
+          syncBalance();
+        }
+
+        // Remove only the round the server confirmed.
+        gemsPendingClaims = gemsPendingClaims.filter(
+          item => item.roundId !== targetRoundId
+        );
+
+        if (gemsServerRoundId === targetRoundId) {
+          gemsServerRoundId = null;
+          gemsServerPayout = 0;
+        }
+
+        claimedCount++;
+
+      } catch (error) {
+        // Keep failed rounds pending so they can be retried.
+        lastError = error;
+        console.error(
+          'GEMS ROUND CLAIM ERROR:',
+          targetRoundId,
+          error
+        );
       }
-    );
-
-    const data = await response.json();
-
-    if(!response.ok || !data.success){
-      throw new Error(data.error || 'Win claim failed');
     }
 
-    // Update the actual server balance.
-    balance = Number(data.balance);
-    syncBalance();
-
-    // Remove ONLY the round that was successfully claimed.
-    gemsPendingClaims = gemsPendingClaims.filter(
-      item => item.roundId !== targetRoundId
-    );
-
-    // Clear current-round data only if it is the claimed round.
-    if(gemsServerRoundId === targetRoundId){
-      gemsServerRoundId = null;
-      gemsServerPayout = 0;
-    }
-
-    // Recalculate the remaining pending winnings.
+    // Recalculate remaining pending points.
     gemsPendingWin = gemsPendingClaims.reduce(
-      (sum, item) => sum + Number(item.payout || 0),
+      (sum, item) => sum + (Number(item.payout) || 0),
       0
     );
 
-    const winBalance = document.getElementById('gemsWinBalance');
-    const winBox = document.querySelector('.win-balance-box');
+    const winBalance =
+      document.getElementById('gemsWinBalance');
 
-    if(gemsPendingClaims.length){
+    const winBox =
+      document.querySelector('.win-balance-box');
 
+    if (winBalance) {
       winBalance.textContent =
         '+' + gemsMoney(gemsPendingWin) + ' POINTS';
-
-      winBox?.classList.add('show');
-
-    }else{
-
-      winBalance.textContent = '0 POINTS';
-      winBox?.classList.remove('show');
-
     }
 
-    document.getElementById('gemWin').textContent =
-      'WIN CREDITED: ' +
-      gemsMoney(Number(data.credited || 0)) +
-      ' POINTS';
+    if (gemsPendingClaims.length) {
+      winBox?.classList.add('show');
+    } else {
+      winBox?.classList.remove('show');
+    }
 
-  }catch(error){
+    if (lastError) {
+      document.getElementById('gemWin').textContent =
+        claimedCount
+          ? 'SOME WINS CREDITED — RETRY REMAINING'
+          : 'CLAIM ERROR: ' + (lastError.message || lastError);
+    } else {
+      document.getElementById('gemWin').textContent =
+        'WIN CREDITED — ' + claimedCount + ' ROUND(S)';
+    }
 
-    console.error('GEMS WIN CLAIM ERROR:', error);
-
-    document.getElementById('gemWin').textContent =
-      'CLAIM ERROR: ' + (error.message || error);
-
+  } finally {
+    if (button) button.disabled = false;
   }
-
 }
 
 buildGems();
