@@ -4390,19 +4390,27 @@ async function playGems(){
 
       gemsPendingWin = totalWin;
       // Save this paid win separately so the next round
-// cannot overwrite its server round ID.
+// Keep every paid and free-round win separately.
 if (
-!isFreeRound &&
-gemsServerRoundId &&
-!gemsPendingClaims.some(
-item => item.roundId === gemsServerRoundId
-)
+  gemsServerRoundId &&
+  !gemsPendingClaims.some(
+    item => item.roundId === gemsServerRoundId
+  )
 ) {
-gemsPendingClaims.push({
-roundId: gemsServerRoundId,
-payout: totalWin
-});
+  gemsPendingClaims.push({
+    roundId: gemsServerRoundId,
+    payout: Number(totalWin) || 0
+  });
 }
+
+// Show the combined pending winnings.
+const pendingWinTotal = gemsPendingClaims.reduce(
+  (sum, item) => sum + (Number(item.payout) || 0),
+  0
+);
+
+document.getElementById('gemsWinBalance').textContent =
+  '+' + gemsMoney(pendingWinTotal) + ' POINTS';
 
       document.getElementById('gemsWinBalance').textContent =
         '+' + gemsMoney(totalWin) + ' POINTS';
@@ -4462,10 +4470,6 @@ payout: totalWin
         'WIN +' + gemsMoney(totalWin) + ' POINTS';
     }
 
-    // Free-round winnings are claimed automatically.
-    if(isFreeRound && gemsServerRoundId){
-      await claimGemsWin(gemsServerRoundId);
-    }
 
   }catch(error){
 
