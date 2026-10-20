@@ -1082,81 +1082,79 @@ function syncBalance(){
 }
 
 async function loadMyReferralCode(){
-
-  const box = document.getElementById('myReferCode');
-
-  // Pehle purana referral code hatao
+  const box =
+    document.getElementById('myReferCode');
   if(box){
     box.textContent = '—';
   }
-
-  const user = window.zynoAuth.currentUser;
-
+  const user =
+    window.zynoAuth.currentUser;
   if(!user) return;
-
   try{
-
     const userRef = window.zynoDoc(
       window.zynoDb,
       'users',
       user.uid
     );
-
-    const snap = await window.zynoGetDoc(userRef);
-
-    if(!snap.exists()) return;
-
-    const data = snap.data();
-
-    let code = data.myReferralCode;
-    
-    // Agar current user ka referral code missing hai
-    if(data.role === 'user' && !code){
-
+    const userSnap =
+      await window.zynoGetDoc(userRef);
+    if(!userSnap.exists()) return;
+    const userData = userSnap.data();
+    if(userData.role !== 'user') return;
+    let code = String(
+      userData.myReferralCode || ''
+    ).trim().toUpperCase();
+    if(!code){
       code =
         'ZYNO-' +
         user.uid.slice(0,6).toUpperCase();
-        
-      try{
-
-  await window.zynoUpdateDoc(
-    userRef,
-    {
-      myReferralCode: code
+      await window.zynoUpdateDoc(
+        userRef,
+        { myReferralCode: code }
+      );
     }
-  );
-
-}catch(saveError){
-
-  alert(
-    'REFERRAL SAVE ERROR: ' +
-    (saveError.code || 'NO CODE') +
-    '\n' +
-    (saveError.message || 'NO MESSAGE')
-  );
-
-}
-
+    const referralRef = window.zynoDoc(
+      window.zynoDb,
+      'referralCodes',
+      code
+    );
+    const referralSnap =
+      await window.zynoGetDoc(referralRef);
+    if(referralSnap.exists()){
+      const referralData =
+        referralSnap.data();
+      if(referralData.uid !== user.uid){
+        throw new Error(
+          'Referral code already belongs to another user: ' + code
+        );
+      }
+    }else{
+      await window.zynoSetDoc(
+        referralRef,
+        {
+          uid: user.uid,
+          myReferralCode: code
+        }
+      );
     }
-
-    // Sirf CURRENT logged-in user ka code show hoga
     if(box){
-      box.textContent = code || '—';
+      box.textContent = code;
     }
-
   }catch(error){
-
     console.error(
-      'Referral code load error:',
+      'Referral code registration error:',
       error
     );
-
     if(box){
       box.textContent = '—';
     }
-
+    alert(
+      'REFERRAL ERROR: ' +
+      (error.code || 'NO CODE') +
+      '\n' +
+      (error.message || 'NO MESSAGE')
+    );
   }
-
 }
 
 function openGame(id){
