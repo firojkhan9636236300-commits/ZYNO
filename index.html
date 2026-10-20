@@ -4335,7 +4335,10 @@ async function playGems(){
       document.getElementById('gemWin').textContent =
         'CONNECTING TO SERVER...';
     }
-
+    
+    // Hide the previous board before starting the new round.
+    gemGrid.innerHTML = '';
+   
     // Server verifies the bet and deducts it.
     const roundData = await prepareGemRound(
       isFreeRound,
