@@ -5783,177 +5783,179 @@ async function loadAdminUsers(){
 
 }
 
-window.adminAddPoints =
-  async function(userUid){
+window.adminAddPoints = async function(userUid) {
+  // Prevent simultaneous duplicate clicks in this browser.
+  if (!window._zynoAdminAddBusy) {
+    window._zynoAdminAddBusy = new Set();
+  }
 
-  try{
+  if (window._zynoAdminAddBusy.has(userUid)) {
+    alert('Points ADD process already चल रहा है');
+    return;
+  }
 
-    if(
+  window._zynoAdminAddBusy.add(userUid);
+
+  try {
+    if (
       !auth.currentUser ||
-      auth.currentUser.uid !==
-        'nPAn3k3fFmZWAqskELhEtW8sk332'
-    ){
-
-      alert(
-        'Admin access नहीं है'
-      );
-
+      auth.currentUser.uid !== 'nPAn3k3fFmZWAqskELhEtW8sk332'
+    ) {
+      alert('Admin access नहीं है');
       return;
     }
 
-    const input =
-      document.getElementById(
-        `points_${userUid}`
-      );
+    const input = document.getElementById(`points_${userUid}`);
+    const amount = Number(input?.value);
 
-    const amount =
-      Number(
-        input?.value
-      );
-
-    if(
-      !Number.isFinite(amount) ||
-      amount <= 0
-    ){
-
-      alert(
-        'Valid points amount डालें'
-      );
-
+    if (!Number.isFinite(amount) || amount <= 0) {
+      alert('Valid points amount डालें');
       return;
     }
 
-    const userRef =
-      doc(
-        db,
-        'users',
-        userUid
-      );
+    const userRef = doc(db, 'users', userUid);
+    const accountingRef = doc(collection(db, 'accounting'));
 
-    const userSnap =
-      await getDoc(
-        userRef
-      );
+    const result = await runTransaction(db, async (transaction) => {
+      // Read the target user.
+      const userSnap = await transaction.get(userRef);
 
-    if(
-      !userSnap.exists()
-    ){
+      if (!userSnap.exists()) {
+        throw new Error('USER_NOT_FOUND');
+      }
 
-      alert(
-        'User नहीं मिला'
-      );
+      const data = userSnap.data();
 
-      return;
-    }
+      if (data.role === 'admin') {
+        throw new Error('ADMIN_POINTS_NOT_ALLOWED');
+      }
 
-    const data =
-      userSnap.data();
+      const oldPoints = Number(data.points || 0);
+      const oldWagerRequired = Number(data.wagerRequired || 0);
+      const oldWagerCompleted = Number(data.wagerCompleted || 0);
 
-    if(
-      data.role === 'admin'
-    ){
+      if (
+        !Number.isFinite(oldPoints) ||
+        !Number.isFinite(oldWagerRequired) ||
+        !Number.isFinite(oldWagerCompleted)
+      ) {
+        throw new Error('INVALID_USER_BALANCE_DATA');
+      }
 
-      alert(
-        'Admin points change नहीं कर सकते'
-      );
+      // Keep the user's full points amount.
+      const newPoints = oldPoints + amount;
 
-      return;
-    }
+      const wagerForThisPurchase =
+        amount <= 1000 ? amount : amount * 0.50;
 
-    const oldPoints =
-      Number(
-        data.points || 0
-      );
+      const newWagerRequired =
+        oldWagerRequired + wagerForThisPurchase;
 
-    const newPoints =
-      oldPoints + amount;
-      
-      const oldWagerRequired =
-  Number(data.wagerRequired || 0);
+      // Existing 39% + 2% + 59% allocation.
+      const accounting = getZynoAccounting(amount);
+      const commission = accounting.directReferral;
 
-const oldWagerCompleted =
-  Number(data.wagerCompleted || 0);
+      // Check the direct referrer.
+      const uplineUid =
+        typeof data.uplineUid === 'string'
+          ? data.uplineUid
+          : null;
 
-const wagerForThisPurchase =
-  amount <= 1000
-    ? amount
-    : amount * 0.50;
+      let referrerRef = null;
+      let referrerPoints = 0;
 
-const newWagerRequired =
-  oldWagerRequired +
-  wagerForThisPurchase;
+      if (uplineUid && uplineUid !== userUid) {
+        const candidateRef = doc(db, 'users', uplineUid);
+        const candidateSnap = await transaction.get(candidateRef);
 
-const newWagerCompleted =
-  oldWagerCompleted;
-      
-      const accounting =
-  getZynoAccounting(amount);
+        if (
+          candidateSnap.exists() &&
+          candidateSnap.data().role === 'user'
+        ) {
+          const points = Number(candidateSnap.data().points || 0);
 
-console.log(
-  'ZYNO ACCOUNTING',
-  {
-    total: accounting.total,
-    adminSystem: accounting.adminSystem,
-    directReferral: accounting.directReferral,
-    winLoss: accounting.winLoss
-  }
-);
- 
-await setDoc(
-  doc(
-    db,
-    'accounting',
-    `${Date.now()}_${userUid}`
-  ),
-  {
-    userUid: userUid,
-    total: accounting.total,
-    adminSystem: accounting.adminSystem,
-    directReferral: accounting.directReferral,
-    winLoss: accounting.winLoss,
-    uplineUid: data.uplineUid || null,
-    directReferralUid: data.uplineUid || null,
-    type: 'admin_add_points',
-    createdAt: new Date()
-  }
-);
-    await updateDoc(
-  userRef,
-  {
-    points:
-      newPoints,
+          if (!Number.isFinite(points)) {
+            throw new Error('INVALID_REFERRER_BALANCE');
+          }
 
-    wagerRequired:
-      newWagerRequired,
+          referrerRef = candidateRef;
+          referrerPoints = points;
+        }
+      }
 
-    wagerCompleted:
-      newWagerCompleted
-  }
-);
+      // Keep the full amount in the user's balance.
+      transaction.update(userRef, {
+        points: newPoints,
+        wagerRequired: newWagerRequired,
+        wagerCompleted: oldWagerCompleted
+      });
+
+      // Pay 2% to a valid direct referrer.
+      if (referrerRef) {
+        transaction.update(referrerRef, {
+          points: referrerPoints + commission
+        });
+      }
+
+      // Record all allocations in the same transaction.
+      transaction.set(accountingRef, {
+        userUid: userUid,
+        total: accounting.total,
+        adminSystem: accounting.adminSystem,
+        directReferral: accounting.directReferral,
+        winLoss: accounting.winLoss,
+
+        uplineUid: referrerRef ? uplineUid : null,
+        directReferralUid: referrerRef ? uplineUid : null,
+
+        referralRecipientType: referrerRef ? 'user' : 'system',
+        referralCreditedPoints: referrerRef ? commission : 0,
+        systemReferralPoints: referrerRef ? 0 : commission,
+
+        type: 'admin_add_points',
+        createdAt: new Date()
+      });
+
+      return {
+        referrerPaid: Boolean(referrerRef),
+        commission: commission
+      };
+    });
 
     input.value = '';
 
-    alert(
-      `${money(amount)} points ADD हो गए`
-    );
+    if (result.referrerPaid) {
+      alert(
+        `${money(amount)} points ADD हो गए.\n` +
+        `Direct referral commission: ${result.commission} points`
+      );
+    } else {
+      alert(
+        `${money(amount)} points ADD हो गए.\n` +
+        `Referrer नहीं मिला: ${result.commission} points ZYNO SYSTEM allocation में record हुए.`
+      );
+    }
 
     await loadAdminUsers();
 
-  }catch(error){
+  } catch (error) {
+    console.error('Admin ADD points error:', error);
 
-    console.error(
-      error
-    );
-
-    alert(
-      'Points ADD नहीं हुए: ' +
-      (error.code || 'NO CODE') +
-      '\n' +
-      (error.message || 'NO MESSAGE')
-    );
-
+    if (error.message === 'USER_NOT_FOUND') {
+      alert('User नहीं मिला');
+    } else if (error.message === 'ADMIN_POINTS_NOT_ALLOWED') {
+      alert('Admin points change नहीं कर सकते');
+    } else {
+      alert(
+        'Points ADD नहीं हुए: ' +
+        (error.code || 'NO CODE') +
+        '\n' +
+        (error.message || 'NO MESSAGE')
+      );
+    }
+  } finally {
+    window._zynoAdminAddBusy.delete(userUid);
   }
-
 };
 
 window.adminRemovePoints =
