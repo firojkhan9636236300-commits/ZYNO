@@ -3773,6 +3773,22 @@ let gemsServerRoundId = null;
 let gemsServerPayout = 0;
 let gemsPendingClaims = [];
 
+async function runGemsWaitingAnimation(state) {
+  try {
+    while (!state.stop) {
+      // Temporary board must not contain the server's result.
+      gemsRoundBoard = makeEmptyBoard();
+
+      await buildGems();
+    }
+  } catch (error) {
+    console.error(
+      'GEMS WAITING ANIMATION ERROR:',
+      error
+    );
+  }
+}
+
 async function prepareGemRound(isFreeRound = false, roundBet = gemsBet) {
   const user = window.zynoAuth.currentUser;
 
@@ -3862,8 +3878,8 @@ try{
         }
       ],
       {
-        duration: 700 + Math.random() * 350,
-        delay: i * 45 + Math.random() * 100,
+        duration: 250 + Math.random() * 100,
+        delay: i * 12 + Math.random() * 30,
         easing: 'cubic-bezier(0.16, 0.72, 0.24, 1)',
         fill: 'forwards'
       }
@@ -4336,14 +4352,30 @@ async function playGems(){
         'CONNECTING TO SERVER...';
     }
     
-    // Hide the previous board before starting the new round.
-    gemGrid.innerHTML = '';
-   
-    // Server verifies the bet and deducts it.
-    const roundData = await prepareGemRound(
-      isFreeRound,
-      roundBet
-    );
+    // Keep the screen active while waiting for the server.
+const waitingState = { stop: false };
+
+const waitingAnimation = runGemsWaitingAnimation(
+  waitingState
+);
+
+let roundData;
+
+try {
+  // Server verifies the bet and returns the real result.
+  roundData = await prepareGemRound(
+    isFreeRound,
+    roundBet
+  );
+} finally {
+  // Stop temporary animation when the server responds.
+  waitingState.stop = true;
+}
+
+// Let the current falling animation finish.
+await waitingAnimation;
+
+// The real server board will now be displayed below.
 
     document.getElementById('gemsRound').textContent =
       gemsRound;
