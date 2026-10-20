@@ -5437,39 +5437,48 @@ window.createAccount = async function(){
   try{
     
 
-  if(signupReferralType==='upline'){
-
+  if(signupReferralType === 'upline'){
   const enteredCode =
     referralCode.trim().toUpperCase();
-
-  const referralRef =
-    doc(
-      db,
-      'referralCodes',
-      enteredCode
-    );
-
+  if(!enteredCode){
+    msg.textContent = 'Referral Code डालें';
+    return;
+  }
+  let referralUid = null;
+  // First: check referralCodes collection
+  const referralRef = doc(
+    db,
+    'referralCodes',
+    enteredCode
+  );
   const referralSnap =
     await getDoc(referralRef);
-
-  if(!referralSnap.exists()){
-    msg.textContent='Invalid Upline Referral Code';
+  if(referralSnap.exists()){
+    const referralData = referralSnap.data();
+    referralUid = referralData.uid || null;
+  }
+  // Fallback: check users.myReferralCode
+  if(!referralUid){
+    const usersSnap =
+      await getDocs(collection(db, 'users'));
+    usersSnap.forEach((userDoc) => {
+      const userData = userDoc.data();
+      const savedCode = String(
+        userData.myReferralCode || ''
+      ).trim().toUpperCase();
+      if(savedCode === enteredCode){
+        referralUid =
+          userData.uid || userDoc.id;
+      }
+    });
+  }
+  if(!referralUid){
+    msg.textContent =
+      'Invalid Upline Referral Code';
     return;
   }
-
-  const referralData =
-    referralSnap.data();
-
-  if(!referralData.uid){
-    msg.textContent='Invalid Upline Referral Code';
-    return;
-  }
-
-  window.signupUplineUid =
-    referralData.uid;
-
-  window.signupUplineCode =
-    enteredCode;
+  window.signupUplineUid = referralUid;
+  window.signupUplineCode = enteredCode;
 }
     const credential =
       await createUserWithEmailAndPassword(
