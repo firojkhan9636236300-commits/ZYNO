@@ -801,7 +801,53 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 <div id="adminQrManager" style="margin-top:15px;padding:14px;background:#071827;border:1px solid #00e5ff;border-radius:14px;">
   <h3 style="color:#00e5ff;">PAYMENT QR MANAGEMENT</h3>
   <p style="color:#9bb0c8;font-size:12px;">Admin: 4 QR slots • Select one active QR</p>
-  <div id="adminQrSlots"></div>
+  <div id="adminQrSlots">
+
+  <div style="padding:10px;margin-bottom:10px;border:1px solid #19374b;border-radius:10px;">
+    <label style="color:#fff;">
+      <input type="radio" name="zynoActiveQr" value="1" onchange="selectZynoActiveQr(1)">
+      QR SLOT 1 — ACTIVE
+    </label>
+    <br>
+    <img id="zynoQrPreview1" style="display:none;width:180px;max-width:100%;margin:10px 0;">
+    <input type="file" accept="image/*" onchange="uploadZynoQr(1,this)">
+    <div id="zynoQrStatus1" style="color:#9bb0c8;font-size:11px;">No QR uploaded</div>
+  </div>
+
+  <div style="padding:10px;margin-bottom:10px;border:1px solid #19374b;border-radius:10px;">
+    <label style="color:#fff;">
+      <input type="radio" name="zynoActiveQr" value="2" onchange="selectZynoActiveQr(2)">
+      QR SLOT 2
+    </label>
+    <br>
+    <img id="zynoQrPreview2" style="display:none;width:180px;max-width:100%;margin:10px 0;">
+    <input type="file" accept="image/*" onchange="uploadZynoQr(2,this)">
+    <div id="zynoQrStatus2" style="color:#9bb0c8;font-size:11px;">No QR uploaded</div>
+  </div>
+
+  <div style="padding:10px;margin-bottom:10px;border:1px solid #19374b;border-radius:10px;">
+    <label style="color:#fff;">
+      <input type="radio" name="zynoActiveQr" value="3" onchange="selectZynoActiveQr(3)">
+      QR SLOT 3
+    </label>
+    <br>
+    <img id="zynoQrPreview3" style="display:none;width:180px;max-width:100%;margin:10px 0;">
+    <input type="file" accept="image/*" onchange="uploadZynoQr(3,this)">
+    <div id="zynoQrStatus3" style="color:#9bb0c8;font-size:11px;">No QR uploaded</div>
+  </div>
+
+  <div style="padding:10px;margin-bottom:10px;border:1px solid #19374b;border-radius:10px;">
+    <label style="color:#fff;">
+      <input type="radio" name="zynoActiveQr" value="4" onchange="selectZynoActiveQr(4)">
+      QR SLOT 4
+    </label>
+    <br>
+    <img id="zynoQrPreview4" style="display:none;width:180px;max-width:100%;margin:10px 0;">
+    <input type="file" accept="image/*" onchange="uploadZynoQr(4,this)">
+    <div id="zynoQrStatus4" style="color:#9bb0c8;font-size:11px;">No QR uploaded</div>
+  </div>
+
+</div>
   <div id="adminQrMessage" style="color:#ffd34e;font-size:12px;">Loading QR settings...</div>
 </div>
 <!-- ZYNO QR MANAGEMENT END -->
@@ -4728,6 +4774,98 @@ window.zynoGetDocs = getDocs;
 window.zynoSetDoc = setDoc;
 window.zynoUpdateDoc = updateDoc;
 window.zynoOnSnapshot = onSnapshot;
+
+// ZYNO QR MANAGEMENT
+window.uploadZynoQr = async function(slot, input) {
+  try {
+    if (!window.zynoIsAdmin) {
+      alert("Admin access required");
+      return;
+    }
+
+    const file = input.files && input.files[0];
+    if (!file) return;
+
+    const msg = document.getElementById("adminQrMessage");
+    if (msg) msg.textContent = "QR uploading...";
+
+    if (!file.type.startsWith("image/")) {
+      throw new Error("Please select an image");
+    }
+
+    const image = new Image();
+    const objectUrl = URL.createObjectURL(file);
+
+    await new Promise((resolve, reject) => {
+      image.onload = resolve;
+      image.onerror = reject;
+      image.src = objectUrl;
+    });
+
+    const canvas = document.createElement("canvas");
+    const scale = Math.min(1, 800 / Math.max(image.width, image.height));
+
+    canvas.width = Math.round(image.width * scale);
+    canvas.height = Math.round(image.height * scale);
+
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    URL.revokeObjectURL(objectUrl);
+
+    const imageData = canvas.toDataURL("image/jpeg", 0.88);
+
+    if (imageData.length > 700000) {
+      throw new Error("Image too large. Choose a smaller QR image.");
+    }
+
+    await window.zynoSetDoc(
+      window.zynoDoc(window.zynoDb, "paymentQRs", "slot" + slot),
+      {
+        image: imageData,
+        updatedAt: Date.now()
+      }
+    );
+
+    const preview = document.getElementById("zynoQrPreview" + slot);
+    if (preview) {
+      preview.src = imageData;
+      preview.style.display = "block";
+    }
+
+    const status = document.getElementById("zynoQrStatus" + slot);
+    if (status) status.textContent = "QR saved";
+
+    if (msg) msg.textContent = "QR Slot " + slot + " saved successfully";
+  } catch (error) {
+    const msg = document.getElementById("adminQrMessage");
+    if (msg) msg.textContent = error.message || "QR upload failed";
+  }
+};
+
+window.selectZynoActiveQr = async function(slot) {
+  try {
+    if (!window.zynoIsAdmin) {
+      throw new Error("Admin access required");
+    }
+
+    await window.zynoSetDoc(
+      window.zynoDoc(window.zynoDb, "settings", "paymentQR"),
+      {
+        activeSlot: slot,
+        updatedAt: Date.now()
+      }
+    );
+
+    const msg = document.getElementById("adminQrMessage");
+    if (msg) msg.textContent = "Active QR Slot " + slot + " saved";
+  } catch (error) {
+    const msg = document.getElementById("adminQrMessage");
+    if (msg) msg.textContent = error.message || "Could not save active QR";
+  }
+};
 
 /*
  * Firebase functions required by the classic
