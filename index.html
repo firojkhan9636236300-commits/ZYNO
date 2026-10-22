@@ -947,6 +947,38 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   </div>
 
 </section>
+<section id="deposit" class="view">
+  <div class="game-head">
+    <button class="back" onclick="goHome()">← HOME</button>
+    <div class="game-name">DEPOSIT</div>
+    <div style="width:54px"></div>
+  </div>
+
+  <div style="margin-top:20px;padding:18px;border-radius:18px;background:linear-gradient(145deg,#0d2846,#05101e);border:1px solid rgba(0,229,255,.25);">
+    <h3 style="text-align:center;color:#00e5ff;">ADD POINTS</h3>
+
+    <div id="userActiveQrBox" style="text-align:center;margin:18px 0;color:#9bb0c8;">
+      Loading active payment QR...
+    </div>
+
+    <input id="depositAmount" type="number" min="1" placeholder="Deposit amount (₹)"
+      style="width:100%;height:45px;margin-bottom:10px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;">
+
+    <input id="depositTxnId" type="text" placeholder="PhonePe UTR / Transaction ID"
+      style="width:100%;height:45px;margin-bottom:12px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(0,229,255,.2);color:#fff;">
+
+    <button type="button" onclick="submitZynoDeposit()"
+      style="width:100%;height:45px;border:0;border-radius:10px;background:linear-gradient(145deg,#0d8fb5,#00536e);font-weight:1000;color:#fff;">
+      SUBMIT DEPOSIT REQUEST
+    </button>
+
+    <div id="depositMsg" style="text-align:center;min-height:24px;margin-top:12px;color:#ffd34e;font-size:12px;"></div>
+
+    <p style="color:#9bb0c8;font-size:11px;line-height:1.5;">
+      Your request will remain pending until the admin verifies the payment. Points will not be credited automatically.
+    </p>
+  </div>
+</section>
 
 <section id="login" class="view">
   <div class="panel">
@@ -4866,6 +4898,128 @@ window.selectZynoActiveQr = async function(slot) {
     if (msg) msg.textContent = error.message || "Could not save active QR";
   }
 };
+
+// ZYNO DEPOSIT: LOAD ACTIVE QR
+window.loadZynoActiveQr = async function() {
+  const box = document.getElementById("userActiveQrBox");
+  if (!box) return;
+
+  try {
+    box.textContent = "Loading active payment QR...";
+
+    const settingSnap = await window.zynoGetDoc(
+      window.zynoDoc(window.zynoDb, "settings", "paymentQR")
+    );
+
+    if (!settingSnap.exists()) {
+      box.textContent = "Admin has not activated a payment QR yet.";
+      return;
+    }
+
+    const activeSlot = Number(settingSnap.data().activeSlot);
+
+    if (![1, 2, 3, 4].includes(activeSlot)) {
+      box.textContent = "No valid active payment QR.";
+      return;
+    }
+
+    const qrSnap = await window.zynoGetDoc(
+      window.zynoDoc(window.zynoDb, "paymentQRs", "slot" + activeSlot)
+    );
+
+    if (!qrSnap.exists() || !qrSnap.data().image) {
+      box.textContent = "Active QR has not been uploaded yet.";
+      return;
+    }
+
+    box.innerHTML = "";
+
+    const heading = document.createElement("div");
+    heading.textContent = "SCAN TO PAY";
+    heading.style.cssText =
+      "color:#00e5ff;font-weight:900;margin-bottom:12px;";
+
+    const img = document.createElement("img");
+    img.src = qrSnap.data().image;
+    img.alt = "Active payment QR";
+    img.style.cssText =
+      "display:block;width:240px;max-width:100%;height:auto;margin:0 auto;border-radius:12px;background:#fff;padding:8px;";
+
+    box.appendChild(heading);
+    box.appendChild(img);
+
+  } catch (error) {
+    box.textContent = "Could not load QR. Please try again.";
+    console.error("ZYNO QR load error:", error);
+  }
+};
+
+
+// ZYNO DEPOSIT: SUBMIT REQUEST FOR ADMIN VERIFICATION
+window.submitZynoDeposit = async function() {
+  const msg = document.getElementById("depositMsg");
+  const amountInput = document.getElementById("depositAmount");
+  const txnInput = document.getElementById("depositTxnId");
+
+  try {
+    const user = window.zynoAuth && window.zynoAuth.currentUser;
+
+    if (!user) {
+      throw new Error("Please login before submitting a deposit.");
+    }
+
+    const amount = Number(amountInput.value);
+    const txnId = txnInput.value.trim();
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error("Enter a valid deposit amount.");
+    }
+
+    if (!txnId) {
+      throw new Error("Enter your PhonePe UTR / Transaction ID.");
+    }
+
+    if (msg) msg.textContent = "Submitting request...";
+
+    const requestId =
+      "dep_" + Date.now() + "_" +
+      Math.random().toString(36).slice(2, 10);
+
+    await window.zynoSetDoc(
+      window.zynoDoc(
+        window.zynoDb,
+        "depositRequests",
+        requestId
+      ),
+      {
+        uid: user.uid,
+        email: user.email || "",
+        amount: amount,
+        transactionId: txnId,
+        status: "pending",
+        createdAt: Date.now()
+      }
+    );
+
+    if (msg) {
+      msg.textContent =
+        "Request submitted. Points will be added after admin verification.";
+    }
+
+    amountInput.value = "";
+    txnInput.value = "";
+
+  } catch (error) {
+    if (msg) {
+      msg.textContent = error.message || "Could not submit deposit request.";
+    }
+    console.error("ZYNO deposit error:", error);
+  }
+};
+
+
+// Load the active QR
+window.loadZynoActiveQr();
 
 /*
  * Firebase functions required by the classic
