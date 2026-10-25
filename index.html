@@ -1,31 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <script>
-(function(){
-  function report(msg){
-    var box=document.getElementById("zynoDebugBox");
-    if(!box){
-      box=document.createElement("pre");
-      box.id="zynoDebugBox";
-      box.style.cssText="position:fixed;top:5px;left:5px;right:5px;z-index:999999;background:#300;color:white;padding:12px;max-height:45vh;overflow:auto;white-space:pre-wrap;font-size:13px";
-      (document.body||document.documentElement).appendChild(box);
-    }
-    box.textContent+="\n"+msg;
-  }
-
-  window.addEventListener("error",function(e){
-    report("JAVASCRIPT ERROR: "+e.message+"\nLine: "+e.lineno+"\nColumn: "+e.colno+"\nFile: "+e.filename);
-  });
-
-  window.addEventListener("unhandledrejection",function(e){
-    report("PROMISE ERROR: "+String(e.reason));
-  });
-
-  document.addEventListener("DOMContentLoaded",function(){
-    report("DEBUG ACTIVE: page loaded");
-  });
-})();
 </script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
