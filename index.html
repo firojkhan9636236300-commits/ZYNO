@@ -1346,6 +1346,19 @@ function openGame(id){
   }
 }
 
+function openDeposit(){
+  document.querySelectorAll('.view').forEach(v=>{
+    v.classList.remove('active');
+  });
+
+  const depositPage = document.getElementById('deposit');
+
+  if(depositPage){
+    depositPage.classList.add('active');
+    localStorage.setItem('zynoActiveView','deposit');
+  }
+}
+
 function goHome(){
 
   document.querySelectorAll('.view').forEach(v=>{
