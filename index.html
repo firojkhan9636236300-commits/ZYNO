@@ -891,6 +891,20 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
 
   <div id="adminDepositList" style="margin-top:12px;"></div>
 </div>
+<!-- ZYNO ADMIN WITHDRAW REQUESTS START -->
+<div id="adminWithdrawPanel" style="margin-top:18px;padding:15px;border-radius:14px;background:#071827;border:1px solid rgba(255,211,78,.3);">
+  <h3 style="margin:0 0 8px;text-align:center;color:#ffd34e;">
+    WITHDRAW REQUESTS
+  </h3>
+  <div id="adminWithdrawMessage" style="text-align:center;color:#9bb0c8;font-size:12px;margin-bottom:10px;">
+    Admin: requests yahan dikhengi.
+  </div>
+
+REFRESH WITHDRAW REQUESTS
+  <div id="adminWithdrawList" style="margin-top:12px;"></div>
+</div>
+<!-- ZYNO ADMIN WITHDRAW REQUESTS END -->
+
 <!-- ZYNO DEPOSIT APPROVAL PANEL END -->
 </section>
 <section id="transfer" class="view">
@@ -1041,6 +1055,34 @@ animation:gemDrop .18s cubic-bezier(.2,.8,.2,1) both;
   </div>
 </section>
 
+<section id="withdraw" class="view">
+  <div class="game-head">
+    <button class="back" onclick="goHome()">← HOME</button>
+    <div class="game-name">WITHDRAW</div>
+    <div style="width:54px"></div>
+  </div>
+  <div style="margin-top:20px;padding:18px;border-radius:18px;background:linear-gradient(145deg,#0d2846,#05101e);border:1px solid rgba(255,211,78,.3);">
+    <h3 style="text-align:center;color:#ffd34e;margin:0 0 16px;">WITHDRAW POINTS</h3>
+<div class="ibox" style="margin-bottom:14px;">
+  <small>YOUR BALANCE</small>
+  <strong id="withdrawBalance">0 POINTS</strong>
+</div>
+<label style="display:block;color:#9bb0c8;font-size:12px;margin-bottom:6px;">POINTS TO WITHDRAW</label>
+<input id="withdrawAmount" type="number" min="1" step="1" placeholder="Enter points"
+  style="box-sizing:border-box;width:100%;height:45px;margin-bottom:12px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(255,211,78,.3);color:#fff;outline:none;">
+<label style="display:block;color:#9bb0c8;font-size:12px;margin-bottom:6px;">YOUR UPI ID</label>
+<input id="withdrawUpi" type="text" placeholder="example@upi" autocomplete="off"
+  style="box-sizing:border-box;width:100%;height:45px;margin-bottom:14px;padding:0 12px;border-radius:10px;background:#030913;border:1px solid rgba(255,211,78,.3);color:#fff;outline:none;">
+<button type="button" onclick="submitZynoWithdraw()"
+  style="width:100%;height:46px;border:0;border-radius:10px;background:linear-gradient(145deg,#ffd34e,#e7a900);font-weight:1000;color:#030913;">
+  SUBMIT WITHDRAW REQUEST
+</button>
+<div id="withdrawMsg" style="text-align:center;min-height:24px;margin-top:12px;color:#ffd34e;font-size:12px;"></div>
+<p style="color:#9bb0c8;font-size:11px;line-height:1.5;margin-bottom:0;">
+  Your request will be reviewed by Admin. Points are deducted only after approval. Never share your UPI PIN or OTP.
+</p>
+  </div>
+</section>
 <section id="login" class="view">
   <div class="panel">
 
@@ -1357,6 +1399,26 @@ function openDeposit(){
     depositPage.classList.add('active');
     localStorage.setItem('zynoActiveView','deposit');
   }
+}
+
+function openWithdraw(){
+document.querySelectorAll(’.view’).forEach(v=>{
+v.classList.remove(‘active’);
+});
+
+const withdrawPage = document.getElementById(‘withdraw’);
+
+if(withdrawPage){
+withdrawPage.classList.add(‘active’);
+localStorage.setItem(‘zynoActiveView’,‘withdraw’);
+
+if(typeof window.loadZynoWithdrawBalance === 'function'){
+  window.loadZynoWithdrawBalance();
+}
+
+} else {
+alert(‘Withdraw screen nahi mili’);
+}
 }
 
 function goHome(){
@@ -5319,6 +5381,364 @@ window.rejectZynoDeposit = async function(requestId) {
   } catch (error) {
     alert(error.message || "Rejection failed.");
   }
+};
+
+// ZYNO WITHDRAW: LOAD USER BALANCE
+window.loadZynoWithdrawBalance = async function() {
+  const balanceBox = document.getElementById("withdrawBalance");
+
+  try {
+    const user = window.zynoAuth && window.zynoAuth.currentUser;
+
+    if (!user) {
+      if (balanceBox) balanceBox.textContent = "LOGIN REQUIRED";
+      return;
+    }
+
+    const userRef = window.zynoDoc(
+      window.zynoDb,
+      "users",
+      user.uid
+    );
+
+    const userSnap = await window.zynoGetDoc(userRef);
+
+    if (!userSnap.exists()) {
+      throw new Error("User account not found.");
+    }
+
+    const points = Number(userSnap.data().points || 0);
+
+    if (!Number.isFinite(points) || points < 0) {
+      throw new Error("Invalid balance.");
+    }
+
+    if (balanceBox) {
+      balanceBox.textContent = Math.floor(points).toLocaleString("en-IN") + " POINTS";
+    }
+
+  } catch (error) {
+    if (balanceBox) balanceBox.textContent = "UNAVAILABLE";
+    console.error("ZYNO withdraw balance error:", error);
+  }
+};
+
+
+// ZYNO WITHDRAW: SUBMIT REQUEST
+window.submitZynoWithdraw = async function() {
+  const msg = document.getElementById("withdrawMsg");
+  const amountInput = document.getElementById("withdrawAmount");
+  const upiInput = document.getElementById("withdrawUpi");
+
+  try {
+    const user = window.zynoAuth && window.zynoAuth.currentUser;
+
+    if (!user) {
+      throw new Error("Please login before requesting withdrawal.");
+    }
+
+    const amount = Number(amountInput.value);
+    const upiId = upiInput.value.trim();
+
+    if (!Number.isSafeInteger(amount) || amount <= 0) {
+      throw new Error("Enter a valid whole number of points.");
+    }
+
+    if (!upiId || !/^[A-Za-z0-9._-]{2,256}@[A-Za-z][A-Za-z0-9]{1,63}$/.test(upiId)) {
+      throw new Error("Enter a valid UPI ID, for example name@upi.");
+    }
+
+    const userRef = window.zynoDoc(
+      window.zynoDb,
+      "users",
+      user.uid
+    );
+
+    const userSnap = await window.zynoGetDoc(userRef);
+
+    if (!userSnap.exists()) {
+      throw new Error("User account not found.");
+    }
+
+    const balance = Number(userSnap.data().points || 0);
+
+    if (!Number.isFinite(balance) || balance < 0) {
+      throw new Error("Invalid user balance.");
+    }
+
+    if (amount > balance) {
+      throw new Error("Insufficient points balance.");
+    }
+
+    if (msg) msg.textContent = "Submitting withdrawal request...";
+
+    const requestId =
+      "wd_" + user.uid + "_" + Date.now() + "_" +
+      Math.random().toString(36).slice(2, 8);
+
+    await window.zynoSetDoc(
+      window.zynoDoc(
+        window.zynoDb,
+        "withdrawRequests",
+        requestId
+      ),
+      {
+        uid: user.uid,
+        email: user.email || "",
+        amount: amount,
+        upiId: upiId,
+        status: "pending",
+        createdAt: Date.now()
+      }
+    );
+
+    if (msg) {
+      msg.textContent =
+        "Request submitted. Points will be deducted only after Admin approval.";
+    }
+
+    amountInput.value = "";
+    upiInput.value = "";
+
+    await window.loadZynoWithdrawBalance();
+
+  } catch (error) {
+    if (msg) {
+      msg.textContent =
+        error.message || "Could not submit withdrawal request.";
+    }
+
+    console.error("ZYNO withdraw error:", error);
+  }
+};
+
+// ZYNO ADMIN: LOAD WITHDRAW REQUESTS
+window.loadZynoWithdrawRequests = async function() {
+  const list = document.getElementById("adminWithdrawList");
+  const msg = document.getElementById("adminWithdrawMessage");
+
+  try {
+    if (!window.zynoIsAdmin) {
+      throw new Error("Admin access required.");
+    }
+
+    if (msg) msg.textContent = "Loading withdrawal requests...";
+    if (list) list.replaceChildren();
+
+    const snapshot = await window.zynoGetDocs(
+      window.zynoCollection(window.zynoDb, "withdrawRequests")
+    );
+
+    const requests = [];
+
+    snapshot.forEach(function(item) {
+      requests.push({ id: item.id, data: item.data() });
+    });
+
+    requests.sort(function(a, b) {
+      return Number(b.data.createdAt || 0) -
+             Number(a.data.createdAt || 0);
+    });
+
+    let pendingCount = 0;
+
+    requests.forEach(function(item) {
+      const d = item.data;
+
+      if (d.status !== "pending") return;
+      pendingCount++;
+
+      const card = document.createElement("div");
+      card.style.cssText =
+        "margin:12px 0;padding:12px;background:#030913;" +
+        "border:1px solid #6c5b2a;border-radius:12px;";
+
+      const details = document.createElement("div");
+      details.style.cssText =
+        "color:#fff;font-size:12px;line-height:1.9;";
+
+      details.textContent =
+        "Email: " + (d.email || "Not available") +
+        " | Points: " + Number(d.amount || 0) +
+        " | UPI: " + (d.upiId || "") +
+        " | Status: " + d.status;
+
+      const approve = document.createElement("button");
+      approve.type = "button";
+      approve.textContent = "APPROVE";
+      approve.style.cssText =
+        "padding:10px;margin:10px 8px 0 0;border:0;" +
+        "border-radius:8px;background:#087f5b;color:#fff;font-weight:900;";
+      approve.onclick = function() {
+        window.approveZynoWithdraw(item.id);
+      };
+
+      const reject = document.createElement("button");
+      reject.type = "button";
+      reject.textContent = "REJECT";
+      reject.style.cssText =
+        "padding:10px;margin-top:10px;border:0;" +
+        "border-radius:8px;background:#8b2635;color:#fff;font-weight:900;";
+      reject.onclick = function() {
+        window.rejectZynoWithdraw(item.id);
+      };
+
+      card.appendChild(details);
+      card.appendChild(approve);
+      card.appendChild(reject);
+
+      if (list) list.appendChild(card);
+    });
+
+    if (msg) {
+      msg.textContent = pendingCount
+        ? pendingCount + " pending withdrawal request(s)."
+        : "No pending withdrawal requests.";
+    }
+
+  } catch (error) {
+    if (msg) msg.textContent =
+      error.message || "Could not load withdrawal requests.";
+  }
+};
+
+// ZYNO ADMIN: APPROVE WITHDRAW REQUEST
+window.approveZynoWithdraw = async function(requestId) {
+const msg = document.getElementById(“adminWithdrawMessage”);
+
+try {
+if (
+!window.zynoAuth ||
+!window.zynoAuth.currentUser ||
+window.zynoAuth.currentUser.uid !== “nPAn3k3fFmZWAqskELhEtW8sk332”
+) {
+throw new Error(“Admin access required.”);
+}
+
+if (!confirm("Approve this withdrawal and deduct points?")) return;
+if (msg) msg.textContent = "Processing withdrawal approval...";
+const db = window.zynoDb;
+const requestRef = window.zynoDoc(db, "withdrawRequests", requestId);
+const accountingRef = window.zynoDoc(db, "accounting", "withdraw_" + requestId);
+const result = await window.zynoRunTransaction(db, async function(transaction) {
+  const requestSnap = await transaction.get(requestRef);
+  if (!requestSnap.exists()) throw new Error("Request not found.");
+  const request = requestSnap.data();
+  if (request.status !== "pending") {
+    throw new Error("This request has already been processed.");
+  }
+  const amount = Number(request.amount);
+  if (!Number.isSafeInteger(amount) || amount <= 0) {
+    throw new Error("Invalid withdrawal amount.");
+  }
+  const userRef = window.zynoDoc(db, "users", request.uid);
+  const userSnap = await transaction.get(userRef);
+  if (!userSnap.exists()) throw new Error("User account not found.");
+  const userData = userSnap.data();
+  const oldPoints = Number(userData.points || 0);
+  if (!Number.isFinite(oldPoints) || oldPoints < amount) {
+    throw new Error("User has insufficient points now.");
+  }
+  const uplineUid =
+    typeof userData.uplineUid === "string" &&
+    userData.uplineUid !== request.uid
+      ? userData.uplineUid
+      : null;
+  let referrerRef = null;
+  let referrerPoints = 0;
+  let commission = 0;
+  if (uplineUid) {
+    const candidateRef = window.zynoDoc(db, "users", uplineUid);
+    const candidateSnap = await transaction.get(candidateRef);
+    if (
+      candidateSnap.exists() &&
+      candidateSnap.data().role === "user"
+    ) {
+      referrerRef = candidateRef;
+      referrerPoints = Number(candidateSnap.data().points || 0);
+      if (!Number.isFinite(referrerPoints) || referrerPoints < 0) {
+        throw new Error("Invalid referrer balance.");
+      }
+      commission = Math.round(amount * 0.01 * 100) / 100;
+    }
+  }
+  transaction.update(userRef, {
+    points: oldPoints - amount
+  });
+  if (referrerRef && commission > 0) {
+    transaction.update(referrerRef, {
+      points: referrerPoints + commission
+    });
+  }
+  transaction.update(requestRef, {
+    status: "approved",
+    reviewedAt: Date.now(),
+    referralCommission: commission,
+    referralUid: referrerRef ? uplineUid : null
+  });
+  transaction.set(accountingRef, {
+    type: "withdraw_referral_commission",
+    userUid: request.uid,
+    total: amount,
+    directReferral: commission,
+    uplineUid: referrerRef ? uplineUid : null,
+    referralCreditedPoints: referrerRef ? commission : 0,
+    createdAt: new Date()
+  });
+  return { amount: amount, commission: commission };
+});
+if (msg) {
+  msg.textContent =
+    "Withdrawal approved: " + result.amount +
+    " points deducted. Referral commission: " +
+    result.commission + " points.";
+}
+await window.loadZynoWithdrawRequests();
+
+} catch (error) {
+console.error(“ZYNO approve withdrawal error:”, error);
+if (msg) msg.textContent = error.message || “Approval failed.”;
+else alert(error.message || “Approval failed.”);
+}
+};
+
+// ZYNO ADMIN: REJECT WITHDRAW REQUEST
+window.rejectZynoWithdraw = async function(requestId) {
+const msg = document.getElementById(“adminWithdrawMessage”);
+
+try {
+if (
+!window.zynoAuth ||
+!window.zynoAuth.currentUser ||
+window.zynoAuth.currentUser.uid !== “nPAn3k3fFmZWAqskELhEtW8sk332”
+) {
+throw new Error(“Admin access required.”);
+}
+
+if (!confirm("Reject this withdrawal? User points will not be deducted.")) {
+  return;
+}
+const db = window.zynoDb;
+const requestRef = window.zynoDoc(db, "withdrawRequests", requestId);
+await window.zynoRunTransaction(db, async function(transaction) {
+  const requestSnap = await transaction.get(requestRef);
+  if (!requestSnap.exists()) throw new Error("Request not found.");
+  if (requestSnap.data().status !== "pending") {
+    throw new Error("This request has already been processed.");
+  }
+  transaction.update(requestRef, {
+    status: "rejected",
+    reviewedAt: Date.now()
+  });
+});
+if (msg) msg.textContent = "Withdrawal rejected. No points deducted.";
+await window.loadZynoWithdrawRequests();
+
+} catch (error) {
+console.error(“ZYNO reject withdrawal error:”, error);
+if (msg) msg.textContent = error.message || “Rejection failed.”;
+else alert(error.message || “Rejection failed.”);
+}
 };
 
 /*
