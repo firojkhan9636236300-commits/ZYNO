@@ -5604,15 +5604,15 @@ window.loadZynoWithdrawRequests = async function() {
 
 // ZYNO ADMIN: APPROVE WITHDRAW REQUEST
 window.approveZynoWithdraw = async function(requestId) {
-const msg = document.getElementById(“adminWithdrawMessage”);
+const msg = document.getElementById("adminWithdrawMessage");
 
 try {
 if (
 !window.zynoAuth ||
 !window.zynoAuth.currentUser ||
-window.zynoAuth.currentUser.uid !== “nPAn3k3fFmZWAqskELhEtW8sk332”
+window.zynoAuth.currentUser.uid !== "nPAn3k3fFmZWAqskELhEtW8sk332"
 ) {
-throw new Error(“Admin access required.”);
+throw new Error("Admin access required.");
 }
 
 if (!confirm("Approve this withdrawal and deduct points?")) return;
@@ -5696,23 +5696,23 @@ if (msg) {
 await window.loadZynoWithdrawRequests();
 
 } catch (error) {
-console.error(“ZYNO approve withdrawal error:”, error);
-if (msg) msg.textContent = error.message || “Approval failed.”;
-else alert(error.message || “Approval failed.”);
+console.error("ZYNO approve withdrawal error:", error);
+if (msg) msg.textContent = error.message || "Approval failed.";
+else alert(error.message || "Approval failed.");
 }
 };
 
 // ZYNO ADMIN: REJECT WITHDRAW REQUEST
 window.rejectZynoWithdraw = async function(requestId) {
-const msg = document.getElementById(“adminWithdrawMessage”);
+const msg = document.getElementById("adminWithdrawMessage");
 
 try {
 if (
 !window.zynoAuth ||
 !window.zynoAuth.currentUser ||
-window.zynoAuth.currentUser.uid !== “nPAn3k3fFmZWAqskELhEtW8sk332”
+window.zynoAuth.currentUser.uid !== "nPAn3k3fFmZWAqskELhEtW8sk332"
 ) {
-throw new Error(“Admin access required.”);
+throw new Error("Admin access required.");
 }
 
 if (!confirm("Reject this withdrawal? User points will not be deducted.")) {
@@ -5735,9 +5735,9 @@ if (msg) msg.textContent = "Withdrawal rejected. No points deducted.";
 await window.loadZynoWithdrawRequests();
 
 } catch (error) {
-console.error(“ZYNO reject withdrawal error:”, error);
-if (msg) msg.textContent = error.message || “Rejection failed.”;
-else alert(error.message || “Rejection failed.”);
+console.error("ZYNO reject withdrawal error:", error);
+if (msg) msg.textContent = error.message || "Rejection failed.";
+else alert(error.message || "Rejection failed.");
 }
 };
 
