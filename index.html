@@ -1428,23 +1428,22 @@ function openDeposit(){
 }
 
 function openWithdraw(){
-document.querySelectorAll(’.view’).forEach(v=>{
-v.classList.remove(‘active’);
-});
+  document.querySelectorAll('.view').forEach(v=>{
+    v.classList.remove('active');
+  });
 
-const withdrawPage = document.getElementById(‘withdraw’);
+  const withdrawPage = document.getElementById('withdraw');
 
-if(withdrawPage){
-withdrawPage.classList.add(‘active’);
-localStorage.setItem(‘zynoActiveView’,‘withdraw’);
+  if(withdrawPage){
+    withdrawPage.classList.add('active');
+    localStorage.setItem('zynoActiveView','withdraw');
 
-if(typeof window.loadZynoWithdrawBalance === 'function'){
-  window.loadZynoWithdrawBalance();
-}
-
-} else {
-alert(‘Withdraw screen nahi mili’);
-}
+    if(typeof window.loadZynoWithdrawBalance === 'function'){
+      window.loadZynoWithdrawBalance();
+    }
+  } else {
+    alert('Withdraw screen nahi mili');
+  }
 }
 
 function goHome(){
