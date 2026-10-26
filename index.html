@@ -1276,32 +1276,30 @@ function syncBalance(){
 }
 
 async function loadMyReferralCode(){
-  const box =
-    document.getElementById('myReferCode');
-  if(box){
-    box.textContent = '—';
-  }
-  const user =
-    window.zynoAuth.currentUser;
+  const box = document.getElementById('myReferCode');
+  if(box) box.textContent = '—';
+  const user = window.zynoAuth.currentUser;
   if(!user) return;
+  let step = 'START';
   try{
+    step = 'READ_USER';
     const userRef = window.zynoDoc(
       window.zynoDb,
       'users',
       user.uid
     );
-    const userSnap =
-      await window.zynoGetDoc(userRef);
-    if(!userSnap.exists()) return;
+    const userSnap = await window.zynoGetDoc(userRef);
+    if(!userSnap.exists()){
+      throw new Error('User document does not exist.');
+    }
     const userData = userSnap.data();
     if(userData.role !== 'user') return;
     let code = String(
       userData.myReferralCode || ''
     ).trim().toUpperCase();
     if(!code){
-      code =
-        'ZYNO-' +
-        user.uid.slice(0,6).toUpperCase();
+      code = 'ZYNO-' + user.uid.slice(0,6).toUpperCase();
+      step = 'UPDATE_USER_REFERRAL_CODE';
       await window.zynoUpdateDoc(
         userRef,
         { myReferralCode: code }
@@ -1312,17 +1310,17 @@ async function loadMyReferralCode(){
       'referralCodes',
       code
     );
-    const referralSnap =
-      await window.zynoGetDoc(referralRef);
+    step = 'READ_REFERRAL_CODE';
+    const referralSnap = await window.zynoGetDoc(referralRef);
     if(referralSnap.exists()){
-      const referralData =
-        referralSnap.data();
+      const referralData = referralSnap.data();
       if(referralData.uid !== user.uid){
         throw new Error(
           'Referral code already belongs to another user: ' + code
         );
       }
     }else{
+      step = 'CREATE_REFERRAL_CODE';
       await window.zynoSetDoc(
         referralRef,
         {
@@ -1331,22 +1329,14 @@ async function loadMyReferralCode(){
         }
       );
     }
-    if(box){
-      box.textContent = code;
-    }
+    if(box) box.textContent = code;
   }catch(error){
-    console.error(
-      'Referral code registration error:',
-      error
-    );
-    if(box){
-      box.textContent = '—';
-    }
+    console.error('Referral failure step:', step, error);
+    if(box) box.textContent = '—';
     alert(
-      'REFERRAL ERROR: ' +
-      (error.code || 'NO CODE') +
-      '\n' +
-      (error.message || 'NO MESSAGE')
+      'REFERRAL ERROR at ' + step +
+      '\nCode: ' + (error.code || 'NO CODE') +
+      '\nMessage: ' + (error.message || 'NO MESSAGE')
     );
   }
 }
