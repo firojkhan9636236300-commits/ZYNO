@@ -5272,17 +5272,17 @@ window.approveZynoDeposit = async function(requestId) {
       throw new Error("Admin access required");
     }
 
-    if (!confirm("PhonePe payment verify kar liya hai? Approve karne par points credit honge.")) {
+    if (!confirm("Payment verify kar liya hai? Approve karne par points credit honge.")) {
       return;
     }
 
-    const requestRef = window.zynoDoc(
-      window.zynoDb, "depositRequests", requestId
-    );
+    const db = window.zynoDb;
+    const requestRef = window.zynoDoc(db, "depositRequests", requestId);
+    const accountingRef = window.zynoDoc(db, "accounting", "deposit_" + requestId);
 
     let creditedPoints = 0;
 
-    await window.zynoRunTransaction(window.zynoDb, async function(tx) {
+    await window.zynoRunTransaction(db, async function(tx) {
       const requestSnap = await tx.get(requestRef);
 
       if (!requestSnap.exists()) {
@@ -5296,6 +5296,7 @@ window.approveZynoDeposit = async function(requestId) {
       }
 
       const amount = Number(d.amount);
+
       if (!Number.isFinite(amount) || amount <= 0) {
         throw new Error("Invalid deposit amount.");
       }
@@ -5303,30 +5304,82 @@ window.approveZynoDeposit = async function(requestId) {
       const type = d.depositType === "normal" ? "normal" : "fast";
       creditedPoints = Math.round(amount * (type === "fast" ? 1.1 : 1));
 
-      const userRef = window.zynoDoc(
-        window.zynoDb, "users", d.uid
-      );
-
+      const userRef = window.zynoDoc(db, "users", d.uid);
       const userSnap = await tx.get(userRef);
 
       if (!userSnap.exists()) {
         throw new Error("User account not found.");
       }
 
-      const oldPoints = Number(userSnap.data().points || 0);
+      const userData = userSnap.data();
+      const oldPoints = Number(userData.points || 0);
 
       if (!Number.isFinite(oldPoints) || oldPoints < 0) {
         throw new Error("Invalid user balance.");
+      }
+
+      const commission = Math.round(amount * 0.02 * 100) / 100;
+
+      const uplineUid =
+        typeof userData.uplineUid === "string" &&
+        userData.uplineUid !== d.uid
+          ? userData.uplineUid
+          : null;
+
+      let referrerRef = null;
+      let referrerPoints = 0;
+
+      if (uplineUid) {
+        const candidateRef = window.zynoDoc(db, "users", uplineUid);
+        const candidateSnap = await tx.get(candidateRef);
+
+        if (
+          candidateSnap.exists() &&
+          candidateSnap.data().role === "user"
+        ) {
+          referrerRef = candidateRef;
+          referrerPoints = Number(candidateSnap.data().points || 0);
+
+          if (!Number.isFinite(referrerPoints) || referrerPoints < 0) {
+            throw new Error("Invalid referrer balance.");
+          }
+        }
       }
 
       tx.update(userRef, {
         points: oldPoints + creditedPoints
       });
 
+      if (referrerRef && commission > 0) {
+        tx.update(referrerRef, {
+          points: referrerPoints + commission
+        });
+      }
+
       tx.update(requestRef, {
         status: "approved",
         creditedPoints: creditedPoints,
-        reviewedAt: Date.now()
+        reviewedAt: Date.now(),
+        referralCommission: commission,
+        referralUid: referrerRef ? uplineUid : null
+      });
+
+      const accounting = getZynoAccounting(amount);
+
+      tx.set(accountingRef, {
+        type: "deposit_approval",
+        userUid: d.uid,
+        total: amount,
+        creditedPoints: creditedPoints,
+        adminSystem: accounting.adminSystem,
+        directReferral: commission,
+        winLoss: accounting.winLoss,
+        uplineUid: referrerRef ? uplineUid : null,
+        directReferralUid: referrerRef ? uplineUid : null,
+        referralRecipientType: referrerRef ? "user" : "system",
+        referralCreditedPoints: referrerRef ? commission : 0,
+        systemReferralPoints: referrerRef ? 0 : commission,
+        createdAt: new Date()
       });
     });
 
