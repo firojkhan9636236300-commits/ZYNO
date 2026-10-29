@@ -5655,102 +5655,133 @@ window.loadZynoWithdrawRequests = async function() {
 
 // ZYNO ADMIN: APPROVE WITHDRAW REQUEST
 window.approveZynoWithdraw = async function(requestId) {
-const msg = document.getElementById("adminWithdrawMessage");
-
-try {
-if (
-!window.zynoAuth ||
-!window.zynoAuth.currentUser ||
-window.zynoAuth.currentUser.uid !== "nPAn3k3fFmZWAqskELhEtW8sk332"
-) {
-throw new Error("Admin access required.");
-}
-
-if (!confirm("Approve this withdrawal and deduct points?")) return;
-if (msg) msg.textContent = "Processing withdrawal approval...";
-const db = window.zynoDb;
-const requestRef = window.zynoDoc(db, "withdrawRequests", requestId);
-const accountingRef = window.zynoDoc(db, "accounting", "withdraw_" + requestId);
-const result = await window.zynoRunTransaction(db, async function(transaction) {
-  const requestSnap = await transaction.get(requestRef);
-  if (!requestSnap.exists()) throw new Error("Request not found.");
-  const request = requestSnap.data();
-  if (request.status !== "pending") {
-    throw new Error("This request has already been processed.");
-  }
-  const amount = Number(request.amount);
-  if (!Number.isSafeInteger(amount) || amount <= 0) {
-    throw new Error("Invalid withdrawal amount.");
-  }
-  const userRef = window.zynoDoc(db, "users", request.uid);
-  const userSnap = await transaction.get(userRef);
-  if (!userSnap.exists()) throw new Error("User account not found.");
-  const userData = userSnap.data();
-  const oldPoints = Number(userData.points || 0);
-  if (!Number.isFinite(oldPoints) || oldPoints < amount) {
-    throw new Error("User has insufficient points now.");
-  }
-  const uplineUid =
-    typeof userData.uplineUid === "string" &&
-    userData.uplineUid !== request.uid
-      ? userData.uplineUid
-      : null;
-  let referrerRef = null;
-  let referrerPoints = 0;
-  let commission = 0;
-  if (uplineUid) {
-    const candidateRef = window.zynoDoc(db, "users", uplineUid);
-    const candidateSnap = await transaction.get(candidateRef);
-    if (
-      candidateSnap.exists() &&
-      candidateSnap.data().role === "user"
-    ) {
-      referrerRef = candidateRef;
-      referrerPoints = Number(candidateSnap.data().points || 0);
-      if (!Number.isFinite(referrerPoints) || referrerPoints < 0) {
-        throw new Error("Invalid referrer balance.");
-      }
-      commission = Math.round(amount * 0.01 * 100) / 100;
+  try {
+    if (!window.zynoIsAdmin) {
+      throw new Error("Admin access required.");
     }
-  }
-  transaction.update(userRef, {
-    points: oldPoints - amount
-  });
-  if (referrerRef && commission > 0) {
-    transaction.update(referrerRef, {
-      points: referrerPoints + commission
-    });
-  }
-  transaction.update(requestRef, {
-    status: "approved",
-    reviewedAt: Date.now(),
-    referralCommission: commission,
-    referralUid: referrerRef ? uplineUid : null
-  });
-  transaction.set(accountingRef, {
-    type: "withdraw_referral_commission",
-    userUid: request.uid,
-    total: amount,
-    directReferral: commission,
-    uplineUid: referrerRef ? uplineUid : null,
-    referralCreditedPoints: referrerRef ? commission : 0,
-    createdAt: new Date()
-  });
-  return { amount: amount, commission: commission };
-});
-if (msg) {
-  msg.textContent =
-    "Withdrawal approved: " + result.amount +
-    " points deducted. Referral commission: " +
-    result.commission + " points.";
-}
-await window.loadZynoWithdrawRequests();
 
-} catch (error) {
-console.error("ZYNO approve withdrawal error:", error);
-if (msg) msg.textContent = error.message || "Approval failed.";
-else alert(error.message || "Approval failed.");
-}
+    if (!confirm("Kya aap is withdrawal ko approve karna chahte hain?")) {
+      return;
+    }
+
+    const db = window.zynoDb;
+    const requestRef = window.zynoDoc(db, "withdrawRequests", requestId);
+    const accountingRef = window.zynoDoc(
+      db, "accounting", "withdraw_" + requestId
+    );
+
+    const result = await window.zynoRunTransaction(db, async function(tx) {
+      const requestSnap = await tx.get(requestRef);
+
+      if (!requestSnap.exists()) {
+        throw new Error("Request not found.");
+      }
+
+      const request = requestSnap.data();
+
+      if (request.status !== "pending") {
+        throw new Error("This request has already been processed.");
+      }
+
+      const amount = Number(request.amount);
+
+      if (!Number.isSafeInteger(amount) || amount <= 0) {
+        throw new Error("Invalid withdrawal amount.");
+      }
+
+      const userRef = window.zynoDoc(db, "users", request.uid);
+      const userSnap = await tx.get(userRef);
+
+      if (!userSnap.exists()) {
+        throw new Error("User account not found.");
+      }
+
+      const userData = userSnap.data();
+      const oldPoints = Number(userData.points || 0);
+
+      if (!Number.isFinite(oldPoints) || oldPoints < amount) {
+        throw new Error("User has insufficient points now.");
+      }
+
+      const commission = Math.round(amount * 0.01 * 100) / 100;
+
+      const uplineUid =
+        typeof userData.uplineUid === "string" &&
+        userData.uplineUid !== request.uid
+          ? userData.uplineUid
+          : null;
+
+      let referrerRef = null;
+      let referrerPoints = 0;
+
+      if (uplineUid) {
+        const candidateRef = window.zynoDoc(db, "users", uplineUid);
+        const candidateSnap = await tx.get(candidateRef);
+
+        if (
+          candidateSnap.exists() &&
+          candidateSnap.data().role === "user"
+        ) {
+          referrerRef = candidateRef;
+          referrerPoints = Number(candidateSnap.data().points || 0);
+
+          if (!Number.isFinite(referrerPoints) || referrerPoints < 0) {
+            throw new Error("Invalid referrer balance.");
+          }
+        }
+      }
+
+      tx.update(userRef, {
+        points: oldPoints - amount
+      });
+
+      if (referrerRef && commission > 0) {
+        tx.update(referrerRef, {
+          points: referrerPoints + commission
+        });
+      }
+
+      tx.update(requestRef, {
+        status: "approved",
+        reviewedAt: Date.now(),
+        referralCommission: commission,
+        referralUid: referrerRef ? uplineUid : null
+      });
+
+      tx.set(accountingRef, {
+        type: "withdraw_referral_commission",
+        userUid: request.uid,
+        total: amount,
+        directReferral: commission,
+        uplineUid: referrerRef ? uplineUid : null,
+        directReferralUid: referrerRef ? uplineUid : null,
+        referralRecipientType: referrerRef ? "user" : "system",
+        referralCreditedPoints: referrerRef ? commission : 0,
+        systemReferralPoints: referrerRef ? 0 : commission,
+        createdAt: new Date()
+      });
+
+      return {
+        amount: amount,
+        commission: commission,
+        systemReferral: !referrerRef
+      };
+    });
+
+    alert(
+      "Withdrawal approved. " + result.amount +
+      " points deducted. 1% commission: " +
+      result.commission + " points. " +
+      (result.systemReferral
+        ? "Recorded under SYSTEM REFERRAL accounting."
+        : "Credited to direct referrer.")
+    );
+
+    await window.loadZynoWithdrawRequests();
+
+  } catch (error) {
+    alert(error.message || "Withdrawal approval failed.");
+  }
 };
 
 // ZYNO ADMIN: REJECT WITHDRAW REQUEST
