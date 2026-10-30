@@ -5735,67 +5735,98 @@ window.approveZynoWithdraw = async function(requestId) {
 
       const commission = Math.round(amount * 0.01 * 100) / 100;
 
-      const uplineUid =
-        typeof userData.uplineUid === "string" &&
-        userData.uplineUid !== request.uid
-          ? userData.uplineUid
-          : null;
+const uplineUid =
+  typeof userData.uplineUid === "string" &&
+  userData.uplineUid !== request.uid
+    ? userData.uplineUid
+    : null;
 
-      let referrerRef = null;
-      let referrerPoints = 0;
+let referrerRef = null;
+let referrerPoints = 0;
 
-      if (uplineUid) {
-        const candidateRef = window.zynoDoc(db, "users", uplineUid);
-        const candidateSnap = await tx.get(candidateRef);
+if (uplineUid) {
+  const candidateRef = window.zynoDoc(db, "users", uplineUid);
+  const candidateSnap = await tx.get(candidateRef);
 
-        if (
-          candidateSnap.exists() &&
-          candidateSnap.data().role === "user"
-        ) {
-          referrerRef = candidateRef;
-          referrerPoints = Number(candidateSnap.data().points || 0);
+  if (
+    candidateSnap.exists() &&
+    candidateSnap.data().role === "user"
+  ) {
+    referrerRef = candidateRef;
+    referrerPoints = Number(candidateSnap.data().points || 0);
 
-          if (!Number.isFinite(referrerPoints) || referrerPoints < 0) {
-            throw new Error("Invalid referrer balance.");
-          }
-        }
-      }
+    if (!Number.isFinite(referrerPoints) || referrerPoints < 0) {
+      throw new Error("Invalid referrer balance.");
+    }
+  }
+}
 
-      tx.update(userRef, {
-        points: oldPoints - amount
-      });
+// SYSTEM REFERRAL: Admin balance read
+let adminRef = null;
+let adminPoints = 0;
 
-      if (referrerRef && commission > 0) {
-        tx.update(referrerRef, {
-          points: referrerPoints + commission
-        });
-      }
+if (!referrerRef && commission > 0) {
+  adminRef = window.zynoDoc(
+    db,
+    "users",
+    "nPAn3k3fFmZWAqskELhEtW8sk332"
+  );
 
-      tx.update(requestRef, {
-        status: "approved",
-        reviewedAt: Date.now(),
-        referralCommission: commission,
-        referralUid: referrerRef ? uplineUid : null
-      });
+  const adminSnap = await tx.get(adminRef);
 
-      tx.set(accountingRef, {
-        type: "withdraw_referral_commission",
-        userUid: request.uid,
-        total: amount,
-        directReferral: commission,
-        uplineUid: referrerRef ? uplineUid : null,
-        directReferralUid: referrerRef ? uplineUid : null,
-        referralRecipientType: referrerRef ? "user" : "system",
-        referralCreditedPoints: referrerRef ? commission : 0,
-        systemReferralPoints: referrerRef ? 0 : commission,
-        createdAt: new Date()
-      });
+  if (!adminSnap.exists() || adminSnap.data().role !== "admin") {
+    throw new Error("Admin account not found.");
+  }
 
-      return {
-        amount: amount,
-        commission: commission,
-        systemReferral: !referrerRef
-      };
+  adminPoints = Number(adminSnap.data().points || 0);
+
+  if (!Number.isFinite(adminPoints) || adminPoints < 0) {
+    throw new Error("Invalid admin balance.");
+  }
+}
+
+tx.update(userRef, {
+  points: oldPoints - amount
+});
+
+if (referrerRef && commission > 0) {
+  tx.update(referrerRef, {
+    points: referrerPoints + commission
+  });
+}
+
+// SYSTEM REFERRAL commission goes to Admin
+if (adminRef && commission > 0) {
+  tx.update(adminRef, {
+    points: adminPoints + commission
+  });
+}
+
+tx.update(requestRef, {
+  status: "approved",
+  reviewedAt: Date.now(),
+  referralCommission: commission,
+  referralUid: referrerRef ? uplineUid : null
+});
+
+tx.set(accountingRef, {
+  type: "withdraw_referral_commission",
+  userUid: request.uid,
+  total: amount,
+  directReferral: commission,
+  uplineUid: referrerRef ? uplineUid : null,
+  directReferralUid: referrerRef ? uplineUid : null,
+  referralRecipientType: referrerRef ? "user" : "system",
+  referralCreditedPoints: referrerRef ? commission : 0,
+  systemReferralPoints: referrerRef ? 0 : commission,
+  createdAt: new Date()
+});
+
+return {
+  amount: amount,
+  commission: commission,
+  systemReferral: !referrerRef
+};
     });
 
     alert(
