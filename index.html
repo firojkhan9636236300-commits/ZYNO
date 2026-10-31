@@ -4886,23 +4886,6 @@ localStorage.removeItem('zynoActiveView');
 }catch(e){}
 
 </script>
-
-<script>
-window.addEventListener("error", function(e) {
-  alert("ZYNO JS ERROR: " + e.message + " | LINE: " + e.lineno);
-});
-
-window.addEventListener("unhandledrejection", function(e) {
-  alert("ZYNO PROMISE ERROR: " + e.reason);
-});
-
-alert("ZYNO TEST: NORMAL SCRIPT WORKING");
-</script>
-
-<script type="module">
-alert("ZYNO TEST: MODULE WORKING");
-</script>
-
 <script type="module">
 Promise.all([
   import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
@@ -4937,8 +4920,6 @@ runTransaction,
 onSnapshot
   } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
   
-  alert("ZYNO TEST: MODULE PART 5 REACHED");
-
   const firebaseConfig = {
     apiKey: "AIzaSyDpQHse79QRukas1LD_GTLf-CmDWtArA_c",
     authDomain: "zyno-dc777.firebaseapp.com",
