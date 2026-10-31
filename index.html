@@ -4896,6 +4896,18 @@ alert("ZYNO TEST: MODULE WORKING");
 </script>
 
 <script type="module">
+Promise.all([
+  import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
+  import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"),
+  import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
+]).then(() => {
+  alert("ZYNO TEST: FIREBASE IMPORTS OK");
+}).catch((e) => {
+  alert("ZYNO FIREBASE ERROR: " + e.message);
+});
+</script>
+
+<script type="module">
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import {
