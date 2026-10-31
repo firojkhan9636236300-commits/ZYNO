@@ -4888,6 +4888,14 @@ localStorage.removeItem('zynoActiveView');
 </script>
 
 <script>
+window.addEventListener("error", function(e) {
+  alert("ZYNO JS ERROR: " + e.message + " | LINE: " + e.lineno);
+});
+
+window.addEventListener("unhandledrejection", function(e) {
+  alert("ZYNO PROMISE ERROR: " + e.reason);
+});
+
 alert("ZYNO TEST: NORMAL SCRIPT WORKING");
 </script>
 
