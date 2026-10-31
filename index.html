@@ -5441,11 +5441,13 @@ tx.set(accountingRef, {
   directReferralUid: referrerRef ? uplineUid : null,
   referralRecipientType: referrerRef ? "user" : "system",
   referralCreditedPoints: referrerRef ? commission : 0,
-  systemReferralPoints: referrerRef ? 0 : commission,
+    systemReferralPoints: referrerRef ? 0 : commission,
   createdAt: new Date()
 });
 
-    alert("Approved. " + creditedPoints + " points credited.");
+});
+
+alert("Approved. " + creditedPoints + " points credited.");
     await window.loadZynoDepositRequests();
 
   } catch (error) {
