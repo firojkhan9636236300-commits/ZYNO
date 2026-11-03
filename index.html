@@ -5937,8 +5937,20 @@ if(window.r11ApplyFirestore){
   }
 
   if(Array.isArray(data.lastWins36)){
-    window.globalLastWins36 = data.lastWins36;
+
+  window.globalLastWins36 =
+    data.lastWins36.slice(0,4);
+
+  if(typeof window.renderLast === 'function'){
+
+    window.renderLast(
+      'r36last',
+      window.globalLastWins36
+    );
+
   }
+
+}
 
   if(Array.isArray(data.lastWins11)){
     window.globalLastWins11 = data.lastWins11.slice(0,4);
