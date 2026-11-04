@@ -1709,7 +1709,13 @@ function tickR36(){
   const start = Number(globalRoundStart36 || 0);
 
   if(start <= 0){
-    r36Open = false;
+
+  r36Open = false;
+
+  if(!window.r36ClaimingSpin){
+    claimR36Spin();
+  }
+
     return;
   }
 
