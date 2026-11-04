@@ -1882,20 +1882,21 @@ if(win36 > 0){
 
 }
     
- // GLOBAL LAST 4 WIN UPDATE
- await finalizeR36Round(globalRound36);
-    r36Spin = false;
-    // Next round
-    setTimeout(()=>{
-  document.getElementById('wheel36Winner').textContent =
-    'ZYNO';
-    
-  document.querySelector('.r36-brand-center').style.display = '';
-  
-  resetR36Round();
+ // CLEAR OLD BETS, THEN START NEXT GLOBAL ROUND
+setTimeout(async()=>{
   clearBets36();
+
+  await finalizeR36Round(globalRound36);
+
+  r36Spin = false;
+
+  document.getElementById('wheel36Winner').textContent = 'ZYNO';
+
+  document.querySelector('.r36-brand-center').style.display = '';
+
   document.getElementById('r36msg').textContent =
     'Press and hold a number to bet';
+
 },4000);
   },5900);
 }
