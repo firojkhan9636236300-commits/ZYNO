@@ -2390,6 +2390,76 @@ async function claimR36Spin(){
 
 }
 
+/* ---------- FINALIZE R36 ROUND ---------- */
+
+async function finalizeR36Round(spinRoundId){
+
+  if(window.r36FinalizingRound) return;
+
+  window.r36FinalizingRound = true;
+
+  try{
+
+    const ref = getR36Ref();
+
+    await window.zynoRunTransaction(
+      window.zynoDb,
+      async(transaction)=>{
+
+        const snap = await transaction.get(ref);
+
+        if(!snap.exists()) return;
+
+        const data = snap.data();
+
+        if(String(data.roundId36) !== String(spinRoundId)){
+          return;
+        }
+
+        if(data.phase36 !== 'spinning'){
+          return;
+        }
+
+        const winner = Number(data.result36);
+
+        if(!Number.isInteger(winner) || winner < 0 || winner > 36){
+          return;
+        }
+
+        const oldLast = Array.isArray(data.lastWins36)
+          ? data.lastWins36
+          : [];
+
+        const newLast = [winner, ...oldLast].slice(0,4);
+
+        const nextStart = Date.now();
+
+        transaction.set(ref,{
+
+          lastWins36: newLast,
+          roundId36: nextStart,
+          roundStart36: nextStart,
+          result36: Math.floor(Math.random() * 37),
+          phase36: 'betting',
+          spinStart36: null
+
+        },{merge:true});
+
+      }
+    );
+
+  }catch(error){
+
+    console.error('R36 finalize error:',error);
+
+  }finally{
+
+    window.r36FinalizingRound = false;
+
+  }
+
+}
+
 /* ---------- APPLY GLOBAL R36 DATA ---------- */
 
 window.r36ApplyFirestore = function(data){
