@@ -2263,6 +2263,37 @@ function getR11TimerValue(start){
 
 }
 
+/* ---------- R36 FIRESTORE ---------- */
+
+function getR36Ref(){
+
+  return window.zynoDoc(
+    window.zynoDb,
+    'gameResults',
+    'roulette'
+  );
+
+}
+
+function getR36TimerValue(start){
+
+  const s = Number(start || 0);
+
+  if(s <= 0){
+    return 30;
+  }
+
+  const end = s + R36_ROUND_MS;
+
+  return Math.max(
+    0,
+    Math.ceil(
+      (end - Date.now()) / 1000
+    )
+  );
+
+}
+
 /* ---------- APPLY GLOBAL R11 DATA ---------- */
 
 window.r11ApplyFirestore =
