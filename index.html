@@ -1692,142 +1692,78 @@ document.getElementById('removeBet36').addEventListener('click',()=>{
 });
 
 function clearBets36(){bets36={};grid36.querySelectorAll('.bet-number').forEach(b=>{b.querySelector('.bet-count').textContent='';b.classList.remove('winner')})}
+
+/* ---------- R36 GLOBAL TIMER ---------- */
+
 function tickR36(){
 
-  const v =
-    document.getElementById('r36timer');
+  const timer = document.getElementById('r36timer');
 
-  if(r36Spin) return;
+  if(!timer) return;
 
-  /*
-    FIREBASE GLOBAL TIMER
-    Agar Firestore me valid roundStart36
-    aur betClose36 milega to wahi timer use hoga.
-  */
-  const now = Date.now();
+  if(r36Spin){
+    timer.textContent = 0;
+    return;
+  }
 
-  if(
-    typeof globalRoundStart36 === 'number' &&
-    typeof globalBetClose36 === 'number' &&
-    globalRoundStart36 > 0 &&
-    globalBetClose36 > globalRoundStart36
-  ){
+  const start = Number(globalRoundStart36 || 0);
 
-    const remaining =
-      Math.max(
-        0,
-        Math.ceil(
-          (globalBetClose36 - now) / 1000
-        )
-      );
+  if(start <= 0){
+    r36Open = false;
+    return;
+  }
 
-    r36Time = remaining;
+  const phase = window.r36GlobalPhase36 || 'betting';
 
-    if(
-      document
-        .getElementById('r36')
-        .classList
-        .contains('active')
-    ){
-      v.textContent = remaining;
-    }
+  if(phase === 'spinning'){
 
-    if(
-      remaining <= 4 &&
-      remaining > 0
-    ){
-      r36Open = false;
-
-      if(
-        document
-          .getElementById('r36')
-          .classList
-          .contains('active')
-      ){
-        v.classList.add('closed');
-
-        document.getElementById('r36msg').textContent =
-          'BETTING CLOSED — spinning...';
-      }
-    }
-
-    if(
-      remaining === 0 &&
-      r36Spin === false
-    ){
-      r36Time = -1;
-      r36Open = false;
-      claimR36Spin();
-    }
+    r36Open = false;
+    r36Time = 0;
+    timer.textContent = 0;
+    timer.classList.add('closed');
 
     return;
   }
 
-  /*
-    FIRESTORE TIMER ABHI SET NAHI HAI.
-    Isliye current working 30-second
-    fallback behavior rahega.
-  */
-  if(r36Time > 0){
+  if(phase !== 'betting') return;
 
-  const savedEnd = Number(
-    localStorage.getItem(R36_ROUND_KEY) || 0
-  );
+  const remaining = getR36TimerValue(start);
 
-  if(savedEnd > Date.now()){
+  r36Time = remaining;
 
-    r36Time = Math.ceil(
-      (savedEnd - Date.now()) / 1000
-    );
-
-  }else{
-
-    r36Time = 0;
-
+  if(document.getElementById('r36').classList.contains('active')){
+    timer.textContent = remaining;
   }
 
-  if(
-    document
-      .getElementById('r36')
-      .classList
-      .contains('active')
-  ){
-    v.textContent = r36Time;
-  }
-}
+  if(remaining > 4){
 
-  if(
-    r36Time <= 4 &&
-    r36Time > 0
-  ){
+    r36Open = true;
+    timer.classList.remove('closed');
+
+    document.getElementById('r36msg').textContent =
+      'Press and hold a number to bet';
+
+  }else if(remaining > 0){
 
     r36Open = false;
+    timer.classList.add('closed');
 
-    if(
-      document
-        .getElementById('r36')
-        .classList
-        .contains('active')
-    ){
+    document.getElementById('r36msg').textContent =
+      'BETTING CLOSED — spinning...';
 
-      v.classList.add('closed');
-
-      document.getElementById('r36msg').textContent =
-        'BETTING CLOSED — spinning...';
-    }
   }
 
-  if(
-    r36Time === 0 &&
-    r36Spin === false
-  ){
+  if(remaining === 0 && !window.r36ClaimingSpin){
 
-    r36Time = -1;
     r36Open = false;
+    timer.textContent = 0;
 
     claimR36Spin();
+
   }
+
 }
+
 async function spin36(){
   if(r36Spin) return;
   r36Spin = true;
