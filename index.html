@@ -1788,12 +1788,19 @@ async function spin36(){
   }
 
 }, 50);
-  // Firebase global result mile to wahi use hoga.
-  // Agar result available nahi hai to 0-36 ke beech result generate hoga.
-  const winner =
-    Number.isInteger(globalResult36)
-      ? globalResult36
-      : Math.floor(Math.random() * 37);
+  
+  if(
+  !Number.isInteger(globalResult36) ||
+  globalResult36 < 0 ||
+  globalResult36 > 36
+){
+  r36Spin = false;
+  console.error('R36: Global result not available');
+  return;
+}
+
+const winner = globalResult36;
+
   const index =
     wheelNums.indexOf(winner);
   const slice =
