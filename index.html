@@ -2294,6 +2294,73 @@ function getR36TimerValue(start){
 
 }
 
+/* ---------- APPLY GLOBAL R36 DATA ---------- */
+
+window.r36ApplyFirestore = function(data){
+
+  if(!data) return;
+
+  if(data.roundId36 !== undefined){
+    globalRound36 = data.roundId36;
+  }
+
+  if(data.roundStart36 !== undefined){
+    globalRoundStart36 = Number(data.roundStart36);
+  }
+
+  if(data.result36 !== undefined){
+    globalResult36 = Number(data.result36);
+  }
+
+  if(Array.isArray(data.lastWins36)){
+
+    globalLastWins36 = data.lastWins36.slice(0,4);
+
+    r36Last = globalLastWins36.slice(0,4);
+
+    renderLast('r36last', r36Last);
+  }
+
+  window.r36GlobalPhase36 = data.phase36 || 'betting';
+
+  if(data.phase36 === 'spinning'){
+
+    r36Open = false;
+    r36Time = 0;
+
+    const timer = document.getElementById('r36timer');
+
+    if(timer){
+      timer.textContent = 0;
+      timer.classList.add('closed');
+    }
+
+    if(!r36Spin && Number.isInteger(globalResult36) &&
+       globalResult36 >= 0 && globalResult36 <= 36){
+
+      spin36();
+    }
+
+    return;
+  }
+
+  if(data.phase36 === 'betting' && !r36Spin){
+
+    const remaining = getR36TimerValue(globalRoundStart36);
+
+    r36Time = remaining;
+    r36Open = remaining > 4;
+
+    const timer = document.getElementById('r36timer');
+
+    if(timer){
+      timer.textContent = remaining;
+      timer.classList.toggle('closed', !r36Open);
+    }
+  }
+
+};
+
 /* ---------- APPLY GLOBAL R11 DATA ---------- */
 
 window.r11ApplyFirestore =
