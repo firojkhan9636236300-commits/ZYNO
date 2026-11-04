@@ -2294,6 +2294,102 @@ function getR36TimerValue(start){
 
 }
 
+/* ---------- CLAIM GLOBAL R36 SPIN ---------- */
+
+async function claimR36Spin(){
+
+  if(window.r36ClaimingSpin || r36Spin){
+    return;
+  }
+
+  window.r36ClaimingSpin = true;
+
+  try{
+
+    const ref = getR36Ref();
+
+    let spinNow = false;
+    let spinResult = null;
+
+    await window.zynoRunTransaction(
+      window.zynoDb,
+      async(transaction)=>{
+
+        const snap = await transaction.get(ref);
+
+        if(!snap.exists()) return;
+
+        const data = snap.data();
+
+        const phase = data.phase36 || 'betting';
+        const now = Date.now();
+
+        if(phase === 'spinning'){
+
+          spinResult = Number(data.result36);
+          spinNow = true;
+          return;
+
+        }
+
+        const start = Number(data.roundStart36 || 0);
+
+        if(start <= 0){
+
+          transaction.set(ref,{
+            roundId36: now,
+            roundStart36: now,
+            phase36: 'betting',
+            spinStart36: null
+          },{merge:true});
+
+          return;
+        }
+
+        if(now < start + R36_ROUND_MS){
+          return;
+        }
+
+        spinResult = Math.floor(Math.random() * 37);
+
+        transaction.set(ref,{
+          phase36: 'spinning',
+          spinStart36: now,
+          result36: spinResult
+        },{merge:true});
+
+        spinNow = true;
+
+      }
+    );
+
+    if(
+      spinNow &&
+      Number.isInteger(spinResult) &&
+      spinResult >= 0 &&
+      spinResult <= 36
+    ){
+
+      globalResult36 = spinResult;
+
+      if(!r36Spin){
+        spin36();
+      }
+
+    }
+
+  }catch(error){
+
+    console.error('R36 claim error:',error);
+
+  }finally{
+
+    window.r36ClaimingSpin = false;
+
+  }
+
+}
+
 /* ---------- APPLY GLOBAL R36 DATA ---------- */
 
 window.r36ApplyFirestore = function(data){
